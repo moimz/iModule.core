@@ -1,0 +1,18 @@
+.WidgetBoardRecentlySidelist {font-size:12px;}
+.WidgetBoardRecentlySidelist .listTitle {display:table; overflow:hidden; margin-bottom:10px;}
+.WidgetBoardRecentlySidelist .listTitle i {display:table-cell; white-space:nowrap; overflow:hidden; color:#bbb; padding-right:5px;}
+.WidgetBoardRecentlySidelist .listTitle b {display:table-cell; white-space:nowrap; overflow:hidden;}
+.WidgetBoardRecentlySidelist .listTitle b a {color:#333; text-decoration:none;}
+.WidgetBoardRecentlySidelist .listTitle .bar {display:table-cell; width:100%; overflow:hidden; font-size:0px;}
+.WidgetBoardRecentlySidelist .listTitle .bar span {display:block; height:2px; margin:0px 0px 3px 5px; padding:0px; background:#eee;}
+
+.WidgetBoardRecentlySidelist ul {list-style:none;}
+.WidgetBoardRecentlySidelist ul li {padding-left:10px;}
+.WidgetBoardRecentlySidelist ul li a {height:24px; line-height:24px; display:block; text-decoration:none; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#222;}
+.WidgetBoardRecentlySidelist ul li a:hover {color:#e91b23;}
+.WidgetBoardRecentlySidelist ul li a span {height:24px; line-height:24px; float:right; display:block; white-space:nowrap; margin-left:5px;}
+.WidgetBoardRecentlySidelist ul li a span.post {font-family:OpenSans, defaultFont; font-size:11px; font-weight:bold; color:#e91b23;}
+.WidgetBoardRecentlySidelist ul li a span.ment {font-size:11px; color:#999;}
+.WidgetBoardRecentlySidelist ul li a span.ment:empty {display:none;}
+.WidgetBoardRecentlySidelist ul li a i {font-size:10px; color:#ddd; float:left; display:block; height:24px; line-height:24px; margin-right:5px;}
+.WidgetBoardRecentlySidelist ul li.new a i {color:#e91b23;}

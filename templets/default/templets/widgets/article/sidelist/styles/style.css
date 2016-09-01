@@ -1,0 +1,23 @@
+.WidgetArticleSidelist {font-size:12px;}
+.WidgetArticleSidelist .listTitle {display:table; overflow:hidden; margin-bottom:10px;}
+.WidgetArticleSidelist .listTitle i {display:table-cell; white-space:nowrap; overflow:hidden; color:#bbb; padding-right:5px;}
+.WidgetArticleSidelist .listTitle b {display:table-cell; white-space:nowrap; overflow:hidden;}
+.WidgetArticleSidelist .listTitle b a {color:#333; text-decoration:none;}
+.WidgetArticleSidelist .listTitle .bar {display:table-cell; width:100%; overflow:hidden; font-size:0px;}
+.WidgetArticleSidelist .listTitle .bar span {display:block; height:2px; margin:0px 0px 3px 5px; padding:0px; background:#eee;}
+
+.WidgetArticleSidelist ul {list-style:none;}
+.WidgetArticleSidelist ul li {padding-left:10px;}
+.WidgetArticleSidelist ul li a {height:24px; line-height:24px; display:block; text-decoration:none; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; color:#222;}
+.WidgetArticleSidelist ul li a:hover {color:#e91b23;}
+.WidgetArticleSidelist ul li a span.ment, .WidgetArticleSidelist ul li a span.name {height:24px; line-height:24px; float:right; display:block; white-space:nowrap; margin-left:5px;}
+.WidgetArticleSidelist ul li a span.ment {font-family:OpenSans, defaultFont; font-size:11px; font-weight:bold; color:#e91b23;}
+.WidgetArticleSidelist ul li a span.name {font-size:11px; color:#999;}
+.WidgetArticleSidelist ul li a span.name:empty {display:none;}
+.WidgetArticleSidelist ul li a span.type {display:inline-block; font-family:OpenSans, tahoma; font-size:10px; width:15px; height:15px; line-height:15px; border:1px solid #000; vertical-align:top; padding:0px; text-align:center; margin:3px 0px 0px 0px; border-radius:3px;}
+.WidgetArticleSidelist ul li a span.QUESTION {border-color:#e91b23; color:#e91b23;}
+.WidgetArticleSidelist ul li a span.ANSWER {border-color:#2980b9; color:#2980b9;}
+.WidgetArticleSidelist ul li a span.QUESTION.selected {background:#e91b23; color:#fff;}
+.WidgetArticleSidelist ul li a span.ANSWER.selected {background:#2980b9; color:#fff;}
+.WidgetArticleSidelist ul li a i {font-size:10px; color:#ddd; float:left; display:block; height:24px; line-height:24px; margin-right:5px;}
+.WidgetArticleSidelist ul li.new a i {color:#e91b23;}

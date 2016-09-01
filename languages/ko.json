@@ -1,0 +1,10 @@
+{
+	"error":{
+		"permissionString":{
+			"unknownCode":"정의되지 않은 치환자 {code}가 있습니다.",
+			"parse":"입력된 권한구문을 해석할 수 없습니다.",
+			"boolean":"입력된 권한구문 해석값이 true 또는 false 가 아닙니다.",
+			"doubleQuotation":"권한구문에는 쌍따옴표(\")를 입력할 수 없습니다."
+		}
+	}
+}

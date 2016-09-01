@@ -1,0 +1,40 @@
+.WidgetMemberLoginSidebar {}
+.WidgetMemberLoginSidebar .inputBlock {margin-bottom:10px;}
+.WidgetMemberLoginSidebar .buttons {display:table; width:100%; table-layout:fixed;}
+.WidgetMemberLoginSidebar .buttons .social {display:table-cell; width:32px; vertical-align:top;}
+.WidgetMemberLoginSidebar .buttons .button {display:table-cell; width:100%; vertical-align:top;}
+.WidgetMemberLoginSidebar .btn {display:block; width:100%;}
+.WidgetMemberLoginSidebar .buttons .social .btn {width:28px; padding:5px 0px;}
+
+.WidgetMemberLoginSidebar .bottom {height:30px; color:#666; font-size:11px;}
+.WidgetMemberLoginSidebar .bottom .autoLogin, .WidgetMemberLoginSidebar .bottom .mypage {display:inline-block; height:30px; line-height:30px; vertical-align:middle; cursor:pointer;}
+.WidgetMemberLoginSidebar .bottom .autoLogin input {margin-right:5px; float:left; margin-top:8px;}
+.WidgetMemberLoginSidebar .bottom .link {float:right; height:30px; line-height:30px;}
+.WidgetMemberLoginSidebar .bottom a {text-decoration:none; color:#666;}
+.WidgetMemberLoginSidebar .bottom a:hover {color:#e4232c;}
+
+.WidgetMemberLoginSidebar .info {display:table; table-layout:fixed; width:100%;}
+.WidgetMemberLoginSidebar .info > div {display:table-cell; vertical-align:middle;}
+.WidgetMemberLoginSidebar .info div.photo {width:70px;}
+.WidgetMemberLoginSidebar .info div.photo img {width:58px; height:58px; border:1px solid #ccc; border-radius:3px;}
+.WidgetMemberLoginSidebar .info div.detail {width:100%;}
+.WidgetMemberLoginSidebar .info div.detail .nickname {font-size:15px; font-weight:bold; margin-bottom:10px; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
+.WidgetMemberLoginSidebar .info div.detail .nickname .reg_date {font-size:11px; font-family:OpenSans, defaultFont; color:#666; float:right; font-weight:normal; margin-top:3px;}
+.WidgetMemberLoginSidebar .info div.detail .level {display:table; table-layout:fixed; width:100%;}
+.WidgetMemberLoginSidebar .info div.detail .level .text {display:table-cell; width:40px; font-size:12px; font-family:OpenSans, defaultFont; vertical-align:middle;}
+.WidgetMemberLoginSidebar .info div.detail .level .text b {color:#e4232c;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph {width:100%; font-size:0px; vertical-align:middle;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .bar {height:10px; border:1px solid #c7c7c7; border-radius:5px; background:#e1e1e1; position:relative; margin-top:1px;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .percentage {min-width:10px; margin:-1px; height:10px; border:1px solid #a6d592; width:50%; border-radius:5px; background:#e8f688; vertical-align:top;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail {display:none; position:absolute; z-index:150; width:100%; top:14px; text-align:center;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail .arrowBox {position:relative; background:#e4232c; border:1px solid #fa481d; height:20px; line-height:20px; padding:0 5px; color:#fff; font-size:11px; display:inline-block; vertical-align:middle;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail .arrowBox:after, .WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail .arrowBox:before {bottom:100%; left:50%; border:solid transparent; content:" "; height:0; width:0; position:absolute; pointer-events:none;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail .arrowBox:after {border-color:rgba(228, 35, 44, 0); border-bottom-color:#e4232c; border-width:4px; margin-left:-4px;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph .levelDetail .arrowBox:before {border-color:rgba(250, 72, 29, 0); border-bottom-color:#fa481d; border-width:5px; margin-left:-5px;}
+.WidgetMemberLoginSidebar .info div.detail .level .graph:hover .levelDetail {display:block;}
+.WidgetMemberLoginSidebar .blocks {display:table; width:100%; table-layout:fixed; color:#333;}
+.WidgetMemberLoginSidebar .blocks > div {display:table-cell; width:50%; height:28px; line-height:28px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; vertical-align:middle;}
+.WidgetMemberLoginSidebar .blocks > div > i {float:left; width:15px; height:28px; line-height:28px;}
+.WidgetMemberLoginSidebar .blocks > div .number {font-family:OpenSans, defaultFont; font-size:11px;}
+.WidgetMemberLoginSidebar .blocks > div b {color:#e4232c;}
+.WidgetMemberLoginSidebar .blocks > div a {color:#333; text-decoration:none;}

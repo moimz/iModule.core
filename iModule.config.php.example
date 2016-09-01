@@ -1,0 +1,11 @@
+<?php
+$_CONFIGS->key = 'kr.imodule.www'; // Secret key for AES256 encryption
+$_CONFIGS->db = new stdClass();
+$_CONFIGS->db->type = 'mysql'; // DB type
+$_CONFIGS->db->host = 'localhost'; // DB host
+$_CONFIGS->db->username = 'root'; // DB user_id
+$_CONFIGS->db->password = 'yourpassword'; // DB password
+$_CONFIGS->db->database = 'imodule'; // DB database name
+$_CONFIGS->db->port = 3306; // DB port
+$_CONFIGS->db->charset = 'utf8'; // DB charset
+?>
