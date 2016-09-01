@@ -1,0 +1,15 @@
+.DS_Store
+/iModule.config.php
+/addons/*
+!/addons/index.php
+/attachments/*
+!/attachments/index.php
+/configs/*
+!/configs/index.php
+!/configs/init.config.php
+/modules/*
+!/modules/index.php
+/templets/*
+!/templets/default
+/widgets/*
+!/widgets/index.php
