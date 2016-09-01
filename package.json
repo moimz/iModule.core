@@ -11,6 +11,7 @@
 	},
 	"requirements":{
 		"modules/admin":"3.0.0",
+		"modules/attachment":"3.0.0",
 		"modules/email":"3.0.0",
 		"modules/keyword":"3.0.0",
 		"modules/member":"3.0.0",
