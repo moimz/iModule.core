@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title><?php echo $IM->getSiteTitle(); ?></title>
-<?php echo $IM->getSiteHeader(); ?>
+<?php echo $IM->getHeadResource(); ?>
 </head>
 <body>
 	
