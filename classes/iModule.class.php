@@ -18,7 +18,7 @@ class iModule {
 	 * @private string[] $table DB 테이블 별칭 및 원 테이블명을 정의하기 위한 변수
 	 */
 	private $DB;
-	private $table; // store core database tables
+	private $table;
 	
 	/**
 	 * 사이트 주소에 의해 정의되는 사이트설정변수
@@ -67,7 +67,7 @@ class iModule {
 	public $Cache;
 	
 	private $initTime = 0;
-	public $timezone; // server timezone
+	private $timezone; // server timezone
 	
 	/**
 	 * 사이트 설정변수
@@ -80,17 +80,17 @@ class iModule {
 	 * @private string $siteImage OG META 태그를 위한 사이트 이미지 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
 	 */
 	public $site;
-	private $siteTitle = null; // use for for meta tag in html head
-	private $siteDescription = null; // use for meta tag in html head (For SEO)
-	private $siteCanonical = null; // use for meta tag in html head (For SEO)
-	private $siteImage = null; // use for meta tag in html head (For Social site preview image likes facebook or twitter and etc.)
+	private $siteTitle = null;
+	private $siteDescription = null;
+	private $siteCanonical = null;
+	private $siteImage = null;
 	
-	private $siteHeader = array(); // store all meta tag (likes script, css, meta, ... etc.)
+	private $siteHeader = array();
 	private $templetPath = null;
 	private $templetDir = null;
 	private $useTemplet = true;
 	private $javascriptLanguages = array();
-	private $webFont = array('FontAwesome');
+	private $webFont = array('FontAwesome'); // FontAwesome 은 기본적으로 포함된다.
 	private $webFontDefault = null;
 	
 	/**
@@ -147,21 +147,10 @@ class iModule {
 		$this->idx = Request('idx') == null ? null : Request('idx');
 		
 		/**
-		 * 기본 사이트 자바스크립트 호출
-		 *
-		 * moment.js : 시간포맷을 위한 자바스크립트 라이브러리
-		 * jquery.1.11.2.min.js : jQuery
-		 * default.js : 기본 iModule 자바스크립트 라이브러리
-		 */
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/moment.js');
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/jquery.1.11.2.min.js');
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/default.js');
-		
-		/**
 		 * iModule 이 설치되어 있고, 웹브라우저로 접근하였을 경우 현재 사이트 정의
 		 */
 		if ($_CONFIGS->installed === true && isset($_SERVER['HTTP_HOST']) == true) {
-			$this->initSites();
+			$this->initSite();
 		}
 	}
 	
@@ -183,6 +172,131 @@ class iModule {
 	}
 	
 	/**
+	 * 정상적으로 사이트에 접속시, 현재 접속한 사이트의 기본 URL을 구하고 사이트에 설정된 메뉴들을 저장한다.
+	 */
+	function initSite() {
+		/**
+		 * 모든 사이트의 RAW 데이터를 저장한다.
+		 */
+		$this->sites = $this->db()->select($this->table->site)->orderBy('sort','asc')->get();
+		
+		/**
+		 * 현재 접속한 도메인에 해당하는 사이트가 없을 경우, 유사한 사이트를 찾는다.
+		 */
+		if ($this->db()->select($this->table->site)->where('domain',$this->domain)->has() == false) {
+			$isAlias = false;
+			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+				if ($this->sites[$i]->alias == '') continue;
+				
+				/**
+				 * 현재 접속한 도메인을 alias 로 가지고 있는 사이트를 탐색한다.
+				 */
+				$domains = explode(',',$this->sites[$i]->alias);
+				for ($j=0, $loopj=count($domains);$j<$loopj;$j++) {
+					if ($domains[$j] == $this->domain) {
+						$this->domain = $this->sites[$i]->domain;
+						$isAlias = true;
+						break;
+					}
+					
+					if (preg_match('/\*\./',$domains[$j]) == true) {
+						$aliasToken = explode('.',$domains[$j]);
+						$domainToken = explode('.',$this->domain);
+						$isMatch = true;
+						while (count($aliasToken) > 0) {
+							$token = array_pop($aliasToken);
+							if ($token != '*' && $token != array_pop($domainToken)) {
+								$isMatch = false;
+							}
+						}
+						
+						if ($isMatch == true) {
+							$this->domain = $this->sites[$i]->domain;
+							$isAlias = true;
+							break;
+						}
+					}
+				}
+			}
+			
+			/**
+			 * 전체 사이트 정보를 참고해도 현재 접속한 도메인의 사이트를 찾을 수 없을 경우 에러메세지를 출력한다.
+			 */
+			if ($isAlias == false) {
+				$this->printError('SITE_NOT_FOUND');
+			}
+		}
+		
+		/**
+		 * 언어설정값이 유효한지 확인한다.
+		 */
+		if ($this->language === null) {
+			/**
+			 * 언어셋이 지정되지 않았을 경우 기본언어셋을 검색한다. 만약 찾을 수 없다면 에러메세지를 출력한다.
+			 */
+			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
+			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
+			
+			$this->language = $site->language;
+		} else {
+			/**
+			 * 언어셋이 지정되었고, 해당 언어셋이 현재 사이트에서 사용중인지 확인한다. 만약 사용중인 언어셋이 아니라면 기본언어셋을 사용한다.
+			 */
+			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('language',$this->language)->getOne();
+			if ($site == null) {
+				$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
+				
+				/**
+				 * 기본 언어셋이 없을 경우 에러메세지를 출력한다.
+				 */
+				if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
+				
+				$this->language = $site->language;
+			}
+		}
+		
+		/**
+		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
+		 */
+		if (preg_match('/\/(addons|admin|api|modules|process|templets)(\/[a-z]+)?\/index\.php/',$_SERVER['PHP_SELF']) == false) {
+			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || Request('language') != $site->language) {
+				header("location:".($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/');
+				exit;
+			}
+		}
+		
+		/**
+		 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
+		 */
+		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+		}
+		
+		$pages = $this->db()->select($this->table->page)->orderBy('sort','asc')->get();
+		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
+			if ($pages[$i]->page == '') {
+				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
+				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
+				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
+				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
+				$this->menus[$pages[$i]->domain.'@'.$pages[$i]->language][] = $pages[$i];
+				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu] = array();
+			}
+		}
+		
+		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
+			if ($pages[$i]->page != '') {
+				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
+				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
+				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
+				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
+				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu][] = $pages[$i];
+			}
+		}
+	}
+	
+	/**
 	 * DB클래스를 반환한다.
 	 *
 	 * @param string $code DB코드 (기본값 : default)
@@ -193,6 +307,15 @@ class iModule {
 		$db = new DB();
 		$prefix = $prefix == null ? __IM_DB_PREFIX__ : $prefix;
 		return $db->db($code,$prefix);
+	}
+	
+	/**
+	 * Cache 클래스를 반환한다.
+	 *
+	 * @return Cache $cache
+	 */
+	function cache() {
+		return $this->Cache;
 	}
 	
 	/**
@@ -256,54 +379,167 @@ class iModule {
 	}
 	
 	/**
-	 * Get Cache class
+	 * 모듈 클래스를 불러온다.
+	 * 이미 모듈 클래스가 선언되어 있다면 선언되어 있는 모듈클래스를 반환한다. (중복선언하지 않음)
 	 *
-	 * @return Cache $cache
+	 * @param string $module 모듈이름 (/modules 내부의 해당모듈의 폴더명)
+	 * @return object $module 모듈클래스
 	 */
-	function cache() {
-		return $this->Cache;
+	function getModule($module) {
+		/**
+		 * 선언되어 있는 해당 모듈 클래스가 없을 경우, 새로 선언한다.
+		 */
+		if (isset($this->modules[$module]) == false) {
+			/**
+			 * 모듈코어 클래스를 새로 선언하고, 모듈코어 클래스에서 모듈 클래스를 불러온다.
+			 */
+			$class = new Module($this);
+			$this->modules[$module] = $class->load($module);
+		}
+		
+		/**
+		 * 모듈클래스를 호출하지 못했을 경우, 에러메세지를 출력한다.
+		 */
+		if ($this->modules[$module] === false) $this->printError('LOAD_MODULE_FAIL : '.$module);
+		
+		return $this->modules[$module];
 	}
 	
 	/**
-	 * Fire Event, some module fired event (afterInitContext or afterDoProcess ... etc.)
-	 * iModule core listen all events and transfer Event class.
+	 * 위젯 클래스를 불러온다.
+	 * 위젯은 하나의 페이지에 중복으로 사용할 수 있으므로, 무조건 새로운 클래스를 정의하여 반환한다.
 	 *
-	 * @param string $event event type (afterInitContext or afterDoProcess ... etc.)
-	 * @param string $target event target class name (likes core, board, dataroom ... etc.)
-	 * @param string $caller event target class's method name
-	 * @param object $values some values for event listsners, event listeners(theo others module or addons) can be change this values.
-	 * @param object $results some events fired doProcess method. $results params has processing result and datas. event listeners(theo others module or addons) can be change this values.
-	 * @param string &$context if some events fired context method(likes doLayout, getContext), there's html code stored this parameter. event listeners(theo others module or addons) can be change this values.
+	 * @param string $widget 위젯명 (/widgets 내부의 해당위젯의 폴더명)
+	 * @return object $widget
 	 */
-	function fireEvent($event,$target,$caller,$values=null,$results=null,&$context=null) {
-		$this->Event->fireEvent($event,$target,$caller,$values,$results,$context);
+	function getWidget($widget) {
+		$class = new Widget($this);
+		return $class->load($widget);
 	}
 	
+	/**
+	 * 함수가 호출될 시점의 microtime 을 구한다.
+	 *
+	 * @return double $microtime
+	 */
 	function getMicroTime() {
 		$microtimestmp = explode(" ",microtime());
 		return $microtimestmp[0]+$microtimestmp[1];
 	}
 	
+	/**
+	 * iModule 이 선언되고 나서 함수가 호출되는 시점까지의 수행시간을 구한다.
+	 *
+	 * @return double $loadtime
+	 */
 	function getLoadTime() {
 		return sprintf('%0.5f',$this->getMicroTime() - $this->initTime);
 	}
 	
-	function getHost($isDir=false,$domain=null) {
+	/**
+	 * 모든 첨부파일이 저장되는 절대경로를 반환한다.
+	 *
+	 * @return string $attachment_path
+	 * @see /modules/ModuleAttachment.class.php
+	 * @tode 첨부파일 저장되는 경로를 변경할 수 있는 설정값 추가
+	 */
+	function getAttachmentPath() {
+		return __IM_PATH__.'/attachments';
+	}
+	
+	/**
+	 * 모든 첨부파일이 저장되는 상대경로를 반환한다.
+	 *
+	 * @return string $attachment_dir
+	 * @see /modules/ModuleAttachment.class.php
+	 * @tode 첨부파일 저장되는 경로를 변경할 수 있는 설정값 추가
+	 */
+	function getAttachmentDir() {
+		return __IM_DIR__.'/attachments';
+	}
+	
+	/**
+	 * 현재 접속한 프로토콜(HTTP or HTTPS)를 포함한 Host정보를 구한다.
+	 * 
+	 * @param boolean $isDir true : iModule 이 설치된 디렉토리 경로를 포함한다.
+	 */
+	function getHost($isDir=false) {
 		$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
-		$url.= $domain == null ? $this->domain : $domain;
+		$url.= $this->domain;
 		if ($isDir == true) $url.= __IM_DIR__;
 		
 		return $url;
 	}
 	
-	function getAttachmentPath() {
-		return __IM_PATH__.'/attachments';
+	/**
+	 * 메뉴 URL 을 구한다.
+	 * 모든 파라매터값은 옵션이며 입력되지 않거나, NULL 일 경우 현재 접속한 페이지의 정보를 사용한다.
+	 * 즉, 모든 파라매터값이 없는 상태로 호출하면 현재 페이지의 URL 을 구할 수 있다.
+	 * 파라매터값을 false 로 설정하면 하위주소를 무시한다. $page 값이 false 일 경우 1차 메뉴주소까지만 반환한다.
+	 *
+	 * @param string $menu 1차 메뉴
+	 * @param string $page 2차 메뉴
+	 * @param string $view 모듈별 페이지종류 (목록페이지 또는 글쓰기페이지 등 : 모듈별로 사용되는 값이 다르다.)
+	 * @param string $idx 모듈별 고유값 (게시물번호 또는 회원아이디 등 : 모듈별로 사용되는 값이 다르다.)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 제외한 URL(기본)
+	 * @param string $domain 현재 접속한 도메인이 아닌 다른 사이트로 연결하고자 할 경우 해당 사이트의 도메인
+	 * @param string $language 현재 접속한 언어설정이 아닌 다른 언어의 사이트로 연결하고자 할 경우 해당 언어셋 코드
+	 * @return string $url;
+	 */
+	function getUrl($menu=null,$page=null,$view=null,$number=null,$isFullUrl=false,$domain=null,$language=null) {
+		/**
+		 * 전달된 값이 없거나, NULL 일 경우 현재 페이지의 값으로 설정한다.
+		 */
+		$menu = $menu === null ? $this->menu : $menu;
+		$page = $page === null && $menu == $this->menu ? $this->page : $page;
+		$view = $view === null && $menu == $this->menu && $page == $this->page ? $this->view : $view;
+		
+		/**
+		 * $domain 의 값이 * 일 경우 현재 사이트의 도메인으로 설정한다.
+		 */
+		$domain = $domain == '*' ? $this->site->domain : $domain;
+		
+		/**
+		 * $isFullUrl 값이 true 이거나, 설정된 도메인이 현재 사이트의 도메인과 다를 경우 전체 URL 을 생성한다.
+		 */
+		if ($isFullUrl == true || ($domain != null && $domain !== $this->site->domain)) {
+			$domain = $domain == null ? $_SERVER['HTTP_HOST'] : $domain;
+			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
+			if ($check == null) {
+				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
+				$url.= $domain.__IM_DIR__;
+			} else {
+				$url = $check->is_ssl == 'TRUE' ? 'https://' : 'http://';
+				$url.= $domain.__IM_DIR__;
+			}
+		} else {
+			$url = __IM_DIR__;
+		}
+		
+		/**
+		 * 각각의 파라매터값이 false 가 아닐때까지 하위메뉴 주소를 만들고 반환한다.
+		 */
+		$url.= '/'.($language == null ? $this->language : $language);
+		if ($menu === null || $menu === false) return $url;
+		$url.= '/'.$menu;
+		if ($page === null || $page === false) return $url;
+		$url.= '/'.$page;
+		if ($view === null || $view === false) return $url;
+		$url.= '/'.$view;
+		if ($number === null || $number === false) return $url;
+		$url.= '/'.$number;
+		
+		return $url;
 	}
 	
-	function getAttachmentDir() {
-		return __IM_DIR__.'/attachments';
-	}
-	
+	/**
+	 * 명령을 처리할 주소를 반환한다.
+	 *
+	 * @param string $module 모듈이름
+	 * @param string $action 명령코드
+	 * @param string[] $params 전달할 변수
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 제외한 URL(기본)
+	 */
 	function getProcessUrl($module,$action,$params=array(),$isFullUrl=false) {
 		$queryStrings = array();
 		foreach ($params as $key=>$value) $queryStrings[] = $key.'='.urlencode($value);
@@ -319,55 +555,15 @@ class iModule {
 	}
 	
 	/**
-	 * Get page url
+	 * 모듈 인덱스 페이지의 URL을 반환한다.
+	 * 사이트에 포함되어 동작하는 모듈이 아니라 단독적으로 동작해야하는 모듈의 경우 자신의 모듈폴더에 index.php 파일을 가지며 해당 PHP파일에 접속하기 위한 URL을 반환한다.
 	 *
-	 * @param string $menu menu code, If not string, follow this rule(null : used current menu code, false : return site index url)
-	 * @param string $page page code, If not string, follow this rule(null : used current page code, false : return menu index url)
-	 * @param string $view view code, used module(list, view, write, modify ... etc), If not string, follow this rule(null : used current view code, false : return page index url)
-	 * @param int $number page number in list page or post idx in view page
-	 * @param boolean $isFullUrl If this value is true, return full url include protocol and domain(host)
-	 * @param string $domain If not exists, used current site domain
-	 * @param string $language language code (likes ko, en ... etc), If not exists, used current site language
-	 * @return string $url;
-	 */
-	function getUrl($menu=null,$page=null,$view=null,$number=null,$isFullUrl=false,$domain=null,$language=null) {
-		$menu = $menu === null ? $this->menu : $menu;
-		$page = $page === null && $menu == $this->menu ? $this->page : $page;
-		$view = $view === null && $menu == $this->menu && $page == $this->page ? $this->view : $view;
-		
-		$domain = $domain == '*' ? $this->site->domain : $domain;
-		if ($isFullUrl == true || $domain !== $this->site->domain) {
-			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
-			if ($check == null) {
-				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
-				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
-			} else {
-				$url = $check->is_ssl == 'TRUE' ? 'https://' : 'http://';
-				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
-			}
-		} else {
-			$url = __IM_DIR__;
-		}
-		$url.= '/'.($language == null ? $this->language : $language);
-		if ($menu === null || $menu === false) return $url;
-		$url.= '/'.$menu;
-		if ($page === null || $page === false) return $url;
-		$url.= '/'.$page;
-		if ($view === null || $view === false) return $url;
-		$url.= '/'.$view;
-		if ($number === null || $number === false) return $url;
-		$url.= '/'.$number;
-		
-		return $url;
-	}
-	
-	
-	/**
-	 * Get module's direct url
-	 *
-	 * @param string $module module name
-	 * @param string $container container name
-	 * @param int $idx idx
+	 * @param string $module 모듈이름
+	 * @param string $container 모듈의 index 파일이 처리할 컨테이너코드
+	 * @param string $idx 모듈별로 요구하는 고유값
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 제외한 URL(기본)
+	 * @param string $domain 현재 접속한 도메인이 아닌 다른 사이트로 연결하고자 할 경우 해당 사이트의 도메인
+	 * @param string $language 현재 접속한 언어설정이 아닌 다른 언어의 사이트로 연결하고자 할 경우 해당 언어셋 코드
 	 */
 	function getModuleUrl($module,$container=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
 		$domain = $domain == '*' ? $this->site->domain : $domain;
@@ -392,6 +588,13 @@ class iModule {
 		return $url;
 	}
 	
+	/**
+	 * GET 으로 전달되는 QUERY_STRING(URL의 ? 이하부분)중 일부 파라매터값을 변경하고, 비어있거나 불필요한 QUERY_STRING 삭제한다.
+	 *
+	 * @param string[] $query array('GET 파라매터 KEY'=>'변경할 값, 해당값이 없으면 GET 파라매터를 지운다.')
+	 * @param string $queryString 정리할 query string 값이 없을 경우 $_SERVER['QUERY_STRING'] 을 사용한다.
+	 * @return string $queryString 정리된 GET 파라매터
+	 */
 	function getQueryString($query=array(),$queryString=null) {
 		$queryString = $queryString == null ? $_SERVER['QUERY_STRING'] : $queryString;
 		$query = array_merge(array('menu'=>'','page'=>'','view'=>'','idx'=>'','p'=>'','language'=>''),$query);
@@ -425,106 +628,11 @@ class iModule {
 	}
 	
 	/**
-	 * Init all sites
-	 */
-	function initSites() {
-		$this->sites = $this->db()->select($this->table->site)->orderBy('sort','asc')->get();
-		
-		if ($this->db()->select($this->table->site)->where('domain',$this->domain)->has() == false) {
-			$isAlias = false;
-			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
-				if ($this->sites[$i]->alias == '') continue;
-				
-				$domains = explode(',',$this->sites[$i]->alias);
-				for ($j=0, $loopj=count($domains);$j<$loopj;$j++) {
-					if ($domains[$j] == $this->domain) {
-						$this->domain = $this->sites[$i]->domain;
-						$isAlias = true;
-						break;
-					}
-					
-					if (preg_match('/\*\./',$domains[$j]) == true) {
-						$aliasToken = explode('.',$domains[$j]);
-						$domainToken = explode('.',$this->domain);
-						$isMatch = true;
-						while (count($aliasToken) > 0) {
-							$token = array_pop($aliasToken);
-							if ($token != '*' && $token != array_pop($domainToken)) {
-								$isMatch = false;
-							}
-						}
-						
-						if ($isMatch == true) {
-							$this->domain = $this->sites[$i]->domain;
-							$isAlias = true;
-							break;
-						}
-					}
-				}
-			}
-			
-			if ($isAlias == false) {
-				$this->printError('SITE_NOT_FOUND');
-			}
-		}
-		
-		if ($this->language === null) {
-			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
-			$this->language = $site != null ? $site->language : null;
-		} else {
-			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('language',$this->language)->getOne();
-			if ($site == null) {
-				$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
-				$this->language = $site != null ? $site->language : null;
-			}
-		}
-		
-		if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
-		
-		// URL redirect
-		if (preg_match('/\/(addons|admin|api|modules|process|templets)(\/[a-z]+)?\/index\.php/',$_SERVER['PHP_SELF']) == false) {
-			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || Request('language') != $site->language) {
-				header("location:".($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/');
-				exit;
-			}
-		}
-
-		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
-			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-		}
-		
-		// Init all menus
-		$pages = $this->db()->select($this->table->page)->orderBy('sort','asc')->get();
-		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
-			if ($pages[$i]->page == '') {
-				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
-				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
-				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
-				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
-				$this->menus[$pages[$i]->domain.'@'.$pages[$i]->language][] = $pages[$i];
-				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu] = array();
-			}
-		}
-		
-		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
-			if ($pages[$i]->page != '') {
-				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
-				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
-				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
-				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
-				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu][] = $pages[$i];
-			}
-		}
-	}
-	
-	/**
-	 * Get site configures
+	 * 사이트관리자에 의해 설정된 사이트 설정값을 가져온다.
 	 *
-	 * @param string $domain(optional) Site HTTP_HOST
-	 * @param string $language(optional) Site language
-	 * @param object $lesson Lesson post data from the form
-	 * @return object $domain param not exists return array
+	 * @param string $domain(옵션) 사이트 도메인 주소 (해당 값이 있을 경우 해당 도메인에 대한 설정값이 반환되며 없을 경우 모든 사이트에 대한 설정값이 반환된다.)
+	 * @param string $language(옵션) 사이트 언어셋코드 (해당 값이 있을 경우 해당 언어셋을 사용하고 있는 사이트정보만 반환된다.)
+	 * @return object[] 파라매터 조건에 맞는 사이트정보 (조건에 맞는 사이트가 1뿐이라면 배열이 아닌 사이트정보 Object 가 반환된다.)
 	 */
 	function getSites($domain=null,$language=null) {
 		if ($domain == null && $language == null) return $this->sites;
@@ -540,11 +648,11 @@ class iModule {
 	}
 	
 	/**
-	 * Get site menus (1st depth)
+	 * 현재 사이트의 1차 메뉴 정보를 가져온다.
 	 *
-	 * @param string $menu(optional) if this values exists and find this menu code, return that menu object not menus array.
-	 * @param string $domain(optional) if search for the others(the others domain) site menu, using this param.
-	 * @return object[] $menus all or one menu object
+	 * @param string $menu(옵션) $menu 값이 있을 경우 해당 값에 해당되는 메뉴설정이 반환된다. 없을 경우 전체 메뉴설정이 반환된다.
+	 * @param string $domain(옵션) 현재 접속한 사이트가 아닌 다른 도메인의 1차 메뉴를 가져온다.
+	 * @return object[] $menus
 	 */
 	function getMenus($menu=null,$domain=null) {
 		$domain = $domain === null ? $this->domain : $domain;
@@ -558,6 +666,14 @@ class iModule {
 		return null;
 	}
 	
+	/**
+	 * 현재 사이트의 2차 메뉴 정보를 가져온다.
+	 *
+	 * @param string $menu(옵션) $menu 값이 있을 경우 해당 값에 해당되는 2차 메뉴목록이 반환된다. 없을 경우 전체 1차메뉴의 2차메뉴를 가져온다.
+	 * @param string $page(옵션) $page 값이 있을 경우 $menu 값은 반드시 지정되어 있어야하며, $page 값에 설정된 특정 페이지설정이 반환된다.
+	 * @param string $domain(옵션) 현재 접속한 사이트가 아닌 다른 도메인의 2차 메뉴를 가져온다.
+	 * @return object[] $pages
+	 */
 	function getPages($menu=null,$page=null,$domain=null) {
 		$domain = $domain === null ? $this->domain : $domain;
 		if (count(explode('@',$domain)) == 1) $domain = $domain.'@'.$this->language;
@@ -572,6 +688,49 @@ class iModule {
 		return null;
 	}
 	
+	/**
+	 * 현재 사이트 RAW 데이터를 가공하여 가져온다.
+	 * 
+	 * @return object $site
+	 */
+	function getSite() {
+		if ($this->site != null) return $this->site;
+		
+		$this->site = clone $this->getSites($this->domain,$this->language);
+		
+		$this->site->logo = json_decode($this->site->logo);
+		$this->site->maskicon = json_decode($this->site->maskicon);
+		$this->site->description = $this->site->description ? $this->site->description : null;
+		$this->site->templetConfigs = json_decode($this->site->templetConfigs);
+//		$this->language = $this->language == null ? $this->site->language : $this->language;
+		
+		return $this->site;
+	}
+	
+	/**
+	 * @todo 공사중
+	 */
+	function getPageCountInfo($page) {
+		return null;
+		/*
+		if ($page->type == 'MODULE') {
+			$module = $this->getModule($page->context->module);
+			if (method_exists($module,'getCountInfo') == true) {
+				return $module->getCountInfo($page->context->context,$page->context->config);
+			} else {
+				return null;
+			}
+		}
+		
+		return null;
+		*/
+	}
+	
+	/**
+	 * 현재사이트에서 페이지 하단(푸터)부분에 출력하도록 설정한 1차 또는 2차메뉴를 가져온다.
+	 *
+	 * @return object[] $footerMenus
+	 */
 	function getFooterPages() {
 		$sorts = array();
 		$pages = $this->db()->select($this->table->page)->where('domain',$this->domain)->where('language',$this->language)->where('is_footer','TRUE')->get();
@@ -594,139 +753,6 @@ class iModule {
 		return $footers;
 	}
 	
-	function getPageCountInfo($page) {
-		if ($page->type == 'MODULE') {
-			$module = $this->getModule($page->context->module);
-			if (method_exists($module,'getCountInfo') == true) {
-				return $module->getCountInfo($page->context->context,$page->context->config);
-			} else {
-				return null;
-			}
-		}
-		
-		return null;
-	}
-	
-	function setView($view) {
-		$this->view = $view;
-	}
-	
-	function setIdx($idx) {
-		$this->view = $view;
-	}
-	
-	/**
-	 * Removed site default templet
-	 * Anywhere call this method, you can remove all site templet's design (include site header and footer).
-	 */
-	function removeTemplet() {
-		$this->useTemplet = false;
-	}
-	
-	/**
-	 * Setting for ExtJS Library, Basically, Admin page is using ExtJs library
-	 * ExtJs library doesn't use header cache
-	 */
-	function loadExtJs() {
-		$this->addSiteHeader('style',__IM_DIR__.'/styles/extjs.css');
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/extjs.6.0.1.js');
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/extjs/moimz.js');
-		// load ExtJs locale
-		if (file_exists(__IM_PATH__.'/scripts/extjs/'.$this->language.'/ext-locale-'.$this->language.'.js') == true) {
-			$this->addSiteHeader('script',__IM_DIR__.'/scripts/extjs/'.$this->language.'/ext-locale-'.$this->language.'.js');
-		}
-	}
-	
-	/**
-	 * Load language for Javascript (module only)
-	 *
-	 * @param string $module (loaded module name)
-	 * @param string $langaugeCode If not exists, use site language setting
-	 */
-	function loadLangaugeJs($module,$language=null) {
-		$language = $language != null ? $language : $this->language;
-		$package = $this->Module->getPackage($module);
-		$this->javascriptLanguages[] = $module.'@'.$language.'@'.$package->language;
-	}
-	
-	/**
-	 * Get module class
-	 * If core already loaded request module, using cache.
-	 *
-	 * @param string $modulename module name (the folder name in ./modules folder is module name.)
-	 * @return object $module
-	 */
-	function getModule($module) {
-		// Not exists cache, means iModule core never loaded this module before.
-		if (isset($this->modules[$module]) == false) {
-			$class = new Module($this); // make new module object
-			$this->modules[$module] = $class->load($module); // call module by Module class, and store cache.
-		}
-		
-		if ($this->modules[$module] === false) $this->printError('LOAD_MODULE_FAIL : '.$module); // Not exists requested module, print error.
-		return $this->modules[$module];
-	}
-	
-	function getModulePath($module) {
-		return __IM_PATH__.'/modules/'.$module;
-	}
-	
-	/**
-	 * Get widget
-	 *
-	 * @param string $widgetname widget name (widgetname : find ./widgets folder, modulename/widgetname(using slash) : find ./modules/modulename/widgets folder)
-	 * @return object $widget
-	 */
-	function getWidget($widget) {
-		$class = new Widget($this);
-		return $class->load($widget);
-	}
-	
-	function getSite() {
-		if ($this->site != null) return $this->site;
-		
-		$this->site = clone $this->getSites($this->domain,$this->language);
-		
-		$this->site->logo = json_decode($this->site->logo);
-		$this->site->emblem = $this->site->emblem == -1 ? __IM_DIR__.'/images/logo/emblem.png' : ($this->site->emblem == 0 ? null : __IM_DIR__.'/attachment/view/'.$this->site->emblem.'/emblem.png');
-		$this->site->favicon = $this->site->favicon == -1 ? __IM_DIR__.'/images/logo/favicon.ico' : ($this->site->favicon == 0 ? null : __IM_DIR__.'/attachment/view/'.$this->site->favicon.'/favicon.ico');
-		$this->site->image = $this->site->image == 0 ? null : __IM_DIR__.'/attachment/view/'.$this->site->image.'/preview.jpg';
-		$this->site->maskicon = json_decode($this->site->maskicon);
-		$this->site->maskicon->icon = $this->site->maskicon->icon == -1 ? __IM_DIR__.'/images/logo/maskicon.svg' : ($this->site->maskicon->icon == 0 ? null : __IM_DIR__.'/attachment/view/'.$this->site->maskicon->icon.'/maskicon.svg');
-		$this->site->maskicon->color = $this->site->maskicon->icon == null ? null : $this->site->maskicon->color;
-		$this->site->description = $this->site->description ? $this->site->description : null;
-		$this->site->templetConfigs = json_decode($this->site->templetConfigs);
-		$this->language = $this->language == null ? $this->site->language : $this->language;
-		
-		
-		return $this->site;
-	}
-	
-	/**
-	 * 현재 접속한 페이지의 URL 을 가져온다.
-	function getCurrentURL($menu=false,$page=false,$view=false,$isParameter=false) {
-		$menu = $menu == false ? $this->menu : $menu;
-		$page = $page == false ? $this->page : $page;
-		$view = $view == false ? $this->view : $view;
-		
-		$baseURL = '';
-		if ($menu == '') return '/';
-		else $baseURL.= '/'.$menu;
-		
-		if ($page == '') return $baseURL;
-		else $baseURL.= '/'.$page;
-		
-		if ($view == '') return $baseURL;
-		else $baseURL.= '/'.$view;
-		
-		if ($isParameter == true) {
-			$baseURL.= '';
-		}
-		
-		return $baseURL;
-	}
-	*/
-	
 	/**
 	 * 사이트 템플릿별 설정된 값을 가져온다.
 	 * 해당 설정들은 템플릿 폴더안의 package.json 에 의해 정의되고, 사이트관리자를 통해 설정값이 입력된다.
@@ -739,150 +765,413 @@ class iModule {
 		return $this->site->templetConfigs != null && isset($this->site->templetConfigs->{$key}) == true ? $this->site->templetConfigs->{$key} : '';
 	}
 	
-	function getSiteLogo($type='default') {
-		if (in_array($type,array('default','footer')) == true && $this->site->logo->$type == -1) return __IM_DIR__.'/images/logo/'.$type.'.png';
-		elseif (empty($this->site->logo->$type) == true) return $type == 'default' ? null : $this->getSiteLogo('default');
-		elseif ($this->site->logo->$type == 0) return null;
-		return __IM_DIR__.'/attachment/view/'.$this->site->logo->$type.'/logo.png';
-	}
-	
-	function getSiteEmblem() {
-		return $this->site->emblem;
+	/**
+	 * 사이트 로고 이미지를 가져온다.
+	 * 사이트 로고는 사이트템플릿의 package.json 에 의해 정해진 종류별로 가져올 수 있다.
+	 * 해당 종류의 사이트로고 파일이 없을 경우 기본 로고 이미지를 반환한다.
+	 *
+	 * @param string $type 로고종류
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $logoUrl 로고 이미지 URL
+	 */
+	function getSiteLogo($type='default',$isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		/**
+		 * 로고종류가 default 또는 footer 이고 해당 종류에 설정된 로고가 없을 경우, iModule 의 기본 로고파일을 반환한다.
+		 */
+		if (in_array($type,array('default','footer')) == true && (empty($this->site->logo->{$type}) == true || $this->site->logo->{$type} == -1)) return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/images/logo/'.$type.'.png';
+		
+		/**
+		 * 가져올 로고타입이 사이트관리자에 의해 설정되어 있지 않을 경우, 기본 로고파일을 가져온다.
+		 */
+		if (empty($this->site->logo->$type) == true) return $this->getSiteLogo('default');
+		
+		/**
+		 * 가져올 로고타입을 사이트관리자에 의해 사용하지 않음 으로 설정되어 있는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site->logo->$type == 0) return null;
+		
+		/**
+		 * 사이트 관리자에 설정된 로고파일을 가져온다.
+		 */
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->logo->$type.'/logo.png';
 	}
 	
 	/**
-	 * Get site title for html title tag
+	 * 사이트 엠블럼 이미지를 가져온다.
+	 * 사이트 엠블럼이 지정되지 않은 경우 iModule 의 기본 엠블럼이미지를 반환하고, 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
 	 *
-	 * @return string $siteTitle
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $emblemUrl 엠블럼 이미지 URL
 	 */
-	function getSiteTitle() {
-		if ($this->siteTitle == null) {
-			$site = $this->getSite();
-			$this->siteTitle = $site->title;
-		}
+	function getSiteEmblem($isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
 		
-		return $this->siteTitle;
+		/**
+		 * 엠블럼설정이 없는 경우 iModule 의 기본 엠블럼 이미지를 반환한다.
+		 */
+		if ($this->site->emblem == -1) return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/images/logo/emblem.png';
+		
+		/**
+		 * 엠블럼을 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
+		 */
+		if ($this->site->emblem == 0) return null;
+		
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->emblem.'/emblem.png';
 	}
 	
 	/**
-	 * Set site title for html title tag
+	 * 사이트 favicon 아이콘을 가져온다.
+	 * 사이트 favicon이 지정되지 않은 경우 iModule 의 기본 favicon을 반환하고, 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
 	 *
-	 * @param string $title
-	 * @param boolean $isSiteTitle If this valus is true, using subtitle (ex : siteTitle - subtitle)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $faviconUrl favicon 아이콘 URL
 	 */
-	function setSiteTitle($title,$isSiteTitle=true) {
-		$this->siteTitle = $isSiteTitle == true ? $this->site->title.' - '.$title : $title;
-	}
-	
-	function getSiteDescription() {
-		if ($this->siteDescription !== null) return $this->siteDescription;
+	function getSiteFavicon($isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
 		
-		if ($this->menu != 'index' && $this->menu != 'account') {
-			$menu = $this->getMenus($this->menu);
-			$page = $this->page !== null ? $this->getPages($this->menu,$this->page) : null;
-			$description = $page !== null && $page->description !== null ? $page->description : $page !== null ? $menu->description : null;
-			return $description !== null ? $description : $this->site->description;
-		}
-		return $this->site->description;
-	}
-	
-	function setSiteDescription($description) {
-		$this->siteDescription = $description;
-	}
-	
-	function getSiteCanonical() {
-		return $this->siteCanonical !== null ? $this->siteCanonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
-	}
-	
-	function setSiteCanonical($canonical) {
-		$this->siteCanonical = $canonical;
-	}
-	
-	function getSiteImage($isFullUrl=false) {
-		$url = $isFullUrl == true ? isset($_SERVER['HTTPS']) == true ? 'https://'.$_SERVER['HTTP_HOST'] : 'http://'.$_SERVER['HTTP_HOST'] : '';
+		/**
+		 * favicon설정이 없는 경우 iModule 의 기본 favicon 아이콘을 반환한다.
+		 */
+		if ($this->site->favicon == -1) return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/images/logo/favicon.ico';
 		
-		if ($this->siteImage !== null) return $url.$this->siteImage;
+		/**
+		 * favicon을 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
+		 */
+		if ($this->site->emblem == 0) return null;
 		
-		if ($this->menu != 'index' && $this->menu != 'account') {
-			$page = $this->page ? $this->getPages($this->menu,$this->page) : $this->getMenus($this->menu);
-			return $page->image !== null ? $url.$page->image : $url.$this->site->image;
-		}
-		return $url.$this->site->image;
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->favicon.'/favicon.ico';
 	}
 	
-	function setSiteImage($image) {
+	/**
+	 * 사이트의 mask 아이콘을 가져온다.
+	 * mask 아이콘은 safari 웹브라우져의 고정탭 아이콘으로 사용되는 svg 이미지 파일이며, svg 이미지파일 경로 및 이미지파일 색상을 반환한다.
+	 * 사이트 mask 아이콘이 지정되지 않은 경우 iModule 의 기본 mask 아이콘을 반환하고, 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
+	 *
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return object $maskIcon mask 아이콘 설정 {url:mask 아이콘 url, color : mask 아이콘 색상}
+	 */
+	function getMaskIcon($isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		$maskIcon = new stdClass();
+		
+		/**
+		 * mask 아이콘설정이 없는 경우 iModule 의 기본 mask 아이콘을 사용한다.
+		 */
+		if ($this->site->maskicon->icon == -1) $maskIcon->url = ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/images/logo/maskicon.svg';
+		
+		/**
+		 * mask 아이콘을 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
+		 */
+		elseif ($this->site->maskicon->icon == 0) $maskIcon->url = null;
+		else $maskIcon->url = ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->maskicon->icon.'/maskicon.svg';
+		
+		$maskIcon->color = $maskIcon->url == null ? null : $maskIcon->color;
+		
+		return $maskIcon;
+	}
+	
+	/**
+	 * 사이트 이미지를 가져온다.
+	 * 사이트 이미지는 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 사용하고자 하는 경우에 따라 $type 값을 통해 이미지 최대 크기를 정할 수 있다.
+	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
+	 * 설정된 사이트이미지가 없을 경우 NULL 을 반환한다.
+	 *
+	 * @param string $type 이미지 크기 종류(기본 original)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $imageUrl 이미지 URL
+	 */
+	function getSiteImage($type='original',$isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		/**
+		 * 사이트 이미지를 사용하지 않는다고 설정된 경우나, 알수없는 $type 값일 경우 NULL을 반환한다.
+		 */
+		if ($this->site->image == 0 || in_array($type,array('original','view','thumbnail')) == false) return null;
+		
+		/**
+		 * 사이트 관리자에 설정된 로고파일을 가져온다.
+		 */
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->site->logo->{$type}.'/preview.png';
+	}
+	
+	/**
+	 * 페이지 이미지를 가져온다.
+	 * 페이지 이미지는 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 사용하고자 하는 경우에 따라 $type 값을 통해 이미지 최대 크기를 정할 수 있다.
+	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
+	 * 설정된 페이지 이미지가 없을 경우 사이트 이미지를 가져온다.
+	 *
+	 * @param string $type 이미지 크기 종류(기본 original)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $imageUrl 이미지 URL
+	 */
+	function getPageImage($type='original',$isFullUrl=false) {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		/**
+		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
+		 */
+		$config = $this->page == null ? $this->getMenus($this->menu) : $this->getPages($this->menu,$this->page);
+		
+		/**
+		 * 페이지 이미지가 설정되지 않은 경우, 사이트 이미지를 반환한다.
+		 */
+		if ($config->image == -1) return $this->getSiteImage($type,$isFullUrl);
+		
+		/**
+		 * 페이지 이미지가 사용되지 않는다고 설정된 경우나, 알수없는 $type 값일 경우 NULL을 반환한다.
+		 */
+		if ($config->image == 0 || in_array($type,array('original','view','thumbnail')) == false) return null;
+		
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$config->image.'/preview.png';
+	}
+	
+	/**
+	 * 뷰페이지 이미지를 가져온다.
+	 * 뷰페이지 이미지는 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 사용하고자 하는 경우에 따라 $type 값을 통해 이미지 최대 크기를 정할 수 있다.
+	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
+	 * 설정된 뷰페이지 이미지가 없을 경우 페이지 이미지를 가져온다.
+	 *
+	 * @param string $type 이미지 크기 종류(기본 original)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $imageUrl 이미지 URL
+	 */
+	function getViewImage($type='original',$isFullUrl=false) {
+		/**
+		 * 모듈등에서 설정되어 있는 뷰페이지 이미지가 없는 경우 페이지 이미지를 반환한다.
+		 */
+		if ($this->siteImage == null || $this->siteImage <= 0) return $this->getPageImage($type,$isFullUrl);
+		
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->siteImage.'/preview.png';
+	}
+	
+	/**
+	 * 뷰페이지 이미지를 설정한다.
+	 * 모듈 등에 의하여 특정 뷰페이지의 이미지를 변경할 수 있으며, 해당 이미지는 OG 메타태그를 구성하기 위해서 사용된다.
+	 *
+	 * @param int $image attachment 모듈에 의해 지정된 이미지파일의 고유 idx 값
+	 * @return null
+	 */
+	function setViewImage($image) {
 		$this->siteImage = $image;
 	}
 	
 	/**
-	 * Get site header
+	 * 사이트 타이틀을 가져온다.
 	 *
-	 * @return string $header html tag for <head> tag
-	 * @todo use header cache
+	 * @return string $siteTitle
 	 */
-	function getSiteHeader() {
-		if (count($this->javascriptLanguages) > 0) {
-			$this->addSiteHeader('script',__IM_DIR__.'/scripts/language.js.php?languages='.implode(',',$this->javascriptLanguages));
-		}
-		$this->addSiteHeader('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null ? $this->menu : '').'&page='.($this->page != null ? $this->page : '').'&view='.($this->view != null ? $this->view : ''));
-		$this->addSiteHeader('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFont).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
+	function getSiteTitle() {
+		/**
+		 * 모듈 등에서 지정된 사이트타이틀이 있을 경우 해당 타이틀을 반환한다.
+		 */
+		if ($this->siteTitle != null) return $this->siteTitle;
 		
-		return implode(PHP_EOL,$this->siteHeader).PHP_EOL;
-	}
-	
-	function getTempletPath() {
-		if ($this->templetPath == null) {
-			$site = $this->getSite();
-			$this->templetPath = __IM_PATH__.'/templets/'.$site->templet;
-		}
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
 		
-		return $this->templetPath;
-	}
-	
-	function getTempletDir() {
-		if ($this->templetDir == null) {
-			$site = $this->getSite();
-			$this->templetDir = __IM_DIR__.'/templets/'.$site->templet;
-		}
-		
-		return $this->templetDir;
-	}
-	
-	function setArticle($module,$context,$type,$idx,$reg_date) {
-		$check = $this->db()->select($this->table->article)->where('module',$module)->where('type',$type)->where('idx',$idx)->get();
-		if ($check == null) {
-			$this->db()->insert($this->table->article,array('module'=>$module,'context'=>$context,'type'=>$type,'idx'=>$idx,'reg_date'=>$reg_date,'update_date'=>$reg_date))->execute();
-		} else {
-			$this->db()->update($this->table->article,array('context'=>$context,'update_date'=>$reg_date))->where('module',$module)->where('type',$type)->where('idx',$idx)->execute();
-		}
-	}
-	
-	function deleteArticle($module,$type,$idx) {
-		$this->db()->delete($this->table->article)->where('module',$module)->where('type',$type)->where('idx',$idx)->execute();
-	}
-	
-	function resetArticle() {
-		$this->db()->delete($this->table->article)->execute();
-		$this->Module->resetArticle();
+		return $this->site->title;
 	}
 	
 	/**
-	 * Add webfont lists
-	 * @param string $font font name
-	 * @param boolean $isDefault using default
+	 * 사이트 타이틀을 설정한다.
+	 *
+	 * @param string $title
+	 * @param boolean $isIncludeSiteTitle 사이트 기본타이틀에 추가적으로 타이틀을 지정할 경우 true 로 설정한다.
+	 * @return null
 	 */
-	function addWebFont($font,$isDefault=false) {
+	function setSiteTitle($title,$isSiteTitle=true) {
+		$this->siteTitle = $isSiteTitle == true && $this->site != null ? $this->site->title.' - '.$title : $title;
+	}
+	
+	/**
+	 * 사이트 설명을 가져온다.
+	 * META 태그 구성을 위해 사용된다.
+	 *
+	 * @return string $description
+	 */
+	function getSiteDescription() {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		/**
+		 * 모듈 등에서 지정된 사이트설명 있을 경우 해당 설명을 반환한다.
+		 */
+		if ($this->siteDescription != null) return $this->siteDescription;
+		
+		/**
+		 * 현재 접속한 메뉴에 설정된 설명이 있을 경우 해당 설명을 반환한다.
+		 */
+		$config = $this->page == null ? $this->getMenus($this->menu) : $this->getPages($this->menu,$this->page);
+		if ($config->description) return $config->description;
+		
+		return $this->site->description;
+	}
+	
+	/**
+	 * 사이트 설명을 설정한다.
+	 *
+	 * @param string $description
+	 * @return null
+	 */
+	function setSiteDescription($description) {
+		$this->siteDescription = $description;
+	}
+	
+	/**
+	 * 현재 페이지의 고유 URL 을 가져온다.
+	 * 고유 URL은 반드시 사용중인 모듈에서 지정되어 있어야 하며, 그렇지 않을 경우 현재 URL이 반환된다.
+	 * SEO를 위해 사용된다.
+	 *
+	 * @return string $canonical 고유 URL
+	 */
+	function getSiteCanonical() {
+		return $this->siteCanonical !== null ? $this->siteCanonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
+	}
+	
+	/**
+	 * 현재 페이지의 고유 URL 을 설정한다.
+	 * SEO를 위해 사용된다.
+	 *
+	 * @param string $canonical 고유 URL 은 반드시 도메인을 포함한 전체 URL이어야 한다.
+	 * @return null
+	 */
+	function setSiteCanonical($canonical) {
+		$this->siteCanonical = $canonical;
+	}
+	
+	/**
+	 * 사이트 템플릿의 $_SERVER['DOCUMENT_ROOT'] 포함한 절대경로를 가져온다.
+	 *
+	 * @return string $templetPath
+	 */
+	function getTempletPath() {
+		/**
+		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
+		 */
+		if ($this->site == null) return null;
+		
+		return __IM_PATH__.'/templets/'.$this->site->templet;
+	}
+	
+	/**
+	 * 사이트 템플릿의 상대경로를 가져온다.
+	 *
+	 * @return string $templetDir
+	 */
+	function getTempletDir() {
+		if ($this->site == null) return null;
+		
+		return __IM_DIR__.'/templets/'.$this->site->templet;
+	}
+	
+	/**
+	 * 사이트 템플릿을 제거한다.
+	 * 특정 모듈에서 사이트템플릿 없이 모듈템플릿만으로 사이트화면을 구성할 경우 사용한다.
+	 */
+	function removeTemplet() {
+		$this->useTemplet = false;
+	}
+	
+	/**
+	 * 이 함수가 호출된 이후부터 강제로 $view 를 변경하여 출력한다.
+	 * 한 페이지 내에서 2가지 view 를 사용할 경우 호출한다.
+	 *
+	 * @param string $view 변경할 view 코드
+	 * @return null
+	 */
+	function setView($view) {
+		$this->view = $view;
+	}
+	
+	/**
+	 * 이 함수가 호출된 이후부터 강제로 $idx 를 변경하여 출력한다.
+	 * 한 페이지 내에서 2가지 idx 값을 사용할 경우 호출한다.
+	 *
+	 * @param string $idx 변경할 idx 코드
+	 * @return null
+	 */
+	function setIdx($idx) {
+		$this->idx = $idx;
+	}
+	
+	/**
+	 * 사이트관리자에서는 기본적으로 ExtJS 라이브러리를 사용하나, 기타 사용자페이지에서 ExtJS 라이브러리를 로드할 경우 사용한다.
+	 * ExtJS라이브러리의 기본적인 스타일시트와 현재 설정된 사이트 언어셋에 따른 언어셋을 호출한다.
+	 */
+	function loadExtJs() {
+		$this->addHeadResource('style',__IM_DIR__.'/styles/extjs.css');
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/extjs.6.0.1.js');
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/extjs/moimz.js');
+		// load ExtJs locale
+		if (file_exists(__IM_PATH__.'/scripts/extjs/'.$this->language.'/ext-locale-'.$this->language.'.js') == true) {
+			$this->addHeadResource('script',__IM_DIR__.'/scripts/extjs/'.$this->language.'/ext-locale-'.$this->language.'.js');
+		}
+	}
+	
+	/**
+	 * 자바스크립트용 언어셋 파일을 호출한다.
+	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 해당 함수를 호출하여 자바스크립트상에서 모듈명.getLanguage() 함수로 언어셋을 불러올 수 있다.
+	 *
+	 * @param string $module 모듈명
+	 * @param string $langauge(옵션) 불러올 언어셋 (지정되지 않을 경우 현 사이트의 언어셋코드를 사용한다.)
+	 */
+	function loadLangaugeJs($module,$language=null) {
+		$language = $language != null ? $language : $this->language;
+		$package = $this->Module->getPackage($module);
+		$this->javascriptLanguages[] = $module.'@'.$language.'@'.$package->language;
+	}
+	
+	/**
+	 * 웹폰트 스타일시트를 불러온다.
+	 *
+	 * @param string $font 웹폰트명 (웹폰트명은 /styles/fonts 폴더에 정의되어있으며, 폰트파일은 /fonts 폴더에 존재)
+	 * @param boolean $isDefault 사이트 기본폰트로 사용할지 여부
+	 */
+	function loadWebFont($font,$isDefault=false) {
 		if (in_array($font,$this->webFont) == false) $this->webFont[] = $font;
 		if ($isDefault == true) $this->webFontDefault = $font;
 	}
 	
 	/**
-	 * Add site's head tag
+	 * 사이트 <HEAD> 태그 내부의 리소스를 추가한다.
 	 *
-	 * @param string $type type of meta tag (ex : style, meta, script, link...)
-	 * @param string[] $value values of tag's content (tagname => tagcontent)
+	 * @param string $type 리소스종류 (style, script, meta or etc)
+	 * @param string[] $value 리소스데이터 (style, script 의 경우 해당 파일의 경로 / 기타 태그의 경우 태그 attribute)
 	 */
-	function addSiteHeader($type,$value) {
+	function addHeadResource($type,$value) {
 		$tag = null;
 		
 		switch ($type) {
@@ -922,20 +1211,103 @@ class iModule {
 		if ($tag != null && in_array($tag,$this->siteHeader) == false) $this->siteHeader[] = $tag;
 	}
 	
-	function printError($code,$message='') {
-		if ($this->site == null) {
-			echo 'NOT_FOUND_SITE';
-			if ($code) echo ' : '.$code;
-		} else {
-			echo $this->getHeader();
-			echo '<b>ERROR : </b>'.$code;
-			echo $this->getFooter();
+	/**
+	 * 사이트 <HEAD> 내부 태그를 가져온다.
+	 *
+	 * @return string $header HEAD HTML
+	 * @todo 캐싱 기능 (로드되는 모든 파일을 하나의 파일로 통합)
+	 */
+	function getHeadResource() {
+		/**
+		 * 기본 사이트 자바스크립트 호출
+		 *
+		 * moment.js : 시간포맷을 위한 자바스크립트 라이브러리
+		 * jquery.1.11.2.min.js : jQuery
+		 * default.js : 기본 iModule 자바스크립트 라이브러리
+		 */
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/moment.js');
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/jquery.1.11.2.min.js');
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/default.js');
+		
+		/**
+		 * 자바스크립트 언어셋 요청이 있을 경우 언어셋파일을 자바스크립트로 불러온다.
+		 */
+		if (count($this->javascriptLanguages) > 0) {
+			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?languages='.implode(',',$this->javascriptLanguages));
 		}
+		
+		/**
+		 * PHP 설정값들 중 자바스크립트에 필수적으로 필요한 정보를 불러온다.
+		 */
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null ? $this->menu : '').'&page='.($this->page != null ? $this->page : '').'&view='.($this->view != null ? $this->view : ''));
+		
+		/**
+		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.
+		 */
+		$this->addHeadResource('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFont).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
+		
+		return implode(PHP_EOL,$this->siteHeader).PHP_EOL;
+	}
+	
+	/**
+	 * 전체게시물에 게시물데이터를 추가한다.
+	 *
+	 * @param string $module 모듈명
+	 * @param string $context 모듈의 컨텍스트명
+	 * @param string $type 게시물 종류
+	 * @param int $idx 게시물 고유번호
+	 * @param int $reg_date 게시물 등록일 또는 갱신일(UNIXTIME)
+	 */
+	function setArticle($module,$context,$type,$idx,$reg_date) {
+		$check = $this->db()->select($this->table->article)->where('module',$module)->where('type',$type)->where('idx',$idx)->get();
+		if ($check == null) {
+			$this->db()->insert($this->table->article,array('module'=>$module,'context'=>$context,'type'=>$type,'idx'=>$idx,'reg_date'=>$reg_date,'update_date'=>$reg_date))->execute();
+		} else {
+			$this->db()->update($this->table->article,array('context'=>$context,'update_date'=>$reg_date))->where('module',$module)->where('type',$type)->where('idx',$idx)->execute();
+		}
+	}
+	
+	/**
+	 * 전체게시물에 추가되어 있는 기존 게시물을 삭제한다.
+	 *
+	 * @param string $module 모듈명
+	 * @param string $type 게시물 종류
+	 * @param int $idx 게시물 고유번호
+	 */
+	function deleteArticle($module,$type,$idx) {
+		$this->db()->delete($this->table->article)->where('module',$module)->where('type',$type)->where('idx',$idx)->execute();
+	}
+	
+	/**
+	 * 에러메세지를 출력하고, 사이트 레이아웃 렌더링을 즉시 중단한다.
+	 *
+	 * @param string $code 에러코드 (core 언어셋에 정의되어 있다.)
+	 * @param string $message 추가적인 에러메세지
+	 * @return null
+	 */
+	function printError($code,$message='') {
+		$this->setSiteTitle('ERROR!');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
+		
+		$title = $this->getLanguage('error/code/'.$code);
+		
+		$IM = $this;
+		ob_start();
+		INCLUDE __IM_PATH__.'/includes/error.php';
+		$context = ob_get_contents();
+		ob_end_clean();
+		
+		INCLUDE __IM_PATH__.'/includes/header.php';
+		
+		echo $context;
+		
+		INCLUDE __IM_PATH__.'/includes/footer.php';
+		
 		exit;
 	}
 	
 	/**
-	 * Print html header
+	 * 사이트 레이아웃 헤더 HTML 코드를 가져온다.
 	 *
 	 * @return string $headerHTML
 	 */
@@ -943,28 +1315,28 @@ class iModule {
 		if (defined('__IM_HEADER_INCLUDED__') == true) return;
 		$site = $this->getSite();
 		
-		$this->addSiteHeader('style',__IM_DIR__.'/styles/default.css');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/default.css');
 		
 		$IM = $this;
 		$values = new stdClass();
 		$values->header = '';
 		
-		if ($this->getSiteDescription()) $this->addSiteHeader('meta',array('name'=>'description','content'=>$this->getSiteDescription()));
-		$this->addSiteHeader('link',array('rel'=>'canonical','href'=>$this->getSiteCanonical()));
+		if ($this->getSiteDescription()) $this->addHeadResource('meta',array('name'=>'description','content'=>$this->getSiteDescription()));
+		$this->addHeadResource('link',array('rel'=>'canonical','href'=>$this->getSiteCanonical()));
 		
 		if ($this->site->emblem !== null) {
-			$this->addSiteHeader('link',array('rel'=>'apple-touch-icon','sizes'=>'57x57','href'=>$this->site->emblem));
-			$this->addSiteHeader('link',array('rel'=>'apple-touch-icon','sizes'=>'114x114','href'=>$this->site->emblem));
-			$this->addSiteHeader('link',array('rel'=>'apple-touch-icon','sizes'=>'72x72','href'=>$this->site->emblem));
-			$this->addSiteHeader('link',array('rel'=>'apple-touch-icon','sizes'=>'144x144','href'=>$this->site->emblem));
+			$this->addHeadResource('link',array('rel'=>'apple-touch-icon','sizes'=>'57x57','href'=>$this->site->emblem));
+			$this->addHeadResource('link',array('rel'=>'apple-touch-icon','sizes'=>'114x114','href'=>$this->site->emblem));
+			$this->addHeadResource('link',array('rel'=>'apple-touch-icon','sizes'=>'72x72','href'=>$this->site->emblem));
+			$this->addHeadResource('link',array('rel'=>'apple-touch-icon','sizes'=>'144x144','href'=>$this->site->emblem));
 		}
 		
 		if ($this->site->favicon !== null) {
-			$this->addSiteHeader('link',array('rel'=>'shortcut icon','type'=>'image/x-icon','href'=>$this->site->favicon));
+			$this->addHeadResource('link',array('rel'=>'shortcut icon','type'=>'image/x-icon','href'=>$this->site->favicon));
 		}
 		
 		if ($this->site->maskicon->icon !== null) {
-			$this->addSiteHeader('link',array('rel'=>'mask-icon','href'=>$this->site->maskicon->icon,'color'=>$this->site->maskicon->color));
+			$this->addHeadResource('link',array('rel'=>'mask-icon','href'=>$this->site->maskicon->icon,'color'=>$this->site->maskicon->color));
 		}
 		
 		ob_start();
@@ -981,7 +1353,7 @@ class iModule {
 	}
 	
 	/**
-	 * Print html footer
+	 * 사이트 레이아웃 푸터 HTML 코드를 가져온다.
 	 *
 	 * @return string $footerHTML
 	 */
@@ -1090,7 +1462,7 @@ class iModule {
 		/**
 		 * 사이트 템플릿의 layouts 폴더에 정의된 레이아웃 파일이 없을 경우 에러메세지를 출력한다.
 		 */
-		if (is_file($this->getTempletPath().'/layouts/'.$config->layout.'.php') == false) return $this->printError('NOT_FOUND_LAYOUT : '.$config->layout);
+		if (is_file($this->getTempletPath().'/layouts/'.$config->layout.'.php') == false) $this->printError('NOT_FOUND_LAYOUT : '.$config->layout);
 		
 		/**
 		 * 레이아웃 파일에서 iModule core 에 접근할 수 있도록 $IM 변수를 선언한다.
@@ -1188,10 +1560,10 @@ class iModule {
 	}
 	
 	/**
-	 * Parse permission string
+	 * 권한코드를 해석하여 권한이 존재하는지 확인한다.
 	 *
-	 * @param string $permssionString
-	 * @return boolean $hasPermission
+	 * @param string $permssionString 권한코드
+	 * @return boolean $hasPermission true : 권한이 있는 경우 / false : 권한이 없는 경우
 	 */
 	function parsePermissionString($permissionString) {
 		$member = $this->getModule('member')->getMember();
@@ -1221,7 +1593,8 @@ class iModule {
 	}
 	
 	/**
-	 * Check permission string
+	 * 권한코드가 제대로 입력되었는지 확인한다.
+	 * 권한코드는 EVAL 함수로 PHP에서 직접 실행되기 때문에 유효성 검증이 필요하다.
 	 *
 	 * @param string $permssionString
 	 * @return boolean/string $success or $errorString
@@ -1337,6 +1710,22 @@ class iModule {
 		 * 사이트 HTML 코드를 출력한다.
 		 */
 		echo $html;
+	}
+	
+	/**
+	 * 특정 시점에서 이벤트를 발생시킨다.
+	 * 발생된 이벤트는 모듈이나 에드온 등에서 정의된 이벤트리스너를 호출하게 되고, 이벤트 리스너 내부에서 전달된 값들을 수정하여 최정결과값에 반영할 수 있다.
+	 * 이벤트 발생 및 이벤트 처리는 Event 클래스에서 관여한다.
+	 *
+	 * @param string $event 이벤트 타입 (afterInitContext or afterDoProcess ... etc.)
+	 * @param string $target 이벤트를 발생시킨 대상 (core 또는 모듈명)
+	 * @param string $caller 이벤트를 발생시킨 지점 (보통 이벤트를 발생시킨 함수명)
+	 * @param object $values 이벤트 리스너에게 전달시켜줄 데이터
+	 * @param object $results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
+	 * @param string &$context 레이아웃에 관여하는 이벤트는 현재까지 파싱된 컨텍스트나 레이아웃 HTML 코드를 전달한다. (call by reference)
+	 */
+	function fireEvent($event,$target,$caller,$values=null,$results=null,&$context=null) {
+		$this->Event->fireEvent($event,$target,$caller,$values,$results,$context);
 	}
 }
 ?>
