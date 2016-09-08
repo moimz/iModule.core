@@ -1,4 +1,15 @@
 <?php
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * 위젯코어 클래스는 서버에 설치된 모든 위젯을 관리하고 화면상에 출력한다.
+ * 이 클래스는 모든 위젯의 widget.php 파일이나, 위젯 템플릿에서 $Widget 변수로 접근할 수 있다.
+ * 
+ * @file /classes/Widget.class.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160831
+ */
 class Widget {
 	private $IM;
 	private $Module;

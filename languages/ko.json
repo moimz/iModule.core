@@ -1,5 +1,9 @@
 {
 	"error":{
+		"backToMain":"메인 페이지로 돌아가기",
+		"code":{
+			"NOT_FOUND_SITE":"사이트를 찾을 수 없습니다.<br>먼저 사이트관리자에서 현재 도메인을 사용하는 사이트를 생성한 뒤 사용하여 주십시오."
+		},
 		"permissionString":{
 			"unknownCode":"정의되지 않은 치환자 {code}가 있습니다.",
 			"parse":"입력된 권한구문을 해석할 수 없습니다.",

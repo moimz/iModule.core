@@ -1,93 +1,48 @@
-	<div class="nbreadcrumb">
-		<div class="container">
-			<h3>
-			<?php
-			if ($IM->page == null) {
-				$pageInfo = $IM->getMenus($IM->menu);
-				if (isset($pageInfo->context->icon) == true && preg_match('/^fa\-/',$pageInfo->context->icon) == true) {
-					$icon = $pageInfo->context->icon;
-				} else {
-					$icon = 'fa-file-o';
-				}
-			} else {
-				$pageInfo = $IM->getPages($IM->menu,$IM->page);
-				if (isset($pageInfo->context->icon) == true && preg_match('/^fa\-/',$pageInfo->context->icon) == true) {
-					$icon = $pageInfo->context->icon;
-				} else {
-					if ($pageInfo->type == 'MODULE') {
-						$mPackage = $IM->Module->getPackage($pageInfo->context->module);
-						$icon = isset($mPackage->icon) == true ? $mPackage->icon : 'fa-file-o';
-					} else {
-						$icon = 'fa-file-o';
-					}
-				}
-			}
-			echo '<i class="fa '.$icon.'"></i> '.$pageInfo->title;
-			?>
-			</h3>
-			
-			<ol>
-				<li><a href="<?php echo __IM_DIR__.'/'; ?>"><i class="fa fa-home"></i></a></li>
-				<?php if ($IM->menu != null) { ?>
-				<li><i class="fa fa-angle-right"></i></li>
-				<li<?php echo $IM->page == null ? ' class="current"' : ''; ?>><a href="<?php echo $IM->getUrl(null,false); ?>"><?php echo $IM->getMenus($IM->menu)->title; ?></a></li>
-				<?php if ($IM->page != null) { ?>
-				<li><i class="fa fa-angle-right"></i></li>
-				<li class="current"><a href="<?php echo $IM->getUrl(null,null,false); ?>"><?php echo $IM->getPages($IM->menu,$IM->page)->title; ?></a></li>
-				<?php } } ?>
-			</ol>
-		</div>
-	</div>
-	
-	<div class="container">
-		<div class="row">
-			<div class="col-md-9">
-				<?php echo $context; ?>
-			</div>
-			
-			<div class="col-md-3 hidden-sm hidden-xs">
-				<?php $IM->getWidget('member/login')->setTemplet('@sidebar')->doLayout(); ?>
-				<div class="blankSpace"></div>
-				<?php $IM->getWidget('pagelist')->setTemplet('@sidemenu')->setValue('menu',$IM->menu)->doLayout(); ?>
-				<div class="blankSpace"></div>
-				
-				<?php
-				if ($IM->getPages('index','notice') !== null && $IM->getPages('index','notice')->type == 'MODULE' && $IM->getPages('index','notice')->context->module == 'board') {
-					$notice = $IM->getWidget('board/recently')->setTemplet('@sidelist')->setValue('type','post')->setValue('bid',$IM->getPages('index','notice')->context->context)->setValue('titleIcon','<i class="fa fa-bell"></i>')->setValue('count',3);
-					if ($IM->getPages('index','notice')->context->config != null && $IM->getPages('index','notice')->context->config->category) {
-						$notice->setValue('category',$IM->getPages('index','notice')->context->config->category);
-					}
-					$notice->doLayout();
-					echo '<div class="blankSpace"></div>';
-				}
-				?>
-				
-				<div class="tabTitle" role="tab" data-type="mouseover">
-					<ul>
-						<li data-toggle="latestPost" style="width:50%;" class="selected">최근글</li>
-						<li data-toggle="latestMent" style="width:50%;">최근댓글</li>
-					</ul>
-				</div>
-				
-				<div class="tabContent" role="tabpanel" data-toggle="latestPost">
-					<?php $IM->getWidget('article')->setTemplet('@sidelist')->setValue('type','post')->setValue('count',10)->setValue('titleIcon','<i class="fa fa-leaf"></i>')->doLayout(); ?>
-				</div>
-				
-				<div class="tabContent" role="tabpanel" data-toggle="latestMent" style="display:none;">
-					<?php $IM->getWidget('article')->setTemplet('@sidelist')->setValue('type','ment')->setValue('count',10)->setValue('titleIcon','<i class="fa fa-comments"></i>')->doLayout(); ?>
-				</div>
-				
-				<div class="blankSpace"></div>
-				
-				<div style="min-height:600px;">
-					<div class="rightFixed">
-						<div class="rightFixedInner">
-							<?php echo $IM->getSiteTempletConfig('ad_sidebar'); ?>
-						</div>
-					</div>
-					
-					<script>$(".rightFixedInner").data("html",<?php echo json_encode($IM->getSiteTempletConfig('ad_sidebar')); ?>);</script>
-				</div>
-			</div>
-		</div>
-	</div>
+<?php
+/**
+ * 이 파일은 iModule 사이트템플릿(default)의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule 사이트 템플릿의 컨텍스트를 구성하기 위한 레이아웃파일로 사이트관리자에서 [서브페이지 (상단에 네비게이션바 및 우측에 페이지목록이 포함되어 있습니다.)] 레이아웃을 선택한 메뉴에 사용된다.
+ * 
+ * @file /templets/default/layouts/index.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160906
+ */
+if (defined('__IM__') == false) exit;
+?>
+<main>
+	<?php
+	/**
+	 * 이 레이아웃에서 컨텍스트가 들어갈 위치에 컨텍스트 HTML 을 출력한다.
+	 * @see /classes/iModule.class.php -> getContextLayout()
+	 */
+	echo $context;
+	?>
+</main>
+
+<aside>
+	<?php
+	/**
+	 * 현재 메뉴의 서브메뉴(2차메뉴)가 있을 경우, 서브메뉴 네비게이션을 출력한다.
+	 * @see /classes/iModule.class.php -> getPages()
+	 */
+	$pages = $IM->getPages($IM->menu);
+	if (count($pages) > 0) {
+	?>
+	<ul>
+		<?php
+		foreach ($pages as $page) {
+			/**
+			 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
+			 * @see /classes/iModule.class.php -> parseIconString()
+			 */
+			$icon = $IM->parseIconString($menu->icon);
+		?>
+		<li>
+			<a href="<?php echo $IM->getUrl($page->menu,$page->page,false); ?>"><?php echo $icon.$page->title; ?></a>
+		</li>
+		<?php } ?>
+	</ul>
+	<?php } ?>
+</aside>

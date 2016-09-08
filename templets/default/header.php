@@ -1,110 +1,131 @@
 <?php
+/**
+ * 이 파일은 iModule 사이트템플릿(default)의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule 사이트 템플릿으로 iModule 코어에 포함되어 있는 기본템플릿은 주석이 있다.
+ * 주석이 없는 템플릿은 iModule 웹사이트에서 다운로드 받을 수 있다.
+ * 
+ * @file /templets/default/header.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160905
+ */
 if (defined('__IM__') == false) exit;
+
+/**
+ * 헤더가 출력되었는지 확인하기 위한 상수 정의
+ */
 define('__IM_HEADER_INCLUDED__',true);
 
-$temp = explode('.',$_SERVER['HTTP_HOST']);
-$domain = $temp[1];
+/**
+ * 언어셋에 따라 웹폰트를 불러온다.
+ */
+if ($IM->language == 'ko') {
+	$IM->loadWebFont('NanumBarunGothic',true);
+	$IM->loadWebFont('OpenSans');
+} else {
+	$IM->loadWebFont('OpenSans',true);
+}
 
-$IM->addWebFont('NanumBarunGothic',true);
-$IM->addWebFont('OpenSans');
-$IM->addSiteHeader('style',$IM->getTempletDir().'/styles/style.css');
-$IM->addSiteHeader('script',$IM->getTempletDir().'/scripts/script.js');
+/**
+ * 템플릿 전용 자바스크립트와 스타일시트를 불러온다.
+ * common.css 파일은 iModule core 에 의하여 자동으로 로딩된다.
+ * @see /styles/common.css
+ * @see /templets/default/styles/common.css.sample
+ */
+$IM->addHeadResource('style',$IM->getTempletDir().'/styles/style.css');
+$IM->addHeadResource('script',$IM->getTempletDir().'/scripts/script.js');
 ?>
 <!DOCTYPE HTML>
 <html lang="<?php echo $IM->language; ?>">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?php echo $IM->getSiteTitle(); ?></title>
-<?php echo $IM->getSiteHeader(); ?>
-<?php echo $IM->getSiteTempletConfig('head'); ?>
+<?php
+/**
+ * 사이트 <HEAD> 태그 내부의 리소스를 출력한다.
+ * <HEAD> 태그 내부 리소스는 iModule core 에 의하여 관리됩니다.
+ * @see /classes/iModule.class.php -> getHeadResource()
+ */
+echo $IM->getHeadResource();
+
+/**
+ * 사이트 템플릿 설정에서 head 값을 가져온다.
+ * @see /templets/default/package.json -> configs
+ * @see /classes/iModule.class.php -> getSiteTempletConfig()
+ */
+echo $IM->getSiteTempletConfig('head');
+?>
 </head>
 <body>
 
+<?php
+/**
+ * iModule 을 감싸는 레이어를 선언하여 줍니다. (필수)
+ */
+?>
 <div id="iModuleWrapper">
+	<?php
+	/**
+	 * iModule 의 알림메세지가 출력되는 레이어를 선언하여 줍니다. (해당 id 값이 정의되어 있지 않은경우 브라우저의 alert 창으로 메세지가 출력됩니다.)
+	 */
+	?>
 	<div id="iModuleAlertMessage"></div>
 	
-	<header id="iModuleHeader" class="hidden-xs">
-		<div class="topmenu">
-			<div class="container">
-				<ul class="familySite">
-					<?php foreach ($IM->getSites(null,$IM->language) as $site) { ?>
-					<li><a href="<?php echo $site->is_ssl == 'TRUE' ? 'https' : 'http'; ?>://<?php echo $site->domain; ?>"><?php echo $site->title; ?></a></li>
-					<?php } ?>
-				</ul>
-			</div>
-		</div>
+	<header>
+		<?php
+		/**
+		 * 사이트로고를 가져온다.
+		 * 사이트로고가 없을 경우 사이트타이틀을 출력한다.
+		 * @see /classes/iModule.class.php -> getSiteLogo()
+		 */
+		?>
+		<h1><?php echo $IM->getSiteLogo('default') == null ? $IM->getSiteTitle() : '<img src="'.$IM->getSiteLogo('default').'" alt="'.$IM->getSiteTitle().'">'; ?></h1>
 		
-		<div class="header">
-			<div class="container">
-				<h1<?php echo $IM->getSiteLogo('default') == null ? ' class="text"' : ' style="background-image:url('.$IM->getSiteLogo('default').');"'; ?>><a href="<?php echo __IM_DIR__.'/'.$IM->language.'/'; ?>"><?php echo $IM->getSite()->title; ?></a></h1>
-				
-				<div class="topRight">
-					<?php echo $IM->getSiteTempletConfig('ad_top'); ?>
-				</div>
-			</div>
-		</div>
-	</header>
-	
-	<div class="naviWrapper">
-		<nav id="iModuleNavigation" class="navigation" role="navigation">
-			<div class="container">
-				<ul class="hidden-xs hidden-sm">
-					<?php $menus = $IM->getMenus(); for ($i=0, $loop=count($menus);$i<$loop;$i++) { $pages = $IM->getPages($menus[$i]->menu); ?>
-					<li>
-						<a href="<?php echo $IM->getUrl($menus[$i]->menu,false); ?>"<?php echo $IM->menu == $menus[$i]->menu ? ' class="selected"' : ''; ?>><?php echo $menus[$i]->title; ?></a>
-						<?php if (count($pages) > 0) { ?>
-						<ul class="dropdown">
-							<?php for ($j=0, $loopj=count($pages);$j<$loopj;$j++) { $pageCountInfo = $IM->getPageCountInfo($pages[$j]); ?>
-							<li>
-								<?php if ($pages[$j]->type == 'LINK') { ?>
-								<a href="<?php echo $pages[$j]->context->link; ?>" target="<?php echo $pages[$j]->context->target; ?>">
-									<span class="link"><i class="fa fa-share-square-o"></i></span>
-									<?php echo $pages[$j]->title; ?>
-								</a>
-								<?php } else { ?>
-								<a href="<?php echo $IM->getUrl($menus[$i]->menu,$pages[$j]->page,false); ?>">
-									<?php if ($pageCountInfo != null) { ?>
-									<span class="badge<?php echo $pageCountInfo->latest_date > time() - 60*60*24*3 ? ' new' : ''; ?>"><?php echo isset($pageCountInfo->count) == true ? number_format($pageCountInfo->count) : $pageCountInfo->text; ?></span>
-									<?php } ?>
-									<?php echo $pages[$j]->title; ?>
-								</a>
-								<?php } ?>
-							</li>
-							<?php } ?>
-						</ul>
-						<?php } ?>
-					</li>
-					<?php } ?>
-				</ul>
-				
-				<a href="<?php echo __IM_DIR__.'/'; ?>" class="emblem visible-xs-inline-block visible-sm-inline-block"<?php echo $IM->getSite()->emblem !== null ? ' style="background-image:url('.$IM->getSite()->emblem.');"' : ''; ?>><?php echo $IM->getSite()->title; ?></a>
-				
-				<button class="menu visible-xs-inline-block visible-sm-inline-block" onclick="iModule.slideMenu.toggle(true);"><i class="fa fa-bars"></i> MENU</button>
-				
-				<div class="menu push" onclick="TogglePush(this);">
-					<i class="fa fa-bell"></i>
-					<span class="badge" data-push-badge="true"><?php echo $IM->getModule('push')->getPushCount('UNCHECK'); ?></span>
+		<nav>
+			<ul>
+				<?php
+				/**
+				 * 전체 사이트메뉴를 가져와 메뉴링크를 만든다.
+				 * @see /classes/iModule.class.php -> getSitemap()
+				 * @see /classes/iModule.class.php -> getUrl()
+				 */
+				foreach ($IM->getSitemap() as $menu) {
+					/**
+					 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
+					 * @see /classes/iModule.class.php -> parseIconString()
+					 */
+					$icon = $IM->parseIconString($menu->icon);
+				?>
+				<li>
+					<a href="<?php echo $IM->getUrl($menu->menu,false); ?>"><?php echo $icon.$menu->title; ?></a>
 					
-					<div class="list">
-						<div class="arrowBox">
-							<b><?php echo $IM->getModule('push')->getLanguage('title'); ?></b>
-							<button><?php echo $IM->getModule('push')->getLanguage('button/config'); ?></button>
-							<i></i>
-							<button onclick="Push.readAll(event);"><?php echo $IM->getModule('push')->getLanguage('button/read_all'); ?></button>
-						</div>
-						
-						<ul>
-							<li class="loading"></li>
-							<li class="noitem"><?php echo $IM->getModule('push')->getLanguage('error/notFound'); ?></li>
-						</ul>
-						
-						<?php $pushPage = $IM->getModule('member')->getMemberPage('push'); ?>
-						<a href="<?php echo $IM->getUrl($pushPage->menu,$pushPage->page,false); ?>"><?php echo $IM->getModule('push')->getLanguage('button/show_all'); ?></a>
-					</div>
-				</div>
-			</div>
+					<?php
+					/**
+					 * 2차 메뉴가 있다면 를 가져온다.
+					 */
+					if (count($menu->pages) > 0) {
+					?>
+					<ul>
+						<?php
+						foreach ($menu->pages as $page) {
+							/**
+							 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
+							 * @see /classes/iModule.class.php -> parseIconString()
+							 */
+							$icon = $IM->parseIconString($page->icon);
+						?>
+						<li>
+							<a href="<?php echo $IM->getUrl($page->menu,$page->page,false); ?>"><?php echo $icon.$page->title; ?></a>
+						</li>
+						<?php } ?>
+					</ul>
+					<?php } ?>
+				</li>
+				<?php } ?>
+			</ul>
 		</nav>
-	</div>
+	</header>
 	
 	<div class="context">

@@ -122,7 +122,7 @@ if ($action == 'install') {
 		if ($keyFile !== false && $dbFile !== false) {
 			if (CreateDatabase($dbConnect,$package->databases) == true) {
 				if ($dbConnect->select('site_table')->count() == 0) {
-					$dbConnect->insert('site_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'title'=>'iModule','description'=>'Site Description','templet'=>'default','is_ssl'=>(isset($_SERVER['HTTPS']) == true ? 'TRUE' : 'FALSE'),'is_default'=>'TRUE','templetConfigs'=>'{"intro":"Intro Text","facebook":"","twitter":"","company":"Moimz","address":"Seoul, Republic of Korea","contact":"help@moimz.com","copyright":"{year} Moimz","ad_top":"","ad_sidebar":"","ad_slide":""}','sort'=>0))->execute();
+					$dbConnect->insert('site_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'title'=>'iModule','description'=>'Site Description','templet'=>'default','logo'=>'{"default":-1,"footer":-1}','maskicon'=>'{"icon":-1,"color":"#0578bf"}','is_ssl'=>(isset($_SERVER['HTTPS']) == true ? 'TRUE' : 'FALSE'),'is_default'=>'TRUE','templetConfigs'=>'{}','sort'=>0))->execute();
 				} else {
 					$dbConnect->update('site_table',array('templetConfigs'=>'{}'))->where('templetConfigs','')->execute();
 				}

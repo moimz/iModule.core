@@ -148,7 +148,7 @@
 				"module":"primary_key"
 			}
 		},
-		"page_table":{
+		"sitemap_table":{
 			"columns":{
 				"domain":{
 					"type":"varchar",
@@ -183,6 +183,11 @@
 				},
 				"description":{
 					"type":"text",
+					"is_null":true
+				},
+				"icon":{
+					"type":"varchar",
+					"length":100,
 					"is_null":true
 				},
 				"image":{

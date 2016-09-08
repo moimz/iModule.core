@@ -1,0 +1,26 @@
+php_value  display_errors  true
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+RewriteRule ^admin/([^\/]+)/?$ admin/index.php?menu=$1 [L]
+RewriteRule ^admin/([^\/]+)/([^\/]+)$ admin/index.php?menu=$1&page=$2 [L]
+RewriteRule ^admin/([^\/]+)/([^\/]+)/([^\/]+)$ admin/index.php?menu=$1&page=$2&tab=$3 [L]
+
+RewriteRule ^attachment/(original|view|thumbnail|download)/([0-9]+)/([^\/]+)$ process/index.php?module=attachment&action=$1&idx=$2&name=$3 [L]
+RewriteRule ^([a-z]{2})/process/([^/\.]+)/([^/\.]+)/?$ process/index.php?language=$1&module=$2&action=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/api/([^/\.]+)/([^/\.]+)/?$ api/index.php?language=$1&module=$2&api=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/module/([^/\.]+)/?$ modules/$2/index.php?language=$1&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/?$ modules/$2/index.php?language=$1&container=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/([^/]+)/?$ modules/$2/index.php?language=$1&container=$3&idx=$4&%{QUERY_STRING} [L]
+
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/list/([^/]+)/?$ index.php?language=$1&menu=$2&page=$3&view=list&p=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/folder(.*?)$ index.php?language=$1&menu=$2&page=$3&folder=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/tag/(.*?)$ index.php?language=$1&menu=$2&page=$3&tag=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/([^/]+)/?$ index.php?language=$1&menu=$2&page=$3&view=$4&idx=$5&%{QUERY_STRING} [L]
+
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ index.php?language=$1&menu=$2&page=$3&view=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/?$ index.php?language=$1&menu=$2&page=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/?$ index.php?language=$1&menu=$2&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/?$ index.php?language=$1

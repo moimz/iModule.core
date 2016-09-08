@@ -1,45 +1,14 @@
-		<div class="index container">
-			<div class="row">
-				<div class="col-md-9">
-					<div class="notice">
-						<section>
-							<?php
-							if ($IM->getPages('index','notice') !== null && $IM->getPages('index','notice')->type == 'MODULE' && $IM->getPages('index','notice')->context->module == 'board') {
-								$notice = $IM->getWidget('board/recently')->setTemplet('@notice')->setValue('type','post')->setValue('bid',$IM->getPages('index','notice')->context->context)->setValue('titleIcon','<i class="fa fa-bell"></i>')->setValue('count',3);
-								if ($IM->getPages('index','notice')->context->config != null && $IM->getPages('index','notice')->context->config->category) {
-									$notice->setValue('category',$IM->getPages('index','notice')->context->config->category);
-								}
-								$notice->doLayout();
-							}
-							?>
-						</section>
-						
-						<aside>
-							<?php $IM->getWidget('member/recently')->setTemplet('default')->setValue('photoOnly',true)->setValue('count',16)->doLayout(); ?>
-						</aside>
-					</div>
-					
-					<div class="blankSpace"></div>
-					
-					<div class="row">
-						<div class="col-sm-6">
-							<?php $IM->getWidget('article')->setTemplet('default')->setValue('type',array('post','question','answer','version'))->setValue('count',10)->setValue('titleIcon','<i class="fa fa-leaf"></i>')->doLayout(); ?>
-						</div>
-						
-						<div class="col-sm-6">
-							<?php $IM->getWidget('article')->setTemplet('default')->setValue('type','ment')->setValue('count',10)->setValue('titleIcon','<i class="fa fa-leaf"></i>')->doLayout(); ?>
-						</div>
-					</div>
-				</div>
-				
-				<div class="col-md-3 hidden-sm hidden-xs">
-					<?php $IM->getWidget('member/login')->setTemplet('@sidebar')->doLayout(); ?>
-					
-					<div style="min-height:600px;">
-						<div class="rightFixed">
-							<!-- Banner Area (responsive) -->
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+<?php
+/**
+ * 이 파일은 iModule 사이트템플릿(default)의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule 사이트 템플릿의 외부PHP 파일로 직접 PHP파일을 작성해 사이트에 추가할때 사용한다.
+ * 사이트관리자에서 외부페이지를 선택하고, /templets/default/externals/index.php 파일을 선택한 메뉴에 사용된다.
+ * 
+ * @file /templets/default/externals/index.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160906
+ */
+?>
+Welcome to index page.

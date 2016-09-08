@@ -1,15 +1,35 @@
 <?php
 /**
- * This file is part of iModule - https://www.imodule.kr
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
  *
- * @file Module.class.php
- * @author Arzz
+ * 모듈 코어클래스로 iModule 의 모든 모듈을 관리한다.
+ * 이 클래스는 iModule 코어나, Admin 모듈에서 호출되는 경우를 제외하고 각 모듈클래스에서 호출되는 경우 대부분의 $module 파라매터를 사용하지 않아도 된다.
+ * 이 클래스는 각 모듈클래스에서 $Module 변수로 접근할 수 있다.
+ * 
+ * @file /classes/Module.class.php
+ * @author Arzz (arzz@arzz.com)
  * @license MIT License
+ * @version 3.0.0.160907
  */
 class Module {
+	/**
+	 * iModule 코어클래스
+	 */
 	private $IM;
 	
+	/**
+	 * DB 관련 변수정의
+	 *
+	 * @private string[] $table DB 테이블 별칭 및 원 테이블명을 정의하기 위한 변수
+	 */
 	private $table;
+	
+	/**
+	 * 각 모듈에서 이 클래스를 호출하였을 경우 사용되는 모듈정보
+	 *
+	 * @private string $modulePath 이 클래스를 호출한 모듈의 절대경로
+	 * @private string $modulePath 이 클래스를 호출한 모듈의 절대경로
+	 */
 	private $modulePath;
 	private $moduleDir;
 	private $modulePackage;
@@ -168,6 +188,51 @@ class Module {
 	}
 	
 	/**
+	 * [사이트관리자] 모듈의 컨텍스트 목록을 가져온다.
+	 *
+	 * @param string $module 모듈명
+	 * @return striong[] $contexts 컨텍스트명
+	 */
+	function getContexts($module) {
+		$mModule = $this->IM->getModule($module);
+		if (method_exists($mModule,'getContexts') == true) return $mModule->getContexts();
+		return array();
+	}
+	
+	/**
+	 * [사이트관리자] 모듈의 컨텍스트 환경설정을 가져온다.
+	 *
+	 * @param string $domain 설정대상 사이트도메인, 없을경우 현재사이트
+	 * @param string $langauge 설정대상 사이트언어셋, 없을경우 현재사이트
+	 * @param string $module 설정대상 모듈명
+	 * @param string $context 설정대상 컨텍스트명
+	 * @return object[] $configs 컨텍스트 환경설정
+	 */
+	function getContextConfigs($domain,$language,$module,$context) {
+		$site = $this->IM->getSites($domain,$language);
+		$mModule = $this->IM->getModule($module);
+		if (method_exists($mModule,'getContextConfigs') == true) return $mModule->getContextConfigs($site,$context);
+		return array();
+	}
+	
+	/**
+	 * 모듈의 컨텍스트 제목을 가져온다.
+	 *
+	 * @param string $context 컨텍스트명
+	 * @param string $module 모듈명, 모듈명이 없을 경우 현재 로드된 모듈
+	 * @return string $title 컨텍스트 제목
+	 */
+	function getContextTitle($context,$module=null) {
+		$module = $module == null ? $this->loaded : $module;
+		if ($module == null) return '';
+		
+		$mModule = $this->IM->getModule($module);
+		if (method_exists($mModule,'getContextTitle') == true) return $mModule->getContextTitle($context);
+		return '';
+	}
+	
+	
+	/**
 	 * Get module configs from im_module_table's configs field (install module only)
 	 *
 	 * @return object $info
@@ -226,6 +291,38 @@ class Module {
 		$package->dir = $templetDir;
 		
 		return $package;
+	}
+	
+	/**
+	 * 사이트관리자에서 사용하는 모듈 설정패널을 구성한다.
+	 *
+	 * @param string $module 모듈명
+	 * @return string $panel 설정패널 HTML
+	 */
+	function getConfigPanel($module) {
+		/**
+		 * 모듈을 불러온다.
+		 */
+		$mModule = $this->IM->getModule($module);
+		
+		/**
+		 * 모듈에 설정패널 메소드가 없으면 NULL 을 반환한다.
+		 */
+		if (method_exists($mModule,'getConfigPanel') == false) return null;
+		return $mModule->getConfigPanel();
+	}
+	
+	/**
+	 * 사이트관리자에서 사용하는 모듈 설정패널이 있는지 확인한다.
+	 *
+	 * @param string $module 모듈명
+	 * @param boolean $hasConfig
+	 */
+	function isConfigPanel($module) {
+		/**
+		 * 모듈에 설정패널 설정패널 함수가 있으면 true 를 반환한다.
+		 */
+		return method_exists($this->IM->getModule($module),'getConfigPanel') === true;
 	}
 	
 	/**
@@ -305,11 +402,11 @@ class Module {
 	}
 	
 	/**
-	 * Get admin panel of modules
+	 * 사이트관리자 기능을 사용하는 모듈목록을 가져온다.
 	 *
 	 * @return object[] $modules
 	 */
-	function getAdmins() {
+	function getAdminModules() {
 		$modules = $this->IM->db()->select($this->table->module)->where('is_admin','TRUE')->get();
 		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
 //			$modules[$i] = $this->IM->getModule($modules[$i]->module);
@@ -319,11 +416,11 @@ class Module {
 	}
 	
 	/**
-	 * Get modules that used context
+	 * 컨텍스트를 사용한다고 설정된 모듈목록을 가져온다.
 	 *
 	 * @return object[] $modules
 	 */
-	function getContexts() {
+	function getContextModules() {
 		$modules = $this->IM->db()->select($this->table->module)->where('is_context','TRUE')->get();
 		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
 			$modules[$i]->title = $this->getTitle($modules[$i]->module);
