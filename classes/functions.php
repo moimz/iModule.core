@@ -465,6 +465,35 @@ function AntiXSS($data) {
 	return $purifier->purify($data);
 }
 
+/**
+ * 폴더의 용량을 구한다.
+ *
+ * @param string $path 폴더
+ * @param boolean $isKIB KiB 단위 사용여부
+ * @return int $size 폴더용량
+ */
+function GetFolderSize($path) {
+	$size = 0;
+	$openDir = @opendir($path);
+	while ($file = @readdir($openDir)) {
+		if ($file != '.' && $file != '..' && is_dir($path.'/'.$file) == true) {
+			$size+= GetFolderSize($path.'/'.$file);
+		} elseif (is_file($file) == true) {
+			$size+= filesize($path.'/'.$file);
+		}
+	}
+	@closedir($openDir);
+	
+	return $size;
+}
+
+/**
+ * byte 단위의 파일용량을 적절한 단위로 변환한다.
+ *
+ * @param string $size byte 단위 용량
+ * @param boolean $isKIB KiB 단위 사용여부
+ * @return int $size 폴더용량
+ */
 function GetFileSize($size,$isKIB=false) {
 	$depthSize = $isKIB === true ? 1024 : 1000;
 	if ($size / $depthSize / $depthSize / $depthSize > 1) return sprintf('%0.2f',$size / $depthSize / $depthSize / $depthSize).($isKIB === true ? 'GiB' : 'GB');

@@ -15,4 +15,79 @@
 
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 html, body {width:100%; height:100%; overflow:auto; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;}
-input, textarea, button {font-family:inherit;}
+input, textarea, button, select {font-family:inherit; outline:none;}
+
+/**
+ * alert 영역 디자인 정의
+ */
+div[data-role=alert] {position:fixed; top:0; left:0; width:100%;}
+
+/**
+ * Form 객체 기본 디자인 정의
+ */
+div[data-role=input] {display:block; width:100%; height:40px; position:relative;}
+div[data-role=input] input, div[data-role=input] textarea, div[data-role=input] select {-webkit-appearance:none;}
+div[data-role=inputset] {display:block; width:100%; position:relative; font-size:0;}
+div[data-role=inputset] > div[data-role=input] {display:block; margin-top:5px; vertical-align:middle;}
+div[data-role=inputset] > div[data-role=input]:first-child {margin-top:0px;}
+div[data-role=inputset].inline > div[data-role=input] {display:inline-block; margin-top:0px; margin-left:5px;}
+div[data-role=inputset].inline > div[data-role=input]:first-child {margin-left:0px;}
+
+div[data-role=input][data-type=select] > button {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; line-height:1; cursor:pointer; color:#666;}
+div[data-role=input][data-type=select] > button > span {display:inline-block; width:calc(100% - 30px); height:38px; line-height:38px; font-size:14px; vertical-align:middle; text-align:left; box-sizing:border-box; padding:0px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+div[data-role=input][data-type=select] > button > i {display:inline-block; width:30px; height:38px; font-size:14px; line-height:38px; text-align:center; vertical-align:middle;}
+div[data-role=input][data-type=select] > button:focus, div[data-role=input][data-type=select] > button:active, div[data-role=input][data-type=select] > button.focus {border-color:#66afe9;}
+div[data-role=input][data-type=select] > button:focus > i, div[data-role=input][data-type=select] > button:active > i, div[data-role=input][data-type=select] > button.focus > i {color:#428bca;}
+div[data-role=input][data-type=select] > button:disabled {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
+div[data-role=input][data-type=select] > ul {list-style:none; border:1px solid #66afe9; box-sizing:border-box; width:100%; position:absolute; top:39px; left:0; z-index:10; background:#fff; display:none;}
+div[data-role=input][data-type=select] > ul > li {height:38px; line-height:38px; font-size:14px; padding:0px 10px; border-bottom:1px solid #e1e1e1; cursor:pointer; outline:none; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
+div[data-role=input][data-type=select] > ul > li:last-child {border-bottom:0px;}
+div[data-role=input][data-type=select] > ul > li:focus {color:#fff; background-color:#428bca;}
+div[data-role=input][data-type=select].extend > button {border-color:#66afe9;}
+div[data-role=input][data-type=select].extend > button > i:before {content:"\e801";}
+div[data-role=input][data-type=select].extend > ul {display:block; max-height:180px; overflow-y:auto;}
+div[data-role=input][data-type=select] > select {width:100%; height:40px; font-size:14px; opacity:0; -webkit-appearance:none; position:absolute; z-index:1; top:0; left:0;}
+
+div[data-role=input][data-type=input] > input {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:20px; font-size:14px; border-radius:0px;}
+div[data-role=input][data-type=input] > input:focus {border-color:#66afe9;}
+div[data-role=input][data-type=input] > input[type=date] {opacity:0; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;}
+div[data-role=input][data-type=input] > button {background:#fff; position:absolute; top:1px; right:1px; width:38px; height:38px; border:0; line-height:38px; cursor:pointer; color:#666;}
+div[data-role=input][data-type=input] > button:hover {background:#f4f4f4; color:#333;}
+div[data-role=input][data-type=input] > button:focus {border:1px solid #66afe9; top:0px; right:0px; width:40px; height:40px; line-height:38px;}
+div[data-role=input][data-type=input].extend > input {border-color:#66afe9;}
+div[data-role=input][data-type=input].extend > button {background:#428bca; color:#fff;}
+
+div[data-role=input][data-type=input] > div[data-role=picker] {position:absolute; top:40px; left:0px; width:100%; box-sizing:border-box; border:1px solid #e1e1e1; background:#fff; box-shadow:1px 1px 2px rgba(0,0,0,0.1); display:none; z-index:10;}
+div[data-role=input][data-type=input].extend > div[data-role=picker] {display:block;}
+
+div[data-role=input][data-type=checkbox] > label {cursor:pointer; display:inline-block; height:40px; line-height:40px; font-size:14px; color:#666; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
+div[data-role=input][data-type=checkbox] > label > i.checkbox {display:inline-block; width:26px; height:26px; margin:7px 8px 7px 0px; box-sizing:border-box; border:1px solid #e1e1e1; float:left; background:#fff;}
+div[data-role=input][data-type=checkbox] > label > i.checkbox.on {background:#43b3ec; border-color:#5891dd; font-family:moimz; line-height:24px; color:#fff; text-align:center; padding-right:3px;}
+div[data-role=input][data-type=checkbox] > label > i.checkbox.on:before {content:"\e806";}
+
+div[data-role=input], div[data-role=inputset] + div[data-role=input], div[data-role=inputset] {margin-top:5px;}
+
+
+/**
+ * 캘린더
+ */
+div[data-role=calendar] {outline:none; overflow:hidden; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
+div[data-role=calendar] > div.header {width:100%; height:40px; font-size:0;}
+div[data-role=calendar] > div.header > button {width:40px; height:40px; border:0; background:#fff; text-align:center; line-height:40px; cursor:pointer; color:#666; vertical-align:middle;}
+div[data-role=calendar] > div.header > button:hover {background:#f4f4f4; color:#333;}
+div[data-role=calendar] > div.header > div.navigation {display:inline-block; width:calc(100% - 80px); height:40px; vertical-align:middle; text-align:center;}
+div[data-role=calendar] > div.header > div.navigation > span {display:inline-block; height:40px; line-height:40px; padding:0px 5px; font-family:OpenSans, arial, sans-serif; font-size:14px; color:#666; cursor:pointer; position:relative;}
+div[data-role=calendar] > div.header > div.navigation > span.year:after {content:".";}
+div[data-role=calendar] > div.header > div.navigation > span > select {opacity:0; cursor:pointer; position:absolute; top:0; left:-5px; width:calc(100% + 10px); height:40px;}
+div[data-role=calendar] > div.dates {padding:5px;}
+div[data-role=calendar] > div.dates > ul {list-style:none; width:100%; display:block; font-size:0;}
+div[data-role=calendar] > div.dates > ul > li {display:inline-block; width:14%; height:30px; font-size:11px; font-family:OpenSans, arial, sans-serif; text-align:center; vertical-align:middle; background:#f5f5f5; line-height:30px; font-weight:bold;}
+div[data-role=calendar] > div.dates > ul > li.Sun {width:15%; color:#ff004f;}
+div[data-role=calendar] > div.dates > ul > li.Sat {width:15%; color:#008af4;}
+div[data-role=calendar] > div.dates > button {width:14%; border:0; background:#fff; height:26px; line-height:26px; font-size:12px; font-family:OpenSans, arial, sans-serif; text-align:right; cursor:pointer; padding-right:5px; box-sizing:border-box; color:#333;}
+div[data-role=calendar] > div.dates > button.Sun {width:15%; color:#ff004f;}
+div[data-role=calendar] > div.dates > button.Sat {width:15%; color:#008af4;}
+div[data-role=calendar] > div.dates > button.today {color:#00adf9; font-weight:bold;}
+div[data-role=calendar] > div.dates > button.selected {background:#00acf9; color:#fff; font-weight:bold;}
+div[data-role=calendar] > div.dates > button.notMatched {color:#999;}
+div[data-role=calendar] > div.dates > button:hover {background:#ff7829 !important; color:#fff;}

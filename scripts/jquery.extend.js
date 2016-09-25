@@ -10,37 +10,39 @@
  * @version 3.0.0.160903
  */
 (function($) {
-	/**
-	 * jQuery ajax 확장
-	 *
-	 * @param string url 데이터를 전송할 URL
-	 * @param object data 전송할 데이터 (data 가 없을 경우 2번째 인자가 콜백함수가 될 수 있다.)
-	 * @param function callback 콜백함수
-	 */
-	$.send = function(url,data,callback) {
-		if (typeof data == "function") {
-			callback = data;
-			data = null;
-		}
-		
-		$.ajax({
-			type:"POST",
-			url:url,
-			data:data,
-			dataType:"json",
-			success:function(result) {
-				callback(result);
-			},
-			error:function() {
-				iModule.alertMessage.show("error","Server Connect Error!",5);
+	$.propHooks.disabled = {
+		set:function(el,value) {
+			if (el.disabled !== value) {
+				el.disabled = value;
+				value && $(el).trigger("disable");
+				!value && $(el).trigger("enable");
 			}
-		});
+		}
+	};
+	
+	$.attrHooks.disabled = {
+		set:function(el,value) {
+			if (el.disabled !== value) {
+				el.disabled = value;
+				value && $(el).trigger("disable");
+				!value && $(el).trigger("enable");
+			}
+		}
 	};
 	
 	/**
 	 * 특정 객체나 오브젝트를 초기화한다.
 	 */
 	$.fn.inits = function() {
+		if (typeof this != "object" || this.data("isInit") === true) return;
+		
+		if (this.length > 1) {
+			this.each(function() {
+				$(this).inits();
+			});
+			return;
+		}
+		
 		/**
 		 * 객체가 form 일 경우, submit 함수를 받아 form 을 초기화한다.
 		 */
@@ -64,20 +66,677 @@
 				});
 			}
 		}
+		
+		/**
+		 * 객체가 div 이고 data-role 이 input 일 경우
+		 */
+		if (this.is("div[data-role=input]") == true) {
+			/**
+			 * div[data-role=input] 하위에는 자식이 1개 있어야 한다.
+			 */
+			if (this.children().length !== 1) return;
+			
+			/**
+			 * 자식노드가 객체가 select 일 경우
+			 */
+			if (this.children().is("select") == true) {
+				var $container = this;
+				var $select = this.children();
+				$container.attr("data-type","select");
+			
+				var $value = $("option",$select).filter(":selected");
+				var $button = $("<button>").attr("type","button");
+				if ($value.length == 0) {
+					var $text = $("<span>").html("");
+				} else {
+					var $text = $("<span>").html($value.html());
+				}
+				
+				var $arrow = $("<i>").addClass("mi mi-down");
+				$button.append($text).append($arrow);
+				$container.append($button);
+				if ($select.is(":disabled") == true) {
+					$button.attr("disabled",true);
+				}
+				
+				$select.on("disable",function() {
+					var $parent = $(this).parent();
+					var $button = $("button",$parent).prop("disabled",true);
+				});
+				
+				$select.on("enable",function() {
+					var $parent = $(this).parent();
+					var $button = $("button",$parent).prop("disabled",false);
+				});
+				
+				/**
+				 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
+				 */
+				if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null) {
+					$select.on("focus",function() {
+						var $parent = $(this).parent();
+						var $button = $("button",$parent).addClass("focus");
+					});
+					
+					$select.on("blur",function() {
+						var $parent = $(this).parent();
+						var $button = $("button",$parent).removeClass("focus");
+					});
+				} else {
+					var $lists = $("<ul>");
+					$("option",$select).each(function() {
+						var value = $(this).attr("value") ? $(this).attr("value") : "";
+						var $item = $("<li>").attr("data-value",value).html($(this).html());
+						$lists.append($item);
+					});
+					$select.hide();
+					$container.append($lists);
+					
+					$button.on("click",function(e) {
+						var $parent = $(this).parent();
+						var $select = $("select",$parent);
+						var $value = $("option",$select).filter(":selected");
+						var $lists = $("ul",$parent);
+						
+						$("div[data-role=input].extend").not($parent).removeClass("extend");
+						
+						if ($parent.hasClass("extend") == true) {
+							$parent.removeClass("extend");
+							$("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",null);
+						} else {
+							$parent.addClass("extend");
+							$("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",1);
+						}
+						
+						if ($("li[data-value="+$value.attr("value")+"]",$lists).length == 0) {
+							$(this).focus();
+						} else {
+							$("li[data-value="+$value.attr("value")+"]",$lists).focus();
+						}
+						e.preventDefault();
+						e.stopPropagation();
+					});
+					
+					$button.on("keydown",function(e) {
+						if (e.keyCode == 9 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 27) {
+							var $parent = $(this).parent();
+							var $lists = $("ul",$parent);
+							
+							if (e.keyCode == 9) {
+								$parent.removeClass("extend");
+								return;
+							} else {
+								$("div[data-role=input].extend").not($parent).removeClass("extend");
+							}
+							
+							e.preventDefault();
+							
+							if (e.keyCode == 27) {
+								if ($parent.hasClass("extend") == true) {
+									$button.click();
+								}
+								return;
+							} else {
+								if ($parent.hasClass("extend") == false) {
+									$button.click();
+								}
+							}
+							
+							var $items = $("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",1);
+							if ($items.length == 0) return;
+							
+							var index = $items.index($items.filter(":focus"));
+				
+							if (e.keyCode == 38 && index > 0) index--;
+							if (e.keyCode == 40 && index < $items.length - 1) index++;
+							if (!~index) index = 0;
+							
+							$items.eq(index).focus();
+						}
+						
+						if (e.keyCode == 36 || (e.metaKey == true && e.keyCode == 38)) {
+							$items.eq(0).focus();
+							e.preventDefault();
+						}
+						
+						if (e.keyCode == 35 || (e.metaKey == true && e.keyCode == 40)) {
+							$items.eq($items.length - 1).focus();
+							e.preventDefault();
+						}
+						
+						if (e.keyCode == 33 || e.keyCode == 34) {
+							e.preventDefault();
+						}
+					});
+					
+					$("li",$lists).on("mouseover",function(e) {
+						if ($(this).hasClass("divider") == true || $(this).attr("data-disabled") == "true") return;
+						$(this).focus();
+					});
+					
+					$("li",$lists).on("keydown",function(e) {
+						var $parent = $(this).parents("div[data-role=input]");
+						var $lists = $("ul",$parent);
+						var $items = $("li[tabindex=1]",$lists);
+						if ($items.length == 0) return;
+						
+						var index = $items.index($items.filter(":focus"));
+						
+						if (e.keyCode == 9 || e.keyCode == 38 || e.keyCode == 40 || e.keyCode == 27) {
+							e.preventDefault();
+							
+							if (e.keyCode == 27) {
+								if ($parent.hasClass("extend") == true) {
+									$button.click();
+								}
+								return;
+							}
+							
+							if ((e.keyCode == 38 || (e.keyCode == 9 && e.shiftKey == true)) && index > 0) index--;
+							if ((e.keyCode == 40 || (e.keyCode == 9 && e.shiftKey == false)) && index < $items.length - 1) index++;
+							if (!~index) index = 0;
+							
+							$items.eq(index).focus();
+						}
+						
+						if (e.keyCode == 36 || (e.metaKey == true && e.keyCode == 38)) {
+							$items.eq(0).focus();
+							e.preventDefault();
+						}
+						
+						if (e.keyCode == 35 || (e.metaKey == true && e.keyCode == 40)) {
+							$items.eq($items.length - 1).focus();
+							e.preventDefault();
+						}
+						
+						if (e.keyCode == 13) {
+							$items.eq(index).click();
+							e.preventDefault();
+						}
+						
+						if (e.keyCode == 33 || e.keyCode == 34) {
+							e.preventDefault();
+						}
+					});
+					
+					$("li",$lists).on("click",function(e) {
+						if ($(this).hasClass("divider") == true || $(this).attr("data-disabled") == "true") return;
+						
+						var $parent = $(this).parents("div[data-role=input]");
+						var $button = $("button",$parent);
+						var $select = $("select",$parent);
+						
+						$select.val($(this).attr("data-value"));
+						$select.triggerHandler("change");
+						
+						$button.click();
+						$button.focus();
+					});
+				}
+			
+				$select.on("change",function() {
+					var $parent = $(this).parent();
+					var $button = $("button",$parent);
+					var $item = $("option[value="+$(this).val()+"]",$(this));
+					if ($item.length == 0) {
+					
+					} else {
+						$("span",$button).html($item.html());
+					}
+				});
+			}
+			
+			/**
+			 * 자식객체가 input 일 경우
+			 */
+			if (this.children().is("input") == true) {
+				var $container = this;
+				var $input = this.children();
+				$container.attr("data-type","input");
+				
+				/**
+				 * input type이 date 일 경우
+				 */
+				if ($input.is("[type=date]") == true) {
+					var format = $input.attr("data-format") ? $input.attr("data-format") : "YYYY-MM-DD";
+					$input.attr("placeholder",format);
+					
+					/**
+					 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
+					 */
+					if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null) {
+						$input.attr("type","text");
+						
+						var $date = $("<input>").attr("type","date");
+						$container.append($date);
+						
+						var $button = $("<button>").attr("type","button").html("<i class='mi mi-calendar'></i>");
+						$container.append($button);
+						
+						$button.on("click",function() {
+							$date.focus();
+						});
+						
+						$date.on("change",function() {
+							if (moment($(this).val()).isValid() == true) {
+								var format = $input.attr("data-format") ? $input.attr("data-format") : "YYYY-MM-DD";
+								$input.val(moment($(this).val()).format(format));
+							} else {
+								$input.val("");
+							}
+						});
+					} else {
+						$input.attr("type","input");
+						var $button = $("<button>").attr("type","button").html("<i class='mi mi-calendar'></i>");
+						$container.append($button);
+						
+						$input.on("blur",function(value) {
+							if (moment($(this).val()).isValid() == true) {
+								var format = $(this).attr("data-format") ? $(this).attr("data-format") : "YYYY-MM-DD";
+								$(this).val(moment($(this).val()).format(format));
+							} else {
+								$(this).val("");
+							}
+						});
+						
+						$input.on("click",function(e) {
+							var $parent = $(this).parents("div[data-role=input]");
+							$("div[data-role=input].extend").not($parent).removeClass("extend");
+							e.stopPropagation();
+						});
+						
+						$input.on("keydown",function(e) {
+							var $parent = $(this).parents("div[data-role=input]");
+							var value = $(this).val() && moment($(this).val()).isValid() == true ? moment($(this).val()) : moment();
+							
+							if (e.keyCode == 9 || e.keyCode == 27) {
+								$parent.removeClass("extend");
+							}
+							
+							if ($parent.hasClass("extend") == true) {
+								if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
+									e.preventDefault();
+									if (e.keyCode == 37) value.add(-1,"d");
+									if (e.keyCode == 38) value.add(-7,"d");
+									if (e.keyCode == 39) value.add(1,"d");
+									if (e.keyCode == 40) value.add(7,"d");
+									
+									$("div[data-role=calendar]",$parent).calendar(value);
+								}
+							} else {
+								if (e.keyCode == 13) {
+									e.preventDefault();
+									$("button",$parent).triggerHandler("click");
+								}
+								
+								if (e.keyCode == 38 || e.keyCode == 40) {
+									e.preventDefault();
+									if ($(this).data("wait") === true) return;
+									
+									if (e.keyCode == 38) value.add(-1,"d");
+									if (e.keyCode == 40) value.add(1,"d");
+									
+									var format = $(this).attr("data-format") ? $(this).attr("data-format") : "YYYY-MM-DD";
+									$(this).val(value.format(format));
+									$(this).data("wait",true);
+									
+									setTimeout(function($this) { $this.data("wait",false); },50,$(this));
+								}
+							}
+						});
+						
+						$button.on("click",function(e) {
+							var $parent = $(this).parents("div[data-role=input]");
+							var $input = $("input",$parent);
+							var format = $input.attr("data-format") ? $input.attr("data-format") : "YYYY-MM-DD";
+							
+							if ($parent.hasClass("extend") == true) {
+								$parent.removeClass("extend");
+								$input.focus();
+							} else {
+								$("div[data-role=input].extend").not($parent).removeClass("extend");
+								
+								$parent.addClass("extend");
+								$parent.remove("div[data-role=picker]");
+								
+								var $picker = $("<div>").attr("data-role","picker").css("minWidth",280).css("maxWidth",340);
+								$parent.append($picker);
+								$picker.calendar($input.val(),function(value,isDestory) {
+									$input.val(value.format(format));
+									if (isDestory === true) {
+										$parent.removeClass("extend");
+										$input.focus();
+									}
+								});
+							}
+							
+							e.stopPropagation();
+						});
+					}
+				}
+			}
+			
+			/**
+			 * 자식객체가 label 이고, label 의 자식객체가 checkbox 일 경우
+			 */
+			if (this.children().is("label") == true && this.children().eq(0).has("input[type=checkbox]").length == 1) {
+				var $container = this;
+				var $label = this.children();
+				var $checkbox = $("input[type=checkbox]",$container);
+				$container.attr("data-type","checkbox");
+				
+				var $icon = $("<i>").addClass("checkbox");
+				if ($checkbox.is(":checked") == true) $icon.addClass("on");
+				$checkbox.hide();
+				$label.append($icon);
+				
+				$checkbox.on("change",function() {
+					var $parent = $(this).parent().parent();
+					var $icon = $("i.checkbox",$parent);
+					if ($(this).is(":checked") == true) {
+						$icon.addClass("on");
+					} else {
+						$icon.removeClass("on");
+					}
+				});
+			}
+			
+			
+		}
+		
+		/**
+		 * checkbox 박스일 경우
+		 */
+		if (this.attr("data-role") == "checkbox") {
+			if ($("label",this).length == 0) {
+				var $label = $("<label>").html(this.html());
+				this.empty();
+				this.append($label);
+			}
+			
+			
+		}
+		
+		this.data("isInit",true);
 	};
 	
 	/**
-	 * 폼이나 데이터를 Ajax 방식으로 서버에 전송한다.
-	 *
-	 * @param string url 전송할 URL
-	 * @param function callback 전송이 완료된 후 처리할 콜백함수
+	 * 달력을 만든다.
 	 */
-	$.fn.send = function(url,callback) {
-		/**
-		 * 전송대상이 form 이 아닐경우 아무런 행동을 하지 않는다.
-		 */
-		if (this.is("form") == false) return;
-		var data = this.serialize();
+	$.fn.calendar = function(value,callback) {
+		if (value && moment(value).isValid() === false) value = "";
+		if (this.is("div[data-role=calendar]") == true) {
+			var $calendar = this;
+			var $year = $("span.year",$calendar);
+			var $month = $("span.month",$calendar);
+			
+			var year = value ? parseInt(value.format("YYYY")) : $calendar.data("year");
+			var month = value ? parseInt(value.format("M")) : $calendar.data("month");
+			var value = value ? value : $calendar.data("value");
+			
+			if ($calendar.data("value").format("YYYY-MM-DD") != value.format("YYYY-MM-DD")) {
+				$calendar.data("year",year);
+				$calendar.data("month",month);
+				$calendar.data("value",value);
+				$calendar.triggerHandler("change",[value,false]);
+			}
+			
+			var now = moment([$calendar.data("year"),$calendar.data("month")-1,1]);
+			$year.html(now.format("YYYY"));
+			$month.html(now.format("MM"));
+			
+			var $years = $("<select>");
+			for (var i=year-15;i<=year+15;i++) {
+				var $option = $("<option>").attr("value",i).html(i);
+				if (i == year) $option.attr("selected","selected");
+				$years.append($option);
+			}
+			$years.on("click",function(e) {
+				e.stopPropagation();
+			});
+			$years.on("change",function() {
+				$calendar.data("year",parseInt($(this).val()));
+				$calendar.calendar();
+			});
+			$year.append($years);
+			
+			var $months = $("<select>");
+			for (var i=1;i<=12;i++) {
+				var $option = $("<option>").attr("value",i).html(i);
+				if (i == month) $option.attr("selected","selected");
+				$months.append($option);
+			}
+			$months.on("click",function(e) {
+				e.stopPropagation();
+			});
+			$months.on("change",function() {
+				$calendar.data("month",parseInt($(this).val()));
+				$calendar.calendar();
+			});
+			$month.append($months);
+			
+			$("div.dates",$calendar).remove();
+			
+			var $dates = $("<div>").addClass("dates");
+			var $days = $("<ul>");
+			$days.append($("<li>").addClass("Sun").html("Sun"));
+			$days.append($("<li>").addClass("Mon").html("Mon"));
+			$days.append($("<li>").addClass("Tue").html("Tue"));
+			$days.append($("<li>").addClass("Wed").html("Wed"));
+			$days.append($("<li>").addClass("Thu").html("Thu"));
+			$days.append($("<li>").addClass("Fri").html("Fri"));
+			$days.append($("<li>").addClass("Sat").html("Sat"));
+			
+			$dates.append($days);
+			
+			$calendar.append($dates);
+			
+			var start = parseInt(now.format("e"));
+			
+			var thisMonth = false;
+			var endOfMonth = false;
+			for (var i=0;i<=49;i++) {
+				var date = moment(now).add(i - start,"d");
+				
+				if (thisMonth === false && now.format("M") == date.format("M")) thisMonth = true;
+				if (thisMonth == true && now.format("M") != date.format("M")) endOfMonth = true;
+				if (endOfMonth == true && i % 7 == 0) break;
+				
+				var $date = $("<button>").html(date.format("D")).addClass(date.format("ddd")).data("value",date);
+				if (now.format("M") != date.format("M")) $date.addClass("notMatched");
+				if (date.format("YYYY-MM-DD") == moment(value).format("YYYY-MM-DD")) $date.addClass("selected");
+				
+				$date.on("click",function(e) {
+					var $parent = $(this).parents("div[data-role=calendar]");
+					$parent.triggerHandler("change",[$(this).data("value"),true]);
+					e.preventDefault();
+				});
+				$dates.append($date);
+			}
+			
+			$calendar.focus();
+		} else {
+			var $container = this;
+			var value = value ? moment(value) : moment();
+		
+			var $calendar = $("<div>").attr("data-role","calendar").attr("tabindex","1").data("year",parseInt(value.format("YYYY"))).data("month",parseInt(value.format("M"))).data("value",value);
+			
+			var $header = $("<div>").addClass("header");
+			var $prev = $("<button>").attr("type","button").html('<i class="mi mi-left"></i>');
+			$prev.on("mousedown",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				setTimeout(function($this) {
+					var interval = setInterval(function($this) {
+						$this.data("year",$this.data("year") - 1);
+						$this.calendar();
+					},100,$this);
+					
+					$parent.data("moveInterval",interval);
+				},500,$parent);
+			});
+			$prev.on("mouseup",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+					
+					e.stopPropagation();
+				}
+			});
+			$prev.on("mouseout",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+			});
+			$prev.on("click",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				$parent.data("year",$parent.data("year") - 1);
+				$parent.calendar();
+				
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			$header.append($prev);
+			
+			var $navigation = $("<div>").addClass("navigation");
+			var $year = $("<span>").addClass("year");
+			$navigation.append($year);
+			
+			var $month = $("<span>").addClass("month");
+			$navigation.append($month);
+			
+			$header.append($navigation);
+			
+			var $next = $("<button>").attr("type","button").html('<i class="mi mi-right"></i>');
+			$next.on("mousedown",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				setTimeout(function($this) {
+					var interval = setInterval(function($this) {
+						$this.data("year",$this.data("year") + 1);
+						$this.calendar();
+					},100,$this);
+					
+					$parent.data("moveInterval",interval);
+				},500,$parent);
+			});
+			$next.on("mouseup",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+					
+					e.stopPropagation();
+				}
+			});
+			$next.on("mouseout",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+			});
+			$next.on("click",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				$parent.data("year",$parent.data("year") + 1);
+				$parent.calendar();
+				
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			$header.append($next);
+			
+			$calendar.append($header);
+			
+			this.append($calendar);
+			
+			$calendar.calendar();
+			
+			$calendar.on("keydown",function(e) {
+				if (e.keyCode == 9 || e.keyCode == 13 || e.keyCode == 27 || e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
+					var year = $(this).data("year");
+					var month = $(this).data("month");
+					var value = moment($(this).data("value"));
+					
+					if (e.keyCode == 9 || e.keyCode == 13 || e.keyCode == 27) {
+						$(this).triggerHandler("change",[value,true]);
+						return;
+					}
+					
+					if (e.keyCode == 37 || e.keyCode == 38 || e.keyCode == 39 || e.keyCode == 40) {
+						if ($(this).data("wait") === true) {
+							e.preventDefault();
+							return;
+						}
+						
+						$(this).data("wait",true);
+						
+						if (e.keyCode == 37) value.add(-1,"d");
+						if (e.keyCode == 38) value.add(-7,"d");
+						if (e.keyCode == 39) value.add(1,"d");
+						if (e.keyCode == 40) value.add(7,"d");
+						
+						$(this).calendar(value);
+						setTimeout(function($this) { $this.data("wait",false); },50,$(this));
+					}
+					
+					e.preventDefault();
+				}
+			});
+			
+			$calendar.on("change",function(e,value,isDestory) {
+				if (typeof callback == "function" && value) callback(value,isDestory);
+			});
+			
+			$calendar.on("click",function(e) {
+				e.stopPropagation();
+			});
+		}
+	};
+	
+	
+	
+	/**
+	 * jQuery ajax 확장
+	 *
+	 * @param string url 데이터를 전송할 URL
+	 * @param object data 전송할 데이터 (data 가 없을 경우 2번째 인자가 콜백함수가 될 수 있다.)
+	 * @param function callback 콜백함수
+	 */
+	$.send = function(url,data,callback) {
+		if (typeof data == "function") {
+			callback = data;
+			data = null;
+		}
 		
 		$.ajax({
 			type:"POST",
@@ -88,9 +747,130 @@
 				callback(result);
 			},
 			error:function() {
-				iModule.alertMessage.show("error","Server Connect Error!",5);
+				iModule.alert.show("error","Server Connect Error!",5);
 			}
 		});
+	};
+	
+	/**
+	 * 폼 데이터를 Ajax 방식으로 서버에 전송한다.
+	 *
+	 * @param string url 전송할 URL
+	 * @param function callback 전송이 완료된 후 처리할 콜백함수
+	 */
+	$.fn.send = function(url,callback) {
+		/**
+		 * 전송대상이 form 이 아닐경우 아무런 행동을 하지 않는다.
+		 */
+		if (this.is("form") == false) return;
+		var $form = this;
+		var data = $form.serialize();
+		
+		$form.status("loading");
+		
+		$.ajax({
+			type:"POST",
+			url:url,
+			data:data,
+			dataType:"json",
+			success:function(result) {
+				if (result.success == false && result.errors) {
+					$form.status("error",result.errors);
+				}
+				callback(result);
+			},
+			error:function() {
+				$form.status("default");
+				iModule.alert.show("error","Server Connect Error!",5);
+			}
+		});
+	};
+	
+	/**
+	 * 폼이나 input, button 요소의 상태를 변경한다.
+	 *
+	 * @param object object 상태를 변경할 오브젝트
+	 */
+	$.fn.status = function(status,message) {
+		if (typeof this != "object") return;
+		var message = message ? message : null;
+		
+		this.each(function() {
+			/**
+			 * 객체가 Form 일 경우
+			 */
+			if ($(this).is("form") == true) {
+				if (status == "error") {
+					$(this).status("default");
+					
+					if (typeof message == "object") {
+						for (field in message) {
+							var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"]",$(this));
+							if ($field.length == 0) {
+								iModule.alert.show("error",message[field]);
+							} else {
+								$field.status("error",message[field]);
+							}
+						}
+					}
+				} else {
+					/**
+					 * Form 내부의 input, textarea 객체에 대해서 처리
+					 */
+					$("input,textarea,select",$(this)).status(status,message);
+					$("button[type=submit]").status(status);
+				}
+			}
+			
+			/**
+			 * 객체가 submit 버튼일 경우
+			 */
+			if ($(this).is("button[type=submit]") == true || $(this).is("input[type=submit]") == true) {
+				if (status == "loading") {
+					$(this).data("defaultHtml",$(this).html());
+					$(this).html('<i class="mi mi-loading"></i>');
+					$(this).prop("disabled",true);
+				} else {
+					if ($(this).data("defaultHtml")) $(this).html($(this).data("defaultHtml"));
+					$(this).prop("disabled",false);
+				}
+			}
+			
+			/**
+			 * 객체가 input, select, textarea 일 경우
+			 */
+			if ($(this).is("input,textarea,select") == true) {
+				console.log("input,textarea,select",status);
+				if (status == "loading") {
+					$(this).prop("disabled",true);
+				} else {
+					$(this).prop("disabled",false);
+				}
+				
+				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
+				var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
+				
+				console.log($parent,$inputset);
+				
+				if ($parent == null) return;
+				
+				var $inputbox = $inputset == null ? $parent : $inputset;
+				$inputbox.removeClass("success error loading default");
+				$inputbox.addClass(status);
+				
+				var help = message ? message : ($inputbox.attr("data-"+status) ? $inputbox.attr("data-"+status) : null);
+				
+				$("div[data-role=help]",$inputbox).remove();
+				if (help !== null) {
+					var $help = $("<div>").attr("data-role","help").html(help);
+					$inputbox.append($help);
+				}
+			}
+		});
+		
+		return this;
+		
+//		if (this.status)
 	};
 	
 	/**
@@ -109,6 +889,17 @@
 
 		this.animate({left:0},interval);
 	};
+	
+	$(document).ready(function() {
+		/**
+		 * input 객체 초기화
+		 */
+		$("div[data-role=input]").inits();
+		$("body").on("click",function(e) {
+			$("div[data-role=input]").removeClass("extend");
+			$("div[data-role=picker]").remove();
+		});
+	});
 	/*
 	$.fn.positionScroll = function() {
 		if (this.offset().top < $("body").scrollTop() + $("#iModuleNavigation.fixed").outerHeight() + 50) {

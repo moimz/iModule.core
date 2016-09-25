@@ -37,7 +37,7 @@ if (defined('__IM__') == false) exit;
 			 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
 			 * @see /classes/iModule.class.php -> parseIconString()
 			 */
-			$icon = $IM->parseIconString($menu->icon);
+			$icon = $IM->parseIconString($page->icon);
 		?>
 		<li>
 			<a href="<?php echo $IM->getUrl($page->menu,$page->page,false); ?>"><?php echo $icon.$page->title; ?></a>

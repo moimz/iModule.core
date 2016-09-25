@@ -137,6 +137,11 @@
 					"length":"'TRUE','FALSE'",
 					"default":"FALSE"
 				},
+				"is_widget":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				},
 				"configs":{
 					"type":"text"
 				},

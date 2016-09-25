@@ -91,7 +91,7 @@ class iModule {
 	private $templetDir = null;
 	private $useTemplet = true;
 	private $javascriptLanguages = array();
-	private $webFont = array('FontAwesome'); // FontAwesome 은 기본적으로 포함된다.
+	private $webFont = array('moimz'); // Moimz 폰트아이콘은 기본적으로 포함된다.
 	private $webFontDefault = null;
 	
 	/**
@@ -1174,6 +1174,7 @@ class iModule {
 	 */
 	function loadExtJs() {
 		$this->addHeadResource('style',__IM_DIR__.'/styles/extjs.css');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/extjs.extend.css');
 		$this->addHeadResource('script',__IM_DIR__.'/scripts/extjs.js');
 		$this->addHeadResource('script',__IM_DIR__.'/scripts/extjs.extend.js');
 	}
@@ -1200,6 +1201,19 @@ class iModule {
 	function loadWebFont($font,$isDefault=false) {
 		if (in_array($font,$this->webFont) == false) $this->webFont[] = $font;
 		if ($isDefault == true) $this->webFontDefault = $font;
+	}
+	
+	/**
+	 * 언어별로 기본서체를 불러온다.
+	 * 사이트템플릿에 영향을 받지 않은 곳에서만 사용된다. (예 : 에러메세지, 관리자화면 등)
+	 */
+	function loadFont() {
+		if ($this->language == 'ko') {
+			$this->loadWebFont('NanumBarunGothic',true);
+			$this->loadWebFont('OpenSans');
+		} else {
+			$this->loadWebFont('OpenSans',true);
+		}
 	}
 	
 	/**
@@ -1315,28 +1329,91 @@ class iModule {
 	}
 	
 	/**
-	 * 에러메세지를 출력하고, 사이트 레이아웃 렌더링을 즉시 중단한다.
+	 * 사이트 레이아웃 구성에 문제가 없는 에러가 모듈, 위젯, 에드온 등에서 발생하였을 경우, 에러메세지 HTML 을 가져온다.
 	 *
 	 * @param string $code 에러코드 (core 언어셋에 정의되어 있다.)
-	 * @param string $message 추가적인 에러메세지
-	 * @return null
+	 * @param object $value 에러코드에 따른 에러값
+	 * @return $context 에러메세지 HTML
 	 */
-	function printError($code,$message='') {
-		$this->setSiteTitle('ERROR!');
-		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
+	function getError($code,$value=null) {
+		/**
+		 * 사이트 구성에 실패한 상태일 경우 printError()를 호출한다.
+		 */
+		if ($this->site == null) return $this->printError($code,$value);
 		
+		/**
+		 * 에러메세지를 구성한다.
+		 */
 		$title = $this->getLanguage('error/code/'.$code);
+		$title = $title == 'error/code/'.$code ? $this->getLanguage('error/code/UNKNOWN') : $title;
+		$message = $this->parseErrorMessage($code,$value);
 		
-		$IM = $this;
+		/**
+		 * 사이트템플릿에 에러메세지 템플릿이 있을 경우, 사이트템플릿을 불러온다.
+		 */
 		ob_start();
-		INCLUDE __IM_PATH__.'/includes/error.php';
+		$IM = $this;
+		if (is_file($this->getTempletPath().'/error.php') == true) {
+			INCLUDE $this->getTempletPath().'/error.php';
+		} else {
+			$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
+			INCLUDE __IM_PATH__.'/includes/error.php';
+		}
 		$context = ob_get_contents();
 		ob_end_clean();
 		
+		return $context;
+	}
+	
+	/**
+	 * 에러메세지를 출력하고, 사이트 레이아웃 렌더링을 즉시 중단한다.
+	 *
+	 * @param string $code 에러코드 (core 언어셋에 정의되어 있다.)
+	 * @param object $value 에러코드에 따른 에러값
+	 * @return null
+	 */
+	function printError($code,$value=null) {
+		$this->setSiteTitle('ERROR!');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
+		
+		$this->loadFont();
+		
+		/**
+		 * 에러메세지를 구성한다.
+		 */
+		$title = $this->getLanguage('error/code/'.$code);
+		$title = $title == 'error/code/'.$code ? $this->getLanguage('error/code/UNKNOWN') : $title;
+		$message = $this->parseErrorMessage($code,$value);
+		
+		/**
+		 * 에러메세지 컨테이너를 설정한다.
+		 */
+		$context = PHP_EOL.'<div data-role="error" data-type="core">'.PHP_EOL;
+		
+		$IM = $this;
+		INCLUDE __IM_PATH__.'/includes/error.php';
+		$context.= ob_get_contents();
+		ob_end_clean();
+		
+		/**
+		 * 에러메세지 컨테이너를 설정한다.
+		 */
+		$context.= PHP_EOL.'</div>'.PHP_EOL;
+		
+		/**
+		 * 기본 헤더파일을 불러온다.
+		 */
 		INCLUDE __IM_PATH__.'/includes/header.php';
 		
+		/**
+		 * 에러메세지를 출력한다.
+		 */
 		echo $context;
 		
+		/**
+		 * 기본 푸터파일을 불러온다.
+		 */
 		INCLUDE __IM_PATH__.'/includes/footer.php';
 		
 		exit;
@@ -1482,7 +1559,7 @@ class iModule {
 		 * $page->context->widget : 해당 모듈에 전달할 환경설정값 (예 : 템플릿명 등)
 		 */
 		if ($config->type == 'MODULE') {
-			return $this->getModule($config->context->module)->getContext($config->context->context,$config->context->config);
+			return $this->getModule($config->context->module)->getContext($config->context->context,$config->context->configs);
 		}
 		
 		return null;
@@ -1607,6 +1684,24 @@ class iModule {
 		ob_end_clean();
 		
 		return $widget;
+	}
+	
+	/**
+	 * 에러코드에 따라 에러메세지를 구성한다.
+	 *
+	 * @param object $value 에러코드에 따른 에러값
+	 * @return $context 에러메세지 HTML
+	 */
+	function parseErrorMessage($code,$value=null) {
+		$message = '';
+		
+		switch ($code) {
+			case 'NOT_FOUND_TEMPLET_FILE' :
+				if (is_string($value) == true) $message = $value;
+				break;
+		}
+		
+		return $message;
 	}
 	
 	/**

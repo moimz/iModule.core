@@ -67,7 +67,7 @@ var iModule = {
 	/**
 	 * 알림메세지 관련
 	 */
-	alertMessage:{
+	alert:{
 		idx:0,
 		/**
 		 * 알림메세지를 출력한다.

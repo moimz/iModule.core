@@ -12,8 +12,9 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 <meta name="viewport" content="width=800">
 <title>MoimzTools Install - <?php echo $package->title; ?></title>
 <link rel="stylesheet" href="//www.moimz.com/modules/moimz/styles/install.css" type="text/css">
-<?php if ($language != 'en') { ?><link rel="stylesheet" href="//www.moimz.com/modules/moimz/styles/install.<?php echo $language; ?>.css" type="text/css"><?php } ?>
-<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<?php if ($language != 'en') { ?>
+<link rel="stylesheet" href="//www.moimz.com/modules/moimz/styles/install.<?php echo $language; ?>.css" type="text/css">
+<?php } ?>
 <script src="//www.moimz.com/modules/moimz/scripts/jquery.js"></script>
 <script src="//www.moimz.com/modules/moimz/scripts/install.js"></script>
 </head>
@@ -40,7 +41,7 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 			</article>
 			
 			<article data-step="check" data-url="./process/index.php">
-				<button type="button" onclick="Step('check');"><i class="fa fa-refresh"></i> <span data-language="dependencyRefresh"></span></button>
+				<button type="button" onclick="Step('check');"><i class="mi mi-refresh-bold"></i> <span data-language="dependencyRefresh"></span></button>
 				<ul>
 					<li data-dependency="latest"></li>
 					<?php foreach ($package->dependencies as $dependency=>$version) { ?>
@@ -134,8 +135,8 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 				<li data-step="complete" data-link="../admin/index.php"></li>
 			</ul>
 			
-			<button type="button" data-role="prev"><i class="fa fa-arrow-left"></i><span data-language="back"></span></button>
-			<button type="submit" data-role="next"><span data-language="continue"></span><i class="fa fa-arrow-right"></i></button>
+			<button type="button" data-role="prev"><i class="mi mi-back-bold"></i><span data-language="back"></span></button>
+			<button type="submit" data-role="next"><span data-language="continue"></span><i class="mi mi-go-bold"></i></button>
 		</nav>
 	</section>
 </main>

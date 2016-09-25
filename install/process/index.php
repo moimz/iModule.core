@@ -127,8 +127,8 @@ if ($action == 'install') {
 					$dbConnect->update('site_table',array('templetConfigs'=>'{}'))->where('templetConfigs','')->execute();
 				}
 				
-				if ($dbConnect->select('page_table')->count() == 0) {
-					$dbConnect->insert('page_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'menu'=>'index','page'=>'','title'=>'INDEX','type'=>'EXTERNAL','layout'=>'index','context'=>'{"external":"@index.php"}','sort'=>0))->execute();
+				if ($dbConnect->select('sitemap_table')->count() == 0) {
+					$dbConnect->insert('sitemap_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'menu'=>'index','page'=>'','title'=>'INDEX','type'=>'EXTERNAL','layout'=>'index','context'=>'{"external":"@index.php"}','sort'=>0))->execute();
 				}
 				
 				$IM = new iModule();

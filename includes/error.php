@@ -11,19 +11,14 @@
  * @version 3.0.0.160905
  * @see /classes/iModule.class.php -> printError()
  */
- 
-if ($IM->language == 'ko') {
-	$IM->loadWebFont('NanumGothic',true);
-	$IM->loadWebFont('OpenSans');
-} else {
-	$IM->loadWebFont('OpenSans',true);
-}
+
+$IM->loadWebFont('OpenSans');
 ?>
-<main>
-	<h1><i class="fa fa-exclamation-triangle"></i> ERROR!</h1>
+<div class="errorbox">
+	<h1><i class="mi mi-error"></i> ERROR!</h1>
 	
 	<h2><?php echo $title; ?></h2>
 	<?php if ($message) { ?><p><?php echo $message; ?></p><?php } ?>
 	
 	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $IM->getLanguage('error/backToMain'); ?></a>
-</main>
+</div>

@@ -40,7 +40,7 @@ $IM->addHeadResource('script',$IM->getTempletDir().'/scripts/script.js');
 <html lang="<?php echo $IM->language; ?>">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
 <title><?php echo $IM->getSiteTitle(); ?></title>
 <?php
 /**
@@ -60,72 +60,59 @@ echo $IM->getSiteTempletConfig('head');
 </head>
 <body>
 
-<?php
-/**
- * iModule 을 감싸는 레이어를 선언하여 줍니다. (필수)
- */
-?>
-<div id="iModuleWrapper">
+<header style="width:300px; overflow:hidden;">
 	<?php
 	/**
-	 * iModule 의 알림메세지가 출력되는 레이어를 선언하여 줍니다. (해당 id 값이 정의되어 있지 않은경우 브라우저의 alert 창으로 메세지가 출력됩니다.)
+	 * 사이트로고를 가져온다.
+	 * 사이트로고가 없을 경우 사이트타이틀을 출력한다.
+	 * @see /classes/iModule.class.php -> getSiteLogo()
 	 */
 	?>
-	<div id="iModuleAlertMessage"></div>
+	<h1><?php echo $IM->getSiteLogo('default') == null ? $IM->getSiteTitle() : '<img src="'.$IM->getSiteLogo('default').'" alt="'.$IM->getSiteTitle().'">'; ?></h1>
 	
-	<header>
-		<?php
-		/**
-		 * 사이트로고를 가져온다.
-		 * 사이트로고가 없을 경우 사이트타이틀을 출력한다.
-		 * @see /classes/iModule.class.php -> getSiteLogo()
-		 */
-		?>
-		<h1><?php echo $IM->getSiteLogo('default') == null ? $IM->getSiteTitle() : '<img src="'.$IM->getSiteLogo('default').'" alt="'.$IM->getSiteTitle().'">'; ?></h1>
-		
-		<nav>
-			<ul>
+	<nav>
+		<ul>
+			<?php
+			/**
+			 * 전체 사이트메뉴를 가져와 메뉴링크를 만든다.
+			 * @see /classes/iModule.class.php -> getSitemap()
+			 * @see /classes/iModule.class.php -> getUrl()
+			 */
+			foreach ($IM->getSitemap() as $menu) {
+				/**
+				 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
+				 * @see /classes/iModule.class.php -> parseIconString()
+				 */
+				$icon = $IM->parseIconString($menu->icon);
+			?>
+			<li>
+				<a href="<?php echo $IM->getUrl($menu->menu,false); ?>"><?php echo $icon.$menu->title; ?></a>
+				
 				<?php
 				/**
-				 * 전체 사이트메뉴를 가져와 메뉴링크를 만든다.
-				 * @see /classes/iModule.class.php -> getSitemap()
-				 * @see /classes/iModule.class.php -> getUrl()
+				 * 2차 메뉴가 있다면 를 가져온다.
 				 */
-				foreach ($IM->getSitemap() as $menu) {
-					/**
-					 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
-					 * @see /classes/iModule.class.php -> parseIconString()
-					 */
-					$icon = $IM->parseIconString($menu->icon);
+				if (count($menu->pages) > 0) {
 				?>
-				<li>
-					<a href="<?php echo $IM->getUrl($menu->menu,false); ?>"><?php echo $icon.$menu->title; ?></a>
-					
+				<ul>
 					<?php
-					/**
-					 * 2차 메뉴가 있다면 를 가져온다.
-					 */
-					if (count($menu->pages) > 0) {
+					foreach ($menu->pages as $page) {
+						/**
+						 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
+						 * @see /classes/iModule.class.php -> parseIconString()
+						 */
+						$icon = $IM->parseIconString($page->icon);
 					?>
-					<ul>
-						<?php
-						foreach ($menu->pages as $page) {
-							/**
-							 * 메뉴에 아이콘이 설정되어 있을 경우, 아이콘을 가져온다.
-							 * @see /classes/iModule.class.php -> parseIconString()
-							 */
-							$icon = $IM->parseIconString($page->icon);
-						?>
-						<li>
-							<a href="<?php echo $IM->getUrl($page->menu,$page->page,false); ?>"><?php echo $icon.$page->title; ?></a>
-						</li>
-						<?php } ?>
-					</ul>
+					<li>
+						<a href="<?php echo $IM->getUrl($page->menu,$page->page,false); ?>"><?php echo $icon.$page->title; ?></a>
+					</li>
 					<?php } ?>
-				</li>
+				</ul>
 				<?php } ?>
-			</ul>
-		</nav>
-	</header>
-	
-	<div class="context">
+			</li>
+			<?php } ?>
+		</ul>
+	</nav>
+</header>
+
+<div class="context">

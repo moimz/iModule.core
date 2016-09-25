@@ -4,7 +4,7 @@
  *
  * @file mysql.class.php
  * @author Arzz
- * @version 1.1.5
+ * @version 1.1.6
  * @license MIT License
  */
 class mysql {
@@ -110,6 +110,16 @@ class mysql {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$count = $this->rawQuery("SHOW TABLES LIKE '".$this->_prefix.$table."'");
 		return count($count) == 1;
+	}
+	
+	public function size($table) {
+		$table = filter_var($table,FILTER_SANITIZE_STRING);
+		$data = $this->rawQuery("SELECT `DATA_LENGTH`, `INDEX_LENGTH` FROM `information_schema`.`TABLES` WHERE `table_schema`='".$this->db->database."' and `table_name`='".$this->_prefix.$table."'");
+		if (count($data) > 0) {
+			return $data[0]->DATA_LENGTH + $data[0]->INDEX_LENGTH;
+		} else {
+			return 0;
+		}
 	}
 	
 	public function compare($table,$schema) {
