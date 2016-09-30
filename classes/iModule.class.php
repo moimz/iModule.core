@@ -339,9 +339,10 @@ class iModule {
 	 * 코드에 해당하는 문자열이 없을 경우 1차적으로 package.json 에 정의된 기본언어셋의 텍스트를 반환하고, 기본언어셋 텍스트도 없을 경우에는 코드를 그대로 반환한다.
 	 *
 	 * @param string $code 언어코드
+	 * @param string $replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
 	 * @return string $language 실제 언어셋 텍스트
 	 */
-	function getLanguage($code) {
+	function getLanguage($code,$replacement=null) {
 		if ($this->lang == null) {
 			$package = json_decode(file_get_contents(__IM_PATH__.'/package.json'));
 			if (file_exists(__IM_PATH__.'/languages/'.$this->language.'.json') == true) {
@@ -355,33 +356,83 @@ class iModule {
 			}
 		}
 		
+		$returnString = null;
 		$temp = explode('/',$code);
-		if (count($temp) == 1) {
-			return isset($this->lang->$code) == true ? $this->lang->$code : ($this->oLang != null && isset($this->oLang->$code) == true ? $this->oLang->$code : $code);
-		} else {
-			$string = $this->lang;
-			for ($i=0, $loop=count($temp);$i<$loop;$i++) {
-				if (isset($string->{$temp[$i]}) == true) {
-					$string = $string->{$temp[$i]};
-				} else {
-					$string = null;
-					break;
-				}
+		
+		$string = $this->lang;
+		$oString = $this->oLang;
+		for ($i=0, $loop=count($temp);$i<$loop;$i++) {
+			if (isset($string->{$temp[$i]}) == true) {
+				$string = $string->{$temp[$i]};
+			} else {
+				$string = null;
+				break;
 			}
-			
-			if ($string != null) return $string;
-			if ($this->oLang == null) return $code;
-			
+		}
+		
+		if ($string != null) {
+			$returnString = $string;
+		} elseif ($this->oLang != null) {
 			if ($string == null && $this->oLang != null) {
 				$string = $this->oLang;
 				for ($i=0, $loop=count($temp);$i<$loop;$i++) {
-					if (isset($string->{$temp[$i]}) == true) $string = $string->{$temp[$i]};
-					return $code;
+					if (isset($string->{$temp[$i]}) == true) {
+						$string = $string->{$temp[$i]};
+					} else {
+						$string = null;
+						break;
+					}
 				}
 			}
 			
-			return $string;
+			if ($string != null) $returnString = $string;
 		}
+		
+		if ($returnString == null) return $replacement === null ? $code : $replacement;
+		else return $returnString;
+	}
+	
+	/**
+	 * 상황에 맞게 에러코드를 반환한다.
+	 *
+	 * @param string $code 에러코드
+	 * @param object $value(옵션) 에러와 관련된 데이터
+	 * @param string $message(옵션) 변환된 에러메세지
+	 */
+	function getErrorMessage($code,$value=null,$message=null,$isRawData=false) {
+		if (is_object($code) == true) {
+			$message = $code->message;
+			$description = $code->description;
+		} else {
+			$message = '';
+			if ($message == null) {
+				$message = $this->getLanguage('error/'.$code,$code);
+			}
+		
+			$description = null;
+			switch ($code) {
+				default :
+					if ($value != null && is_string($value) == true) $description = $value;
+			}
+			$description = strlen($description) == 0 ? null : $description;
+		}
+		
+		if ($isRawData === true) {
+			$data = new stdClass();
+			$data->message = $message;
+			$data->description = $description;
+			
+			return $data;
+		}
+		
+		/**
+		 * doProcess() 에서 발생한 에러일 경우
+		 */
+		if (preg_match('/\/process\/index\.php$/',$_SERVER['SCRIPT_NAME']) == true) {
+			return $message.($description !== null ? ' ('.$description.')' : '');
+		}
+		
+		return $_SERVER['PHP_SELF'];
 	}
 	
 	/**
@@ -1181,15 +1232,14 @@ class iModule {
 	
 	/**
 	 * 자바스크립트용 언어셋 파일을 호출한다.
-	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 해당 함수를 호출하여 자바스크립트상에서 모듈명.getLanguage() 함수로 언어셋을 불러올 수 있다.
+	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 이 함수를 호출하여 자바스크립트상에서 대상.getLanguage() 함수로 언어셋을 불러올 수 있다.
 	 *
-	 * @param string $module 모듈명
-	 * @param string $langauge(옵션) 불러올 언어셋 (지정되지 않을 경우 현 사이트의 언어셋코드를 사용한다.)
+	 * @param string $type 불러올 대상의 종류 (module, addon, widget)
+	 * @param string $module 불러올 대상의 이름
+	 * @param string $defaultLanguage 불러올 대상의 기본 언어
 	 */
-	function loadLangaugeJs($module,$language=null) {
-		$language = $language != null ? $language : $this->language;
-		$package = $this->Module->getPackage($module);
-		$this->javascriptLanguages[] = $module.'@'.$language.'@'.$package->language;
+	function loadLanguage($type,$target,$defaultLanguage) {
+		$this->javascriptLanguages[] = $type.'@'.$target.'@'.$defaultLanguage;
 	}
 	
 	/**
@@ -1283,7 +1333,9 @@ class iModule {
 		 * 자바스크립트 언어셋 요청이 있을 경우 언어셋파일을 자바스크립트로 불러온다.
 		 */
 		if (count($this->javascriptLanguages) > 0) {
-			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?languages='.implode(',',$this->javascriptLanguages));
+			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language.'&languages='.implode(',',$this->javascriptLanguages));
+		} else {
+			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language);
 		}
 		
 		/**
@@ -1331,22 +1383,28 @@ class iModule {
 	/**
 	 * 사이트 레이아웃 구성에 문제가 없는 에러가 모듈, 위젯, 에드온 등에서 발생하였을 경우, 에러메세지 HTML 을 가져온다.
 	 *
-	 * @param string $code 에러코드 (core 언어셋에 정의되어 있다.)
-	 * @param object $value 에러코드에 따른 에러값
-	 * @return $context 에러메세지 HTML
+	 * @param string $code 에러코드
+	 * @param object $value(옵션) 에러와 관련된 데이터
+	 * @param string $message(옵션) 변환된 에러메세지
+	 * @return $html 에러메세지 HTML
 	 */
-	function getError($code,$value=null) {
+	function getError($code,$value=null,$message=null) {
 		/**
 		 * 사이트 구성에 실패한 상태일 경우 printError()를 호출한다.
 		 */
-		if ($this->site == null) return $this->printError($code,$value);
+		if ($this->site == null) return $this->printError($code,$value,$message);
 		
 		/**
 		 * 에러메세지를 구성한다.
 		 */
-		$title = $this->getLanguage('error/code/'.$code);
-		$title = $title == 'error/code/'.$code ? $this->getLanguage('error/code/UNKNOWN') : $title;
-		$message = $this->parseErrorMessage($code,$value);
+		if (is_object($code) == true) {
+			$message = $code->message;
+			$description = $code->description;
+		} else {
+			$error = $this->getErrorMessage($code,$value,$message,true);
+			$message = $error->message;
+			$description = $error->description;
+		}
 		
 		/**
 		 * 사이트템플릿에 에러메세지 템플릿이 있을 경우, 사이트템플릿을 불러온다.
@@ -1359,20 +1417,21 @@ class iModule {
 			$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
 			INCLUDE __IM_PATH__.'/includes/error.php';
 		}
-		$context = ob_get_contents();
+		$html = ob_get_contents();
 		ob_end_clean();
 		
-		return $context;
+		return $html;
 	}
 	
 	/**
 	 * 에러메세지를 출력하고, 사이트 레이아웃 렌더링을 즉시 중단한다.
 	 *
-	 * @param string $code 에러코드 (core 언어셋에 정의되어 있다.)
-	 * @param object $value 에러코드에 따른 에러값
+	 * @param string $code 에러코드
+	 * @param object $value(옵션) 에러와 관련된 데이터
+	 * @param string $message(옵션) 변환된 에러메세지
 	 * @return null
 	 */
-	function printError($code,$value=null) {
+	function printError($code,$value=null,$message=null) {
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
@@ -1382,9 +1441,14 @@ class iModule {
 		/**
 		 * 에러메세지를 구성한다.
 		 */
-		$title = $this->getLanguage('error/code/'.$code);
-		$title = $title == 'error/code/'.$code ? $this->getLanguage('error/code/UNKNOWN') : $title;
-		$message = $this->parseErrorMessage($code,$value);
+		if (is_object($code) == true) {
+			$message = $code->message;
+			$description = $code->description;
+		} else {
+			$error = $this->getErrorMessage($code,$value,$message,true);
+			$message = $error->message;
+			$description = $error->description;
+		}
 		
 		/**
 		 * 에러메세지 컨테이너를 설정한다.
@@ -1427,8 +1491,6 @@ class iModule {
 	function getHeader() {
 		if (defined('__IM_HEADER_INCLUDED__') == true) return;
 		$site = $this->getSite();
-		
-		$this->addHeadResource('style',__IM_DIR__.'/styles/default.css');
 		
 		/**
 		 * 사이트 설명 META 태그 및 고유주소 META 태그를 정의한다. (SEO)
@@ -1530,6 +1592,7 @@ class iModule {
 		 * $config->context->page : 불러올 2차 메뉴(page)명
 		 */
 		if ($config->type == 'PAGE') {
+			$this->page = $config->context->page;
 			return $this->getPageContext($menu,$config->context->page);
 		}
 		
@@ -1687,24 +1750,6 @@ class iModule {
 	}
 	
 	/**
-	 * 에러코드에 따라 에러메세지를 구성한다.
-	 *
-	 * @param object $value 에러코드에 따른 에러값
-	 * @return $context 에러메세지 HTML
-	 */
-	function parseErrorMessage($code,$value=null) {
-		$message = '';
-		
-		switch ($code) {
-			case 'NOT_FOUND_TEMPLET_FILE' :
-				if (is_string($value) == true) $message = $value;
-				break;
-		}
-		
-		return $message;
-	}
-	
-	/**
 	 * 메뉴나 컨텍스트 아이콘 설정값을 <i> 태그로 파싱한다.
 	 *
 	 * @param string $icon 아이콘 설정값
@@ -1781,12 +1826,12 @@ class iModule {
 		
 		// check unknown code
 		if (preg_match('/\{(.*?)\}/',$permissionString,$match) == true) {
-			return str_replace('{code}',$match[0],$this->getLanguage('error/permissionString/unknownCode'));
+			return str_replace('{code}',$match[0],$this->getErrorMessage('UNKNWON_CODE_IN_PERMISSION_STRING',$match[0]));
 		}
 		
 		// check doubleQuotation
 		if (preg_match('/"/',$permissionString) == true) {
-			return $this->getLanguage('error/permissionString/doubleQuotation');
+			return $this->getErrorMessage('NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING');
 		}
 		
 		// eval check
@@ -1795,8 +1840,8 @@ class iModule {
 		$content = ob_get_contents();
 		ob_end_clean();
 		
-		if ($content) return $this->getLanguage('error/permissionString/parse');
-		if (is_bool($check) == false) return $this->getLanguage('error/permissionString/boolean');
+		if ($content) return $this->getErrorMessage('PERMISSION_STRING_PARSING_FAILED');
+		if (is_bool($check) == false) return $this->getLanguage('NOT_BOOLEAN_PERMISSION_STRING_RESULT');
 		
 		return true;
 	}

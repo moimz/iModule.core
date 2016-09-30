@@ -58,6 +58,16 @@ Welcome to index page.
 		<label><input type="checkbox">안녕</label>
 	</div>
 	
+	<div data-role="inputset" class="inline">
+		<div data-role="input">
+			<label><input type="radio" name="say" value="hello" checked="checked">안녕</label>
+		</div>
+		
+		<div data-role="input">
+			<label><input type="radio" name="say" value="bye" checked="checked">바이</label>
+		</div>
+	</div>
+	
 	<div data-role="input">
 		<input type="date" data-format="YYYY-MM-DD">
 	</div>

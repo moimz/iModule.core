@@ -257,15 +257,62 @@ class Module {
 	}
 	
 	/**
+	 * [사이트관리자] 모듈의 관리자패널 구성한다.
+	 *
+	 * @param string $module 모듈명
+	 * @return string $panel 관리자패널 HTML
+	 */
+	function getAdminPanel($module) {
+		/**
+		 * 모듈을 불러온다.
+		 */
+		$mModule = $this->IM->getModule($module);
+		
+		/**
+		 * 모듈의 언어팩을 불러온다.
+		 */
+		$this->loadLanguage($module);
+		
+		/**
+		 * 모듈의 관리자용 자바스크립트나 스타일시트가 있을 경우 불러온다.
+		 */
+		if (is_file(__IM_PATH__.'/modules/'.$module.'/admin/styles/style.css') == true) {
+			$this->IM->addHeadResource('style',__IM_DIR__.'/modules/'.$module.'/admin/styles/style.css');
+		}
+		
+		if (is_file(__IM_PATH__.'/modules/'.$module.'/admin/scripts/script.js') == true) {
+			$this->IM->addHeadResource('script',__IM_DIR__.'/modules/'.$module.'/admin/scripts/script.js');
+		}
+		
+		/**
+		 * 모듈에 설정패널 메소드가 없으면 NULL 을 반환한다.
+		 */
+		if (method_exists($mModule,'getAdminPanel') == false) return null;
+		return $mModule->getAdminPanel();
+	}
+	
+	/**
 	 * [모듈내부] 모듈의 환경설정을 가져온다.
 	 *
 	 * @param string $key(옵션) 환경설정코드값, 없을경우 전체 환경설정값
 	 * @return string $value 환경설정값
 	 */
 	function getConfig($key=null) {
-		if ($key == null) return $this->moduleConfig;
+		if ($key == null) return $this->moduleConfigs;
 		elseif (empty($this->moduleConfigs->$key) == true) return null;
 		else return $this->moduleConfigs->$key;
+	}
+	
+	/**
+	 * [모듈내부] 모듈의 환경설정을 저장한다.
+	 *
+	 * @param string $key 환경설정코드값, 없을경우 전체 환경설정값
+	 * @param object $value 변경할 환경설정값
+	 * @return string $value 환경설정값
+	 */
+	function setConfig($key,$value) {
+		$this->moduleConfigs->{$key} = $value;
+		$this->IM->db()->update($this->table->module,array('configs'=>json_encode($this->moduleConfigs,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK)))->where('module',$this->loaded)->execute();
 	}
 	
 	/**
@@ -591,6 +638,17 @@ class Module {
 		$size->attachment_size = $attachment_size;
 		
 		return $size;
+	}
+	
+	/**
+	 * 자바스크립트용 언어셋 파일을 호출한다.
+	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 해당 함수를 호출하여 자바스크립트상에서 모듈명.getLanguage() 함수로 언어셋을 불러올 수 있다.
+	 *
+	 * @param string $module 모듈명
+	 */
+	function loadLanguage($module) {
+		$package = $this->getPackage($module);
+		$this->IM->loadLanguage('module',$module,$package->language);
 	}
 	
 	function resetArticle() {

@@ -20,7 +20,7 @@ if (defined('__IM__') == false) exit;
 	echo $context;
 	?>
 </main>
-
+<input type="radio" name="label" value="1000">으아아아아아아</input>
 <aside>
 	<?php
 	/**

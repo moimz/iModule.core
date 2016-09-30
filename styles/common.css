@@ -14,7 +14,7 @@
  */
 
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
-html, body {width:100%; height:100%; overflow:auto; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%;}
+html, body {width:100%; height:100%; overflow:auto; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333;}
 input, textarea, button, select {font-family:inherit; outline:none;}
 
 /**
@@ -26,11 +26,11 @@ div[data-role=alert] {position:fixed; top:0; left:0; width:100%;}
  * Form 객체 기본 디자인 정의
  */
 div[data-role=input] {display:block; width:100%; height:40px; position:relative;}
-div[data-role=input] input, div[data-role=input] textarea, div[data-role=input] select {-webkit-appearance:none;}
+div[data-role=input] input, div[data-role=input] textarea, div[data-role=input] select, div[data-role=input] label {-webkit-appearance:none;}
 div[data-role=inputset] {display:block; width:100%; position:relative; font-size:0;}
 div[data-role=inputset] > div[data-role=input] {display:block; margin-top:5px; vertical-align:middle;}
 div[data-role=inputset] > div[data-role=input]:first-child {margin-top:0px;}
-div[data-role=inputset].inline > div[data-role=input] {display:inline-block; margin-top:0px; margin-left:5px;}
+div[data-role=inputset].inline > div[data-role=input] {display:inline-block; width:auto; margin-top:0px; margin-left:5px;}
 div[data-role=inputset].inline > div[data-role=input]:first-child {margin-left:0px;}
 
 div[data-role=input][data-type=select] > button {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; line-height:1; cursor:pointer; color:#666;}
@@ -49,7 +49,7 @@ div[data-role=input][data-type=select].extend > ul {display:block; max-height:18
 div[data-role=input][data-type=select] > select {width:100%; height:40px; font-size:14px; opacity:0; -webkit-appearance:none; position:absolute; z-index:1; top:0; left:0;}
 
 div[data-role=input][data-type=input] > input {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:20px; font-size:14px; border-radius:0px;}
-div[data-role=input][data-type=input] > input:focus {border-color:#66afe9;}
+div[data-role=input][data-type=input] > input:focus, div[data-role=input][data-type=input] > input.focus {border-color:#66afe9;}
 div[data-role=input][data-type=input] > input[type=date] {opacity:0; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;}
 div[data-role=input][data-type=input] > button {background:#fff; position:absolute; top:1px; right:1px; width:38px; height:38px; border:0; line-height:38px; cursor:pointer; color:#666;}
 div[data-role=input][data-type=input] > button:hover {background:#f4f4f4; color:#333;}
@@ -61,11 +61,39 @@ div[data-role=input][data-type=input] > div[data-role=picker] {position:absolute
 div[data-role=input][data-type=input].extend > div[data-role=picker] {display:block;}
 
 div[data-role=input][data-type=checkbox] > label {cursor:pointer; display:inline-block; height:40px; line-height:40px; font-size:14px; color:#666; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
-div[data-role=input][data-type=checkbox] > label > i.checkbox {display:inline-block; width:26px; height:26px; margin:7px 8px 7px 0px; box-sizing:border-box; border:1px solid #e1e1e1; float:left; background:#fff;}
-div[data-role=input][data-type=checkbox] > label > i.checkbox.on {background:#43b3ec; border-color:#5891dd; font-family:moimz; line-height:24px; color:#fff; text-align:center; padding-right:3px;}
-div[data-role=input][data-type=checkbox] > label > i.checkbox.on:before {content:"\e806";}
+div[data-role=input][data-type=checkbox] > label > button.checkbox {display:inline-block; width:24px; height:24px; margin:7px 8px 7px 0px; box-sizing:border-box; border:1px solid #e1e1e1; float:left; background:#fff; cursor:pointer;}
+div[data-role=input][data-type=checkbox] > label > button.checkbox.on {background:#43b3ec; border-color:#5891dd; font-family:moimz; line-height:22px; color:#fff; text-align:center; padding-right:3px;}
+div[data-role=input][data-type=checkbox] > label > button.checkbox.on:before {content:"\eb10";}
+div[data-role=input][data-type=checkbox] > label > button.checkbox:focus {border-color:#66afe9;}
+div[data-role=input][data-type=checkbox].disabled > label {opacity:0.5;}
+div[data-role=input][data-type=checkbox].disabled > label > button {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
 
-div[data-role=input], div[data-role=inputset] + div[data-role=input], div[data-role=inputset] {margin-top:5px;}
+div[data-role=input][data-type=radio] > label {cursor:pointer; display:inline-block; height:40px; line-height:40px; font-size:14px; color:#666; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
+div[data-role=input][data-type=radio] > label > button.radio {display:inline-block; width:24px; height:24px; margin:7px 8px 7px 0px; box-sizing:border-box; border:1px solid #e1e1e1; float:left; background:#fff; border-radius:50%; cursor:pointer;}
+div[data-role=input][data-type=radio] > label > button.radio.on {border:8px solid #43b3ec; background:#fff;}
+div[data-role=input][data-type=radio] > label > button.radio:focus {border-color:#66afe9;}
+div[data-role=input][data-type=radio].disabled > label {opacity:0.8; cursor:not-allowed;}
+div[data-role=input][data-type=radio].disabled > label > button {border-color:#ccc !important; background:#f4f4f4; cursor:not-allowed;}
+
+div[data-role=input] + div[data-role=input], div[data-role=input] + div[data-role=inputset], div[data-role=inputset] + div[data-role=input], div[data-role=inputset] + div[data-role=inputset] {margin-top:5px;}
+
+div[data-role=help] {font-size:12px; line-height:1.6; color:#666;}
+div[data-role=input] + div[data-role=help], div[data-role=inputset] + div[data-role=help] {margin-top:10px;}
+
+
+/**
+ * 버튼정의
+ */
+div[data-role=button] {font-size:0; text-align:center; padding-left:5px;}
+div[data-role=button] > button, div[data-role=button] > a {display:inline-block; font-size:14px; height:40px; line-height:38px; padding:0px 15px; box-sizing:border-box; border:1px solid rgba(0,0,0,0.1); color:#666; background:#fff; vertical-align:middle; margin-right:5px; text-decoration:none; cursor:pointer;}
+div[data-role=button] > button:hover, div[data-role=button] > a:hover {background:#f4f4f4; color:#333;}
+div[data-role=button] > button[type=submit], div[data-role=button] > .submit {background:#2196f3; color:#fff;}
+div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:hover {background:#1e88e5;}
+div[data-role=button] > .danger {background:#f44336; color:#fff;}
+div[data-role=button] > .danger:hover {background:#e53935;}
+div[data-role=button] > button:disabled {background:#f4f4f4 !important; color:#666 !important; opacity:0.5; cursor:not-allowed;}
+div[data-role=button] > button:focus, div[data-role=button] > a:focus {border-color:rgba(0,0,0,0.5);}
+ul[data-role=table] + div[data-role=button] {margin-top:20px;}
 
 
 /**
@@ -91,3 +119,24 @@ div[data-role=calendar] > div.dates > button.today {color:#00adf9; font-weight:b
 div[data-role=calendar] > div.dates > button.selected {background:#00acf9; color:#fff; font-weight:bold;}
 div[data-role=calendar] > div.dates > button.notMatched {color:#999;}
 div[data-role=calendar] > div.dates > button:hover {background:#ff7829 !important; color:#fff;}
+
+
+/**
+ * 폼 테이블
+ */
+ul[data-role=table] {list-style:none; border-top:2px solid transparent; width:600px; margin:0 auto;}
+ul[data-role=table].red {border-top-color:#f44336;}
+
+ul[data-role=table] > li {display:table; width:100%; min-height:40px; table-layout:fixed; box-sizing:border-box;}
+ul[data-role=table].inner > li {border-bottom:1px solid #eee;}
+ul[data-role=table].outer > li {border-left:1px solid #eee; border-right:1px solid #eee;}
+ul[data-role=table].form > li {min-height:60px;}
+ul[data-role=table].inner.outer > li {border-right:0px;}
+
+ul[data-role=table] > li > span {display:table-cell; vertical-align:top; box-sizing:border-box;}
+ul[data-role=table] > li > span.thead {background:#f4f4f4; font-weight:bold;}
+ul[data-role=table].inner > li > span {border-right:1px solid #eee;}
+ul[data-role=table].view > li > span.thead {width:160px; padding-left:15px; line-height:40px;}
+ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-height:1.6;}
+ul[data-role=table].form > li > span.thead {width:160px; padding-left:15px; line-height:60px;}
+ul[data-role=table].form > li > span.tbody {width:100%; padding:10px; line-height:1;}

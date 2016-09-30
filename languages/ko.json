@@ -1,16 +1,46 @@
 {
+	"text":{
+		"templet":"템플릿",
+		"keyword":"검색어",
+		"email":"이메일",
+		"password":"패스워드",
+		"nickname":"닉네임"
+	},
+	"button":{
+		"prev":"이전",
+		"next":"다음",
+		"confirm":"확인",
+		"cancel":"취소",
+		"close":"닫기",
+		"back_to_main":"메인페이지로 돌아가기"
+	},
+	"action":{
+		"wait":"잠시만 기다려주십시오.",
+		"loading":"데이터를 불러오고 있습니다.",
+		"saving":"데이터를 저장하고 있습니다.",
+		"saved":"데이터를 성공적으로 저장하였습니다.",
+		"working":"요청한 작업을 처리중입니다.",
+		"worked":"성공적으로 처리하였습니다."
+	},
 	"error":{
-		"backToMain":"메인 페이지로 돌아가기",
-		"code":{
-			"UNKNOWN":"알 수 없는 에러가 발생하였습니다.",
-			"NOT_FOUND_TEMPLET_FILE":"아래의 템플릿파일을 찾을 수 없습니다.",
-			"NOT_FOUND_SITE":"사이트를 찾을 수 없습니다.<br>먼저 사이트관리자에서 현재 도메인을 사용하는 사이트를 생성한 뒤 사용하여 주십시오."
-		},
-		"permissionString":{
-			"unknownCode":"정의되지 않은 치환자 {code}가 있습니다.",
-			"parse":"입력된 권한구문을 해석할 수 없습니다.",
-			"boolean":"입력된 권한구문 해석값이 true 또는 false 가 아닙니다.",
-			"doubleQuotation":"권한구문에는 쌍따옴표(\")를 입력할 수 없습니다."
-		}
+		"UNKNOWN":"알 수 없는 에러가 발생하였습니다.",
+		"NOT_FOUND":"요청하신 데이터를 찾을 수 없습니다.",
+		"NOT_FOUND_TEMPLET_FILE":"템플릿파일을 찾을 수 없습니다.",
+		"NOT_FOUND_TEMPLET":"템플릿을 찾을 수 없습니다.",
+		"NOT_FOUND_SITE":"사이트를 찾을 수 없습니다.",
+		"LOWER_CASE_ALPHABET_ONLY":"영어 소문자만 입력가능합니다.",
+		"REQUIRED":"필수입력사항이 누락되었습니다.",
+		"DUPLICATED":"기존에 등록되어 있는 데이터와 중복됩니다.",
+		"INVALID_LANGUAGE_CODE":"언어코드가 잘못입력되었습니다. (영어소문자 2글자)",
+		"INVALID_FORM_DATA":"입력한 데이터에 오류가 있습니다.",
+		"REQUIRED_LOGIN":"회원 로그인이 필요합니다.",
+		"FORBIDDEN":"해당 요청을 처리하기 위한 권한이 없습니다.",
+		"DATA_LOAD_FAILED":"데이터를 불러오는데 실패하였습니다.",
+		"DATA_SAVE_FAILED":"데이터를 저장하는데 실패하였습니다.",
+		"RESERVED_NAME":"시스템에 의해 예약되어 있는 이름입니다.",
+		"UNKNWON_CODE_IN_PERMISSION_STRING":"권한구문에 알 수 없는 치환자가 있습니다.",
+		"NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING":"권한구문에는 쌍따옴표(\")를 입력할 수 없습니다.",
+		"PERMISSION_STRING_PARSING_FAILED":"권한구문을 해석할 수 없습니다.",
+		"NOT_BOOLEAN_PERMISSION_STRING_RESULT":"권한구문의 해석값이 TRUE or FALSE 가 아닙니다."
 	}
 }

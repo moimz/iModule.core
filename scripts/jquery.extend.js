@@ -48,11 +48,6 @@
 		 */
 		if (this.is("form") == true) {
 			/**
-			 * submit 이벤트가 있다면 제거한다.
-			 */
-			this.off("submit");
-			
-			/**
 			 * 매개변수 처리
 			 */
 			var submit = arguments.length > 0 ? arguments[0] : null;
@@ -65,6 +60,8 @@
 					return false;
 				});
 			}
+			
+			this.status("default");
 		}
 		
 		/**
@@ -294,6 +291,18 @@
 				var $input = this.children();
 				$container.attr("data-type","input");
 				
+				if ($input.is(":disabled") == true) {
+					$container.addClass("disabled");
+				}
+				
+				$input.on("disable",function() {
+					$(this).parent().addClass("disabled");
+				});
+				
+				$input.on("enable",function() {
+					$(this).parent().removeClass("disabled");
+				});
+				
 				/**
 				 * input type이 date 일 경우
 				 */
@@ -305,7 +314,7 @@
 					 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
 					 */
 					if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null) {
-						$input.attr("type","text");
+						$input.attr("type","text").prop("readonly",true);
 						
 						var $date = $("<input>").attr("type","date");
 						$container.append($date);
@@ -317,6 +326,14 @@
 							$date.focus();
 						});
 						
+						$date.on("focus",function() {
+							$input.addClass("focus");
+						});
+						
+						$date.on("blur",function() {
+							$input.removeClass("focus");
+						});
+						
 						$date.on("change",function() {
 							if (moment($(this).val()).isValid() == true) {
 								var format = $input.attr("data-format") ? $input.attr("data-format") : "YYYY-MM-DD";
@@ -326,7 +343,7 @@
 							}
 						});
 					} else {
-						$input.attr("type","input");
+						$input.attr("type","text");
 						var $button = $("<button>").attr("type","button").html("<i class='mi mi-calendar'></i>");
 						$container.append($button);
 						
@@ -425,14 +442,26 @@
 				var $checkbox = $("input[type=checkbox]",$container);
 				$container.attr("data-type","checkbox");
 				
-				var $icon = $("<i>").addClass("checkbox");
+				var $icon = $("<button>").attr("type","button").addClass("checkbox");
 				if ($checkbox.is(":checked") == true) $icon.addClass("on");
 				$checkbox.hide();
 				$label.append($icon);
 				
+				if ($checkbox.is(":disabled") == true) {
+					$container.addClass("disabled");
+				}
+				
+				$checkbox.on("disable",function() {
+					$(this).parents("div[data-role=input]").addClass("disabled");
+				});
+				
+				$checkbox.on("enable",function() {
+					$(this).parents("div[data-role=input]").removeClass("disabled");
+				});
+				
 				$checkbox.on("change",function() {
 					var $parent = $(this).parent().parent();
-					var $icon = $("i.checkbox",$parent);
+					var $icon = $("button.checkbox",$parent);
 					if ($(this).is(":checked") == true) {
 						$icon.addClass("on");
 					} else {
@@ -441,20 +470,50 @@
 				});
 			}
 			
-			
-		}
-		
-		/**
-		 * checkbox 박스일 경우
-		 */
-		if (this.attr("data-role") == "checkbox") {
-			if ($("label",this).length == 0) {
-				var $label = $("<label>").html(this.html());
-				this.empty();
-				this.append($label);
+			/**
+			 * 자식객체가 label 이고, label 의 자식객체가 radio 일 경우
+			 */
+			if (this.children().is("label") == true && this.children().eq(0).has("input[type=radio]").length == 1) {
+				var $container = this;
+				var $label = this.children();
+				var $radio = $("input[type=radio]",$container);
+				$container.attr("data-type","radio");
+				
+				var $icon = $("<button>").attr("type","button").addClass("radio");
+				if ($radio.is(":checked") == true) $icon.addClass("on");
+				$radio.hide();
+				$label.append($icon);
+				
+				if ($radio.is(":disabled") == true) {
+					$container.addClass("disabled");
+				}
+				
+				$radio.on("disable",function() {
+					$(this).parents("div[data-role=input]").addClass("disabled");
+				});
+				
+				$radio.on("enable",function() {
+					$(this).parents("div[data-role=input]").removeClass("disabled");
+				});
+				
+				$radio.on("change",function() {
+					var $form = $(this).parents("form");
+					$form = $form.length == 0 ? $("body") : $form;
+					
+					$("input[type=radio][name="+$(this).attr("name")+"]",$form).each(function() {
+						var $parent = $(this).parent().parent();
+						var $icon = $("button.radio",$parent);
+					
+						if ($(this).is(":checked") == true) {
+							console.log("선택되었다");
+							$icon.addClass("on");
+						} else {
+							console.log("해지되었다");
+							$icon.removeClass("on");
+						}
+					});
+				});
 			}
-			
-			
 		}
 		
 		this.data("isInit",true);
@@ -860,10 +919,10 @@
 				
 				var help = message ? message : ($inputbox.attr("data-"+status) ? $inputbox.attr("data-"+status) : null);
 				
-				$("div[data-role=help]",$inputbox).remove();
+				$inputbox.next("div[data-role=help]").remove();
 				if (help !== null) {
 					var $help = $("<div>").attr("data-role","help").html(help);
-					$inputbox.append($help);
+					$inputbox.after($help);
 				}
 			}
 		});

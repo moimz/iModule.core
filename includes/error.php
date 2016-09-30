@@ -15,10 +15,10 @@
 $IM->loadWebFont('OpenSans');
 ?>
 <div class="errorbox">
-	<h1><i class="mi mi-error"></i> ERROR!</h1>
+	<h1><i class="mi mi-attention-o"></i> ERROR!</h1>
 	
-	<h2><?php echo $title; ?></h2>
-	<?php if ($message) { ?><p><?php echo $message; ?></p><?php } ?>
+	<h2><?php echo $message; ?></h2>
+	<?php if ($description) { ?><p><?php echo $description; ?></p><?php } ?>
 	
-	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $IM->getLanguage('error/backToMain'); ?></a>
+	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $IM->getLanguage('button/back_to_main'); ?></a>
 </div>

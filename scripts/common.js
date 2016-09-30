@@ -17,15 +17,24 @@ var iModule = {
 	 * @param object lang 설정된 언어셋
 	 * @param object oLang 모듈 기본언어셋
 	 */
-	addLanguage:function(module,lang,oLang) {
-		if (window[module] === undefined) window[module] = {};
-		window[module]._LANG = lang;
-		window[module]._OLANG = oLang;
-		window[module].getLanguage = function(code) {
-			var temp = code.split("/");
-			if (temp.length == 1) {
-				return this._LANG[code] ? this._LANG[code] : (this._OLANG != null && this._OLANG[code] ? this._OLANG[code] : code);
-			} else {
+	addLanguage:function(type,target,lang,oLang) {
+		if (type == "core") {
+			iModule._LANG = lang;
+			iModule._OLANG = oLang;
+		} else {
+			if (type == "module") {
+				if (window[target] === undefined) window[target] = {};
+				var targetObject = window[target];
+			}
+			
+			targetObject._LANG = lang;
+			targetObject._OLANG = oLang;
+			
+			targetObject.getLanguage = function(code,replacement) {
+				var replacement = replacement ? replacement : null;
+				var returnString = null;
+				var temp = code.split("/");
+				
 				var string = this._LANG;
 				for (var i=0, loop=temp.length;i<loop;i++) {
 					if (string[temp[i]]) {
@@ -36,20 +45,86 @@ var iModule = {
 					}
 				}
 				
-				if (string != null) return string;
-				if (this._OLANG == null) return code;
-				
-				if (string == null && this._OLANG != null) {
+				if (string != null) {
+					returnString = string;
+				} else if (this._OLANG != null) {
 					var string = this._OLANG;
 					for (var i=0, loop=temp.length;i<loop;i++) {
-						if (string[temp[i]]) string = string[temp[i]];
-						else return code;
+						if (string[temp[i]]) {
+							string = string[temp[i]];
+						} else {
+							string = null;
+							break;
+						}
 					}
+					
+					if (string != null) returnString = string;
 				}
 				
-				return string;
+				/**
+				 * 언어셋 텍스트가 없는경우 iModule 코어에서 불러온다.
+				 */
+				if (returnString != null) return returnString;
+				else if ($.inArray(temp[0],["text","button","action"]) > -1) return iModule.getLanguage(code,replacement);
+				else return replacement == null ? code : replacement;
+			};
+			
+			targetObject.getErrorMessage = function(code) {
+				var message = this.getLanguage("error/"+code,code);
+				if (message === code && typeof Admin == "object") message = Admin.getLanguage("error/"+code,code);
+				if (message === code) message = iModule.getErrorMessage(code);
+				
+				return message;
+			};
+		}
+	},
+	/**
+	 * iModule 코어의 언어셋을 가져온다.
+	 *
+	 * @param string code
+	 * @param string replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
+	 * @return string language 실제 언어셋 텍스트
+	 */
+	getLanguage:function(code,replacement) {
+		var replacement = replacement ? replacement : null;
+		var temp = code.split("/");
+		
+		var string = this._LANG;
+		for (var i=0, loop=temp.length;i<loop;i++) {
+			if (string[temp[i]]) {
+				string = string[temp[i]];
+			} else {
+				string = null;
+				break;
 			}
-		};
+		}
+		
+		if (string != null) {
+			return string;
+		} else if (this._OLANG != null) {
+			var string = this._OLANG;
+			for (var i=0, loop=temp.length;i<loop;i++) {
+				if (string[temp[i]]) {
+					string = string[temp[i]];
+				} else {
+					return replacement == null ? code : replacement;
+				}
+			}
+		}
+		
+		return replacement == null ? code : replacement;
+	},
+	/**
+	 * iModule 코어의 에러메세지 가져온다.
+	 *
+	 * @param string code 에러코드
+	 * @return string message 에러메세지
+	 */
+	getErrorMessage:function(code) {
+		var message = this.getLanguage("error/"+code,code);
+		if (message === code) message = iModule.getLanguage("error/UNKNOWN")+" ("+code+")";
+		
+		return message;
 	},
 	/**
 	 * 파일사이즈를 KB, MB, GB 단위로 변환한다.
