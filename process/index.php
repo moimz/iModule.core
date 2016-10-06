@@ -39,7 +39,7 @@ if (preg_match('/^@/',$action) == true && $IM->getModule('member')->isAdmin() ==
 	header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 	header('Cache-Control:post-check=0, pre-check=0', false);
 	header('Pragma:no-cache');
-	exit(json_encode(array('success'=>false,'message'=>$IM->getModule('member')->getLanguage('error/forbidden')),JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
+	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
 } else {
 	if (Request('module') != null) {
 		$results = $IM->getModule(Request('module'))->doProcess(Request('action'));

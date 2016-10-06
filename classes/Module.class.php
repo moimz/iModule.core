@@ -30,20 +30,29 @@ class Module {
 	 * @private string $modulePath 모듈 절대경로
 	 * @private string $moduleDir 모듈 상대경로
 	 * @private string $modulePackage 모듈 package.json 정보
+	 * @private object $moduleConfigs 모듈 환경설정 정보
+	 * @private object $moduleInstalled 모듈 설치정보
+	 * @private object[] $loadedPackages 읽어온 모듈의 package.json 정보
+	 * @private Templet[] $loadedTemplets 읽어온 템플릿 객체
 	 */
 	private $modulePath;
 	private $moduleDir;
 	private $modulePackage;
 	private $moduleConfigs = null;
 	private $moduleInstalled = null;
-	private $loadedPackage = array();
+	private $loadedPackages = array();
+	private $loadedTemplets = array();
 	
+	/**
+	 * 호출된 모듈이 있을 경우 해당 모듈명
+	 */
 	private $loaded = false;
+	private $loadedClass = null;
 	
 	/**
 	 * class 선언
 	 *
-	 * @param iModule $IM iModule core class
+	 * @param iModule $IM iModule 코어클래스
 	 * @see /classes/iModule.class.php
 	 */
 	function __construct($IM) {
@@ -59,7 +68,10 @@ class Module {
 		$this->table = new stdClass();
 		$this->table->module = 'module_table';
 		
-		// Registe module's event listenters
+		/**
+		 * 설치된 모듈에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
+		 * DB접근을 줄이기 위하여 60초동안 모든 모듈에 대한 이벤트 리스너를 캐싱한다.
+		 */
 		if ($this->IM->cache()->check('core','modules','all') > time() - 60) {
 			$modules = json_decode($this->IM->cache()->get('core','modules','all'));
 		} else {
@@ -73,10 +85,10 @@ class Module {
 			foreach ($targets as $target=>$events) {
 				foreach ($events as $event=>$callers) {
 					if ($callers == '*') {
-						$this->IM->Event->addTarget($target,$event,'*','module/'.$modules[$i]->module);
+						$this->IM->Event->addEventListener($target,$event,'*','module/'.$modules[$i]->module);
 					} else {
 						foreach ($callers as $caller) {
-							$this->IM->Event->addTarget($target,$event,$caller,'module/'.$modules[$i]->module);
+							$this->IM->Event->addEventListener($target,$event,$caller,'module/'.$modules[$i]->module);
 						}
 					}
 				}
@@ -88,9 +100,10 @@ class Module {
 	 * [코어] 모듈을 불러온다.
 	 *
 	 * @param string $module 모듈명
-	 * @return Module $module 모듈클래스
+	 * @param boolean $forceLoad(옵션) 모듈이 설치가 되지 않아도 강제로 모듈클래스를 호출할지 여부
+	 * @return Module $Module 모듈클래스
 	 */
-	function load($module) {
+	function load($module,$forceLoad=false) {
 		/**
 		 * 모듈을 불러올때 모듈코어의 모듈전용 변수를 선언한다.
 		 */
@@ -102,17 +115,26 @@ class Module {
 		
 		$this->modulePackage = $this->getPackage($module);
 		
-		// check installed
+		/**
+		 * 설치여부를 확인하여, 설치되지 않았다면 false 를 반환한다.
+		 * 단 $forceLogin 값이 true 일 경우 클래스를 반환한다.
+		 */
 		$this->moduleInstalled = $this->IM->db('default')->select($this->table->module)->where('module',$module)->getOne();
-		if ($this->moduleInstalled == null) return false;
-		else $this->moduleConfigs = json_decode($this->moduleInstalled->configs);
+		if ($this->moduleInstalled != null) {
+			$this->moduleConfigs = json_decode($this->moduleInstalled->configs);
+		} else {
+			$this->moduleConfigs = null;
+			if ($forceLoad == false) return false;
+		}
 		
 		$class = 'Module'.ucfirst($module);
-		if (file_exists($this->modulePath.'/'.$class.'.class.php') == false) return false;
+		
+		if (is_file($this->modulePath.'/'.$class.'.class.php') == false) return false;
 		
 		$this->loaded = $module;
+		$this->loadedClass = new $class($this->IM,$this);
 		
-		return new $class($this->IM,$this);
+		return $this->loadedClass;
 	}
 	
 	/**
@@ -125,6 +147,15 @@ class Module {
 		for ($i=0, $loop=sizeof($globals);$i<$loop;$i++) {
 			$this->IM->getModule($globals[$i]->module);
 		}
+	}
+	
+	/**
+	 * [모듈내부] 호출한 모듈 클래스를 반환한다.
+	 *
+	 * @return object $moduleClass 모듈클래스
+	 */
+	function getClass() {
+		return $this->loadedClass;
 	}
 	
 	/**
@@ -190,15 +221,15 @@ class Module {
 	/**
 	 * [코어/모듈내부] 모듈의 package.json 정보를 반환한다.
 	 *
-	 * @param string $module module's name. If not exists this param, use loaded module after module loaded.
-	 * @return object $info
+	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
+	 * @return object $package package.json 정보
 	 */
 	function getPackage($module=null) {
 		if ($module !== null) {
-			if (isset($this->loadedPackage[$module]) == true) return $this->loadedPackage[$module];
+			if (isset($this->loadedPackages[$module]) == true) return $this->loadedPackages[$module];
 			if (file_exists(__IM_PATH__.'/modules/'.$module.'/package.json') == false) return null;
-			$this->loadedPackage[$module] = json_decode(file_get_contents(__IM_PATH__.'/modules/'.$module.'/package.json'));
-			return $this->loadedPackage[$module];
+			$this->loadedPackages[$module] = json_decode(file_get_contents(__IM_PATH__.'/modules/'.$module.'/package.json'));
+			return $this->loadedPackages[$module];
 		} else {
 			return $this->modulePackage;
 		}
@@ -247,13 +278,70 @@ class Module {
 		/**
 		 * 모듈을 불러온다.
 		 */
-		$mModule = $this->IM->getModule($module);
+		$mModule = new Module($this->IM);
+		$mModule = $mModule->load($module,true);
 		
 		/**
-		 * 모듈에 설정패널 메소드가 없으면 NULL 을 반환한다.
+		 * 모듈클래스에 설정패널 함수가 있으면 해당 함수의 결과값을 리턴한다.
 		 */
-		if (method_exists($mModule,'getConfigPanel') == false) return null;
-		return $mModule->getConfigPanel();
+		if (method_exists($mModule,'getConfigPanel') == true) return $mModule->getConfigPanel();
+		
+		/**
+		 * 모듈클래스에 설정패널 함수가 없다면, 설정패널을 생성한다.
+		 */
+		$package = $this->getPackage($module);
+		
+		/**
+		 * 모듈환경설정이 없다면, NULL 을 반환한다.
+		 */
+		if (isset($package->configs) == false || $package->configs == null) return null;
+		
+		$panel = array();
+		array_push($panel,
+			'<script>',
+			'new Ext.form.Panel({',
+				'id:"ModuleConfigForm",',
+				'border:false,',
+				'bodyPadding:10,',
+				'fieldDefaults:{labelAlign:"right",labelWidth:160,anchor:"100%",allowBlank:true},',
+				'items:['
+		);
+		
+		$fields = array();
+		foreach ($package->configs as $key=>$config) {
+			$field = array();
+			array_push($field,
+				'new Ext.form.TextField({',
+					'name:"'.$key.'",',
+					'fieldLabel:"'.(isset($config->title->{$this->IM->language}) == true ? $config->title->{$this->IM->language} : $config->title->{$package->language}).'",'
+			);
+			
+			if (isset($config->help) == true) {
+				array_push($field,
+					'afterBodyEl:"<div class=\"x-form-help\">'.(isset($config->help->{$this->IM->language}) == true ? $config->help->{$this->IM->language} : $config->help->{$package->language}).'</div>",'
+				);
+			}
+			
+			array_push($field,
+					'allowBlank:false',
+				'})'
+			);
+			
+			$field = implode(PHP_EOL,$field);
+			
+			$fields[] = $field;
+		}
+		
+		$fields = implode(','.PHP_EOL,$fields);
+		array_push($panel,$fields);
+		
+		array_push($panel,
+				']',
+			'});',
+			'</script>'
+		);
+		
+		return implode(PHP_EOL,$panel);
 	}
 	
 	/**
@@ -299,7 +387,7 @@ class Module {
 	 */
 	function getConfig($key=null) {
 		if ($key == null) return $this->moduleConfigs;
-		elseif (empty($this->moduleConfigs->$key) == true) return null;
+		elseif ($this->moduleConfigs == null || isset($this->moduleConfigs->$key) == false) return null;
 		else return $this->moduleConfigs->$key;
 	}
 	
@@ -308,11 +396,14 @@ class Module {
 	 *
 	 * @param string $key 환경설정코드값, 없을경우 전체 환경설정값
 	 * @param object $value 변경할 환경설정값
-	 * @return string $value 환경설정값
+	 * @return Module $this
 	 */
 	function setConfig($key,$value) {
+		if ($this->moduleConfigs == null) return $this;
 		$this->moduleConfigs->{$key} = $value;
 		$this->IM->db()->update($this->table->module,array('configs'=>json_encode($this->moduleConfigs,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK)))->where('module',$this->loaded)->execute();
+		
+		return $this;
 	}
 	
 	/**
@@ -374,72 +465,25 @@ class Module {
 	}
 	
 	/**
-	 * [모듈내부/사이트관리자] 모듈의 모든 템플릿을 가져온다.
+	 * [모듈내부] 모듈 템플릿의 package.json 정보를 가져온다.
 	 *
-	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
-	 * @return object[] $templets 템플릿정보
+	 * @param string $templet 템플릿명
+	 * @return Templet $templet 템플릿 객체
 	 */
-	function getTemplets($module=null) {
-		$module = $module == null ? $this->loaded : $module;
-		if ($module == null) return array();
+	function getTemplet($templet) {
+		if (isset($this->loadedTemplets[$templet]) == true) return $this->loadedTemplets[$templet];
+		$this->loadedTemplets[$templet] = $this->IM->getTemplet($this,$templet);
 		
-		$lists = array();
-		$templetsPath = @opendir($this->getPath($module).'/templets');
-		while ($templetName = @readdir($templetsPath)) {
-			if ($templetName != '.' && $templetName != '..' && is_dir($this->getPath($module).'/templets/'.$templetName) == true) {
-				$package = $this->getTempletPackage($templetName,$module);
-				if ($package !== null) $lists[] = $package;
-			}
-		}
-		@closedir($templetsPath);
-		
-		$siteTemplets = @opendir(__IM_PATH__.'/templets');
-		while ($siteTemplet = @readdir($siteTemplets)) {
-			if ($siteTemplet != '.' && $siteTemplet != '..' && is_dir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$this->loaded) == true) {
-				$templetsPath = @opendir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$this->loaded.'/templets');
-				while ($templetName = @readdir($templetsPath)) {
-					if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$this->loaded.'/templets/'.$templetName) == true) {
-						$package = $this->getTempletPackage('@'.$siteTemplet.'/'.$templetName,$module);
-						if ($package !== null) $lists[] = $package;
-					}
-				}
-				@closedir($templetsPath);
-			}
-		}
-		@closedir($siteTemplets);
-		
-		return $lists;
+		return $this->loadedTemplets[$templet];
 	}
 	
 	/**
-	 * [모듈내부/사이트관리자] 모듈 템플릿의 package.json 정보를 가져온다.
+	 * [모듈내부] 모듈의 모든 템플릿을 가져온다.
 	 *
-	 * @param string $templet 템플릿명
-	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
-	 * @return object $package package.json 정보
+	 * @return object[] $templets 템플릿정보
 	 */
-	function getTempletPackage($templet,$module=null) {
-		$module = $module == null ? $this->loaded : $module;
-		if ($module == false) return null;
-		
-		if (preg_match('/^@/',$templet) == true) {
-			$temp = explode('/',preg_replace('/^@/','',$templet));
-			$templetPath = __IM_PATH__.'/templets/'.$temp[0].'/modules/'.$module.'/templets/'.$temp[1];
-			$templetDir = __IM_DIR__.'/templets/'.$temp[0].'/modules/'.$module.'/templets/'.$temp[1];
-		} else {
-			$templetPath = $this->getPath($module).'/templets/'.$templet;
-			$templetDir = $this->getDir($module).'/templets/'.$templet;
-		}
-		
-		if (is_dir($templetPath) === false || is_file($templetPath.'/package.json') == false) return null;
-		$package = json_decode(file_get_contents($templetPath.'/package.json'));
-		if ($package == null) return null;
-		$package->name = $templet;
-		$package->title = isset($package->title->{$this->IM->language}) == true ? $package->title->{$this->IM->language} : $package->title->{$package->language};
-		$package->path = $templetPath;
-		$package->dir = $templetDir;
-		
-		return $package;
+	function getTemplets() {
+		return $this->IM->getTemplets($this);
 	}
 	
 	/**
@@ -452,7 +496,8 @@ class Module {
 		/**
 		 * 모듈에 설정패널 설정패널 함수가 있으면 true 를 반환한다.
 		 */
-		return method_exists($this->IM->getModule($module),'getConfigPanel') === true;
+		$package = $this->getPackage($module);
+		return isset($package->configs) == true && $package->configs != null;
 	}
 	
 	/**

@@ -30,7 +30,7 @@ var iModule = {
 			targetObject._LANG = lang;
 			targetObject._OLANG = oLang;
 			
-			targetObject.getLanguage = function(code,replacement) {
+			targetObject.getText = function(code,replacement) {
 				var replacement = replacement ? replacement : null;
 				var returnString = null;
 				var temp = code.split("/");
@@ -65,14 +65,14 @@ var iModule = {
 				 * 언어셋 텍스트가 없는경우 iModule 코어에서 불러온다.
 				 */
 				if (returnString != null) return returnString;
-				else if ($.inArray(temp[0],["text","button","action"]) > -1) return iModule.getLanguage(code,replacement);
+				else if ($.inArray(temp[0],["text","button","action"]) > -1) return iModule.getText(code,replacement);
 				else return replacement == null ? code : replacement;
 			};
 			
-			targetObject.getErrorMessage = function(code) {
-				var message = this.getLanguage("error/"+code,code);
-				if (message === code && typeof Admin == "object") message = Admin.getLanguage("error/"+code,code);
-				if (message === code) message = iModule.getErrorMessage(code);
+			targetObject.getErrorText = function(code) {
+				var message = this.getText("error/"+code,code);
+				if (message === code && typeof Admin == "object") message = Admin.getText("error/"+code,code);
+				if (message === code) message = iModule.getErrorText(code);
 				
 				return message;
 			};
@@ -85,7 +85,7 @@ var iModule = {
 	 * @param string replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
 	 * @return string language 실제 언어셋 텍스트
 	 */
-	getLanguage:function(code,replacement) {
+	getText:function(code,replacement) {
 		var replacement = replacement ? replacement : null;
 		var temp = code.split("/");
 		
@@ -120,9 +120,9 @@ var iModule = {
 	 * @param string code 에러코드
 	 * @return string message 에러메세지
 	 */
-	getErrorMessage:function(code) {
-		var message = this.getLanguage("error/"+code,code);
-		if (message === code) message = iModule.getLanguage("error/UNKNOWN")+" ("+code+")";
+	getErrorText:function(code) {
+		var message = this.getText("error/"+code,code);
+		if (message === code) message = iModule.getText("error/UNKNOWN")+" ("+code+")";
 		
 		return message;
 	},

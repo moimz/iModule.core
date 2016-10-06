@@ -69,10 +69,35 @@ function FileReadLine($path,$line) {
 	}
 }
 
+/**
+ * 이메일이 형식에 맞는지 확인한다.
+ *
+ * @param string $email 이메일
+ * @return boolean $isValid
+ */
 function CheckEmail($email) {
 	return preg_match('/^[[:alnum:]]+([_.-\]\+[[:alnum:]]+)*[_.-]*@([[:alnum:]]+([.-][[:alnum:]]+)*)+.[[:alpha:]]{2,4}$/',$email);
 }
 
+/**
+ * 실명에 포함될 수 없는 문자열이 있는지 확인한다.
+ *
+ * @param string $name 실명
+ * @return boolean $isValid
+ */
+function CheckName($name) {
+	if (preg_match('/[~!@#\$%\^&\*\(\)\-_\+\=\[\]\<\>\/\?\'":;\{\}\x{25a0}-\x{25ff}\x{2600}-\x{26ff}]+/u',$name) == true) return false;
+	if (mb_strlen($name,'utf-8') < 2) return false;
+	
+	return true;
+}
+
+/**
+ * 닉네임이 형식에 맞는지 확인한다.
+ *
+ * @param string $nickname 닉네임
+ * @return boolean $isValid
+ */
 function CheckNickname($nickname) {
 	if (preg_match('/[~!@#\$%\^&\*\(\)\-_\+\=\[\]\<\>\/\?\'":;\{\}\x{25a0}-\x{25ff}\x{2600}-\x{26ff}[:space:]]+/u',$nickname) == true) return false;
 	if (mb_strlen($nickname,'utf-8') < 2 || mb_strlen($nickname,'utf-8') > 10) return false;
@@ -569,7 +594,10 @@ function CreateDatabase($dbConnect,$schema) {
 		} elseif ($dbConnect->compare($table,$structure) == false) {
 			$rename = $table.'_BK'.date('YmdHis');
 			if ($dbConnect->rename($table,$rename) == false) return false;
-			if ($dbConnect->create($table,$structure) == false) return false;
+			if ($dbConnect->create($table,$structure) == false) {
+				$dbConnect->rename($rename,$table);
+				return false;
+			}
 			
 			$data = $dbConnect->select($rename)->get();
 			for ($i=0, $loop=count($data);$i<$loop;$i++) {

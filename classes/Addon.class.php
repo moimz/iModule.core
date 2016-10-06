@@ -1,4 +1,14 @@
 <?php
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * 모든 에드온을 관리한다.
+ * 
+ * @file /classes/Addon.class.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.160907
+ */
 class Addon {
 	private $IM;
 	private $addons = array();
@@ -17,7 +27,10 @@ class Addon {
 		if (is_object($IM) == true) {
 			$this->IM = $IM;
 			
-			// Registe addon's event listenters
+			/**
+			 * 설치된 에드온에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
+			 * DB접근을 줄이기 위하여 60초동안 모든 모듈에 대한 이벤트 리스너를 캐싱한다.
+			 */
 			if ($this->IM->cache()->check('core','addons','all') > time() - 60) {
 				$addons = json_decode($this->IM->cache()->get('core','addons','all'));
 			} else {
@@ -31,7 +44,7 @@ class Addon {
 				foreach ($targets as $target=>$events) {
 					foreach ($events as $event=>$callers) {
 						foreach ($callers as $caller) {
-							$this->IM->Event->addTarget($target,$event,$caller,'addon/'.$addons[$i]->addon);
+							$this->IM->Event->addEventListener($target,$event,$caller,'addon/'.$addons[$i]->addon);
 						}
 					}
 				}

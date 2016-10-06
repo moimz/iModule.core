@@ -34,13 +34,15 @@
 	 * 특정 객체나 오브젝트를 초기화한다.
 	 */
 	$.fn.inits = function() {
-		if (typeof this != "object" || this.data("isInit") === true) return;
+		if (typeof this != "object") return;
 		
 		if (this.length > 1) {
 			this.each(function() {
 				$(this).inits();
 			});
 			return;
+		} else {
+			if (this.data("isInit") === true) return;
 		}
 		
 		/**
@@ -74,6 +76,15 @@
 			if (this.children().length !== 1) return;
 			
 			/**
+			 * 자식노드가 버튼인 경우
+			 */
+			if (this.children().is("button") == true) {
+				var $container = this;
+				var $button = this.children();
+				$container.attr("data-type","button");
+			}
+			
+			/**
 			 * 자식노드가 객체가 select 일 경우
 			 */
 			if (this.children().is("select") == true) {
@@ -96,6 +107,8 @@
 					$button.attr("disabled",true);
 				}
 				
+				$select.data("submitValue",null);
+				
 				$select.on("disable",function() {
 					var $parent = $(this).parent();
 					var $button = $("button",$parent).prop("disabled",true);
@@ -104,6 +117,21 @@
 				$select.on("enable",function() {
 					var $parent = $(this).parent();
 					var $button = $("button",$parent).prop("disabled",false);
+				});
+			
+				$select.on("change",function() {
+					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
+						$(this).status("default");
+					}
+					
+					var $parent = $(this).parent();
+					var $button = $("button",$parent);
+					var $item = $("option[value="+$(this).val()+"]",$(this));
+					if ($item.length == 0) {
+					
+					} else {
+						$("span",$button).html($item.html());
+					}
 				});
 				
 				/**
@@ -270,17 +298,6 @@
 						$button.focus();
 					});
 				}
-			
-				$select.on("change",function() {
-					var $parent = $(this).parent();
-					var $button = $("button",$parent);
-					var $item = $("option[value="+$(this).val()+"]",$(this));
-					if ($item.length == 0) {
-					
-					} else {
-						$("span",$button).html($item.html());
-					}
-				});
 			}
 			
 			/**
@@ -295,12 +312,20 @@
 					$container.addClass("disabled");
 				}
 				
+				$input.data("submitValue",null);
+				
 				$input.on("disable",function() {
 					$(this).parent().addClass("disabled");
 				});
 				
 				$input.on("enable",function() {
 					$(this).parent().removeClass("disabled");
+				});
+				
+				$input.on("keyup",function() {
+					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
+						$(this).status("default");
+					}
 				});
 				
 				/**
@@ -434,6 +459,35 @@
 			}
 			
 			/**
+			 * 자식객체가 textarea 일 경우
+			 */
+			if (this.children().is("textarea") == true) {
+				var $container = this;
+				var $textarea = this.children();
+				$container.attr("data-type","textarea");
+				
+				if ($textarea.is(":disabled") == true) {
+					$container.addClass("disabled");
+				}
+				
+				$textarea.data("submitValue",null);
+				
+				$textarea.on("disable",function() {
+					$(this).parent().addClass("disabled");
+				});
+				
+				$textarea.on("enable",function() {
+					$(this).parent().removeClass("disabled");
+				});
+				
+				$textarea.on("keyup",function() {
+					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
+						$(this).status("default");
+					}
+				});
+			}
+			
+			/**
 			 * 자식객체가 label 이고, label 의 자식객체가 checkbox 일 경우
 			 */
 			if (this.children().is("label") == true && this.children().eq(0).has("input[type=checkbox]").length == 1) {
@@ -451,12 +505,20 @@
 					$container.addClass("disabled");
 				}
 				
+				$checkbox.data("submitValue",null);
+				
 				$checkbox.on("disable",function() {
 					$(this).parents("div[data-role=input]").addClass("disabled");
 				});
 				
 				$checkbox.on("enable",function() {
 					$(this).parents("div[data-role=input]").removeClass("disabled");
+				});
+				
+				$checkbox.on("change",function() {
+					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).is(":checked")) {
+						$(this).status("default");
+					}
 				});
 				
 				$checkbox.on("change",function() {
@@ -488,6 +550,8 @@
 					$container.addClass("disabled");
 				}
 				
+				$radio.data("submitValue",null);
+				
 				$radio.on("disable",function() {
 					$(this).parents("div[data-role=input]").addClass("disabled");
 				});
@@ -505,13 +569,15 @@
 						var $icon = $("button.radio",$parent);
 					
 						if ($(this).is(":checked") == true) {
-							console.log("선택되었다");
 							$icon.addClass("on");
 						} else {
-							console.log("해지되었다");
 							$icon.removeClass("on");
 						}
 					});
+					
+					if ($radio.isValid() !== null && $radio.data("submitValue") != $radio.val()) {
+						$radio.status("default");
+					}
 				});
 			}
 		}
@@ -825,6 +891,14 @@
 		var $form = this;
 		var data = $form.serialize();
 		
+		$("input, select, textarea",$form).each(function() {
+			if ($(this).attr("type") == "checkbox") {
+				if ($(this).data("submitValue",$(this).is(":checked")));
+			} else {
+				$(this).attr("submitValue",$(this).val());
+			}
+		});
+		
 		$form.status("loading");
 		
 		$.ajax({
@@ -833,16 +907,38 @@
 			data:data,
 			dataType:"json",
 			success:function(result) {
+				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) {
 					$form.status("error",result.errors);
 				}
-				callback(result);
+				if (result.message) iModule.alert.show("error",result.message);
 			},
 			error:function() {
 				$form.status("default");
 				iModule.alert.show("error","Server Connect Error!",5);
 			}
 		});
+	};
+	
+	/**
+	 * input, select, checkbox 요소의 유효값 상태를 확인한다.
+	 *
+	 * @return boolean 유효성여부 (null 일 경우 알수없다는 의미)
+	 */
+	$.fn.isValid = function() {
+		if (this.length != 1) return null;
+		
+		if (this.is("input,textarea,select") == true) {
+			var $parent = this.parents("div[data-role=input]").length == 0 ? null : this.parents("div[data-role=input]").eq(0);
+			var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
+			
+			if ($parent == null) return null;
+			var $inputbox = $inputset == null ? $parent : $inputset;
+			
+			if ($inputbox.hasClass("success") == true) return true;
+			if ($inputbox.hasClass("error") == true) return false;
+			return null;
+		}
 	};
 	
 	/**
@@ -863,14 +959,27 @@
 					$(this).status("default");
 					
 					if (typeof message == "object") {
-						for (field in message) {
-							var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"]",$(this));
-							if ($field.length == 0) {
-								iModule.alert.show("error",message[field]);
+						for (var field in message) {
+							if (typeof message[field] == "object") {
+								for (var value in message[field]) {
+									var $field = $("input[type=checkbox][name='"+field+"[]'][value='"+value+"']",$(this));
+									if ($field.length == 0) {
+										iModule.alert.show("error",field + " : " + message[field][value]);
+									} else {
+										$field.status("error",message[field][value]);
+									}
+								}
 							} else {
-								$field.status("error",message[field]);
+								var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"], input[type=checkbox][name='"+field+"[]']",$(this));
+								if ($field.length == 0) {
+									iModule.alert.show("error",field + " : " + message[field]);
+								} else {
+									$field.status("error",message[field]);
+								}
 							}
 						}
+						
+						$("div[data-role=input].error, div[data-role=inputset].error").first().scroll();
 					}
 				} else {
 					/**
@@ -884,7 +993,7 @@
 			/**
 			 * 객체가 submit 버튼일 경우
 			 */
-			if ($(this).is("button[type=submit]") == true || $(this).is("input[type=submit]") == true) {
+			if ($(this).is("button") == true || $(this).is("input[type=submit]") == true) {
 				if (status == "loading") {
 					$(this).data("defaultHtml",$(this).html());
 					$(this).html('<i class="mi mi-loading"></i>');
@@ -899,7 +1008,6 @@
 			 * 객체가 input, select, textarea 일 경우
 			 */
 			if ($(this).is("input,textarea,select") == true) {
-				console.log("input,textarea,select",status);
 				if (status == "loading") {
 					$(this).prop("disabled",true);
 				} else {
@@ -909,27 +1017,73 @@
 				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
 				var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
 				
-				console.log($parent,$inputset);
-				
 				if ($parent == null) return;
 				
 				var $inputbox = $inputset == null ? $parent : $inputset;
+				
+				var setStatus = status;
+				if (status == "success") {
+					if ($(this).attr("type") == "checkbox" || $(this).attr("type") == "radio") {
+						if ($("input[name='"+$(this).attr("name")+"']:checked",$inputbox).length == 0) setStatus = "default";
+					} else {
+						if ($inputbox.is("[data-role=inputset]") == true) {
+							setStatus = "default";
+							var $children = $("input, textarea, select",$inputbox);
+							for (var i=0, loop=$children.length;i<loop;i++) {
+								if ($children.eq(i).val().length > 0) {
+									setStatus = "success";
+									break;
+								}
+							}
+						} else {
+							if ($(this).val().length == 0) setStatus = "default";
+						}
+					}
+				}
+				
 				$inputbox.removeClass("success error loading default");
-				$inputbox.addClass(status);
+				$inputbox.addClass(setStatus);
+				if ($inputbox.is("[data-role=inputset]") == true) {
+					$("div[data-role=input]",$inputbox).removeClass("success error loading default").addClass(setStatus);
+				}
 				
-				var help = message ? message : ($inputbox.attr("data-"+status) ? $inputbox.attr("data-"+status) : null);
+				var help = message ? message : ($inputbox.attr("data-"+setStatus) ? $inputbox.attr("data-"+setStatus) : null);
+				help = help == null && $inputbox.attr("data-default") ? $inputbox.attr("data-default") : help;
 				
-				$inputbox.next("div[data-role=help]").remove();
 				if (help !== null) {
-					var $help = $("<div>").attr("data-role","help").html(help);
-					$inputbox.after($help);
+					var $help = $("<div>").attr("data-role","help").addClass(setStatus).html(help);
+					if ($parent.data("isInit") !== true) $parent.inits();
+				}
+				
+				if ($inputbox.is("[data-role=inputset]") == true && $inputbox.hasClass("flex") == true) {
+					$inputbox.next("div[data-role=help]").remove();
+					if (help !== null) $inputbox.after($help);
+				} else {
+					$("div[data-role=help]",$inputbox).remove();
+					if (help !== null) $inputbox.append($help);
 				}
 			}
 		});
 		
 		return this;
+	};
+	
+	/**
+	 * 객체가 스크롤 범위내에 없을 경우 해당 객체 위치로 스크롤 시킨다.
+	 */
+	$.fn.scroll = function() {
+		if (this.length == 0) return;
 		
-//		if (this.status)
+		var offsetTop = 50;
+		var offsetBottom = 50;
+		
+		if (this.offset().top - offsetTop < $("body").scrollTop()) {
+			$("html,body").animate({scrollTop:this.offset().top - offsetTop});
+		}
+		
+		if (this.offset().top + this.outerHeight(true) + offsetBottom > $(window).height() + $("body").scrollTop()) {
+			$("html,body").animate({scrollTop:this.offset().top + this.outerHeight(true) + offsetBottom - $(window).height()});
+		}
 	};
 	
 	/**

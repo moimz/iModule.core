@@ -7,15 +7,12 @@ header('Pragma:no-cache');
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.'index.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
 
 $IM = new iModule();
-$site = $IM->getSite();
-
 $headers = getallheaders();
 if (isset($headers['Authorization']) == true) {
 	$IM->getModule('member')->loginByToken($headers['Authorization']);
 }
 
 if (Request('module') != null) {
-	$pretty = Request('pretty') !== null;
 	$results = $IM->getModule(Request('module'))->getApi(Request('api'));
 	
 	if ($results !== null) {

@@ -87,8 +87,7 @@ class iModule {
 	private $siteImage = null;
 	
 	private $siteHeader = array();
-	private $templetPath = null;
-	private $templetDir = null;
+	private $siteTemplet = null;
 	private $useTemplet = true;
 	private $javascriptLanguages = array();
 	private $webFont = array('moimz'); // Moimz 폰트아이콘은 기본적으로 포함된다.
@@ -335,6 +334,13 @@ class iModule {
 	}
 	
 	/**
+	 * 코어이름을 반환한다.
+	 */
+	function getName() {
+		return 'core';
+	}
+	
+	/**
 	 * 언어셋파일에 정의된 코드를 이용하여 사이트에 설정된 언어별로 텍스트를 반환한다.
 	 * 코드에 해당하는 문자열이 없을 경우 1차적으로 package.json 에 정의된 기본언어셋의 텍스트를 반환하고, 기본언어셋 텍스트도 없을 경우에는 코드를 그대로 반환한다.
 	 *
@@ -342,7 +348,7 @@ class iModule {
 	 * @param string $replacement 일치하는 언어코드가 없을 경우 반환될 메세지 (기본값 : null, $code 반환)
 	 * @return string $language 실제 언어셋 텍스트
 	 */
-	function getLanguage($code,$replacement=null) {
+	function getText($code,$replacement=null) {
 		if ($this->lang == null) {
 			$package = json_decode(file_get_contents(__IM_PATH__.'/package.json'));
 			if (file_exists(__IM_PATH__.'/languages/'.$this->language.'.json') == true) {
@@ -399,22 +405,27 @@ class iModule {
 	 * @param object $value(옵션) 에러와 관련된 데이터
 	 * @param string $message(옵션) 변환된 에러메세지
 	 */
-	function getErrorMessage($code,$value=null,$message=null,$isRawData=false) {
+	function getErrorText($code,$value=null,$message=null,$isRawData=false) {
 		if (is_object($code) == true) {
 			$message = $code->message;
 			$description = $code->description;
 		} else {
 			$message = '';
 			if ($message == null) {
-				$message = $this->getLanguage('error/'.$code,$code);
+				$message = $this->getText('error/'.$code,$code);
 			}
-		
-			$description = null;
-			switch ($code) {
-				default :
-					if ($value != null && is_string($value) == true) $description = $value;
+			
+			if ($message == $code) {
+				$message = $this->getText('error/UNKNOWN');
+				$description = $code;
+			} else {
+				$description = null;
+				switch ($code) {
+					default :
+						if ($value != null && is_string($value) == true) $description = $value;
+				}
+				$description = strlen($description) == 0 ? null : $description;
 			}
-			$description = strlen($description) == 0 ? null : $description;
 		}
 		
 		if ($isRawData === true) {
@@ -425,14 +436,7 @@ class iModule {
 			return $data;
 		}
 		
-		/**
-		 * doProcess() 에서 발생한 에러일 경우
-		 */
-		if (preg_match('/\/process\/index\.php$/',$_SERVER['SCRIPT_NAME']) == true) {
-			return $message.($description !== null ? ' ('.$description.')' : '');
-		}
-		
-		return $_SERVER['PHP_SELF'];
+		return $message.($description !== null ? ' ('.$description.')' : '');
 	}
 	
 	/**
@@ -472,6 +476,29 @@ class iModule {
 	function getWidget($widget) {
 		$class = new Widget($this);
 		return $class->load($widget);
+	}
+	
+	/**
+	 * 템플릿 객체를 가져온다.
+	 *
+	 * @param object $caller 템플릿을 요청하는 클래스 (iModule, Module, Widget)
+	 * @param string $templet 템플릿명
+	 * @return Templet $templet 템플릿 객체
+	 */
+	function getTemplet($caller,$templet) {
+		$class = new Templet($this);
+		return $class->load($caller,$templet);
+	}
+	
+	/**
+	 * 전체 템플릿목록을 가져온다.
+	 *
+	 * @param object $caller 템플릿목록을 요청하는 클래스 (iModule, Module, Widget)
+	 * @return Templet[] $templets 템플릿목록
+	 */
+	function getTemplets($caller) {
+		$class = new Templet($this);
+		return $class->getTemplets($caller);
 	}
 	
 	/**
@@ -741,8 +768,9 @@ class iModule {
 		$language = $language == null ? $this->language : $language;
 		
 		$site = $domain.'@'.$language;
-		if (empty($this->menus[$site]) == true) return $page == null ? array() : null;
+		if (isset($this->menus[$site]) == false) return $page == null ? array() : null;
 		if ($menu == null) return $this->pages[$site];
+		if (isset($this->pages[$site][$menu]) == false) return $page == null ? array() : null;
 		if ($page == null) return $this->pages[$site][$menu];
 		
 		for ($i=0, $loop=count($this->pages[$site][$menu]);$i<$loop;$i++) {
@@ -764,8 +792,6 @@ class iModule {
 		$this->site->logo = json_decode($this->site->logo);
 		$this->site->maskicon = json_decode($this->site->maskicon);
 		$this->site->description = $this->site->description ? $this->site->description : null;
-		$this->site->templetConfigs = json_decode($this->site->templetConfigs);
-//		$this->language = $this->language == null ? $this->site->language : $this->language;
 		
 		return $this->site;
 	}
@@ -842,18 +868,6 @@ class iModule {
 		}
 		
 		return $footers;
-	}
-	
-	/**
-	 * 사이트 템플릿별 설정된 값을 가져온다.
-	 * 해당 설정들은 템플릿 폴더안의 package.json 에 의해 정의되고, 사이트관리자를 통해 설정값이 입력된다.
-	 *
-	 * @param string $key 설정코드
-	 * @return string $value 설정된 값 (설정된 값이 없을 경우 공백이 반환된다.)
-	 */
-	function getSiteTempletConfig($key) {
-		if ($this->site == null) $this->getSite();
-		return $this->site->templetConfigs != null && isset($this->site->templetConfigs->{$key}) == true ? $this->site->templetConfigs->{$key} : '';
 	}
 	
 	/**
@@ -1165,28 +1179,14 @@ class iModule {
 	}
 	
 	/**
-	 * 사이트 템플릿의 $_SERVER['DOCUMENT_ROOT'] 포함한 절대경로를 가져온다.
+	 * 사이트 템플릿 객체를 반환한다.
 	 *
-	 * @return string $templetPath
+	 * @return Templet $siteTemplet
 	 */
-	function getTempletPath() {
-		/**
-		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
-		 */
-		if ($this->site == null) return null;
-		
-		return __IM_PATH__.'/templets/'.$this->site->templet;
-	}
-	
-	/**
-	 * 사이트 템플릿의 상대경로를 가져온다.
-	 *
-	 * @return string $templetDir
-	 */
-	function getTempletDir() {
-		if ($this->site == null) return null;
-		
-		return __IM_DIR__.'/templets/'.$this->site->templet;
+	function getSiteTemplet() {
+		if ($this->siteTemplet !== null) return $this->siteTemplet;
+		$this->siteTemplet = $this->getTemplet($this,$this->getSite()->templet)->setConfigs(json_decode($this->getSite()->templet_configs));
+		return $this->siteTemplet;
 	}
 	
 	/**
@@ -1232,7 +1232,7 @@ class iModule {
 	
 	/**
 	 * 자바스크립트용 언어셋 파일을 호출한다.
-	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 이 함수를 호출하여 자바스크립트상에서 대상.getLanguage() 함수로 언어셋을 불러올 수 있다.
+	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 이 함수를 호출하여 자바스크립트상에서 대상.getText() 함수로 언어셋을 불러올 수 있다.
 	 *
 	 * @param string $type 불러올 대상의 종류 (module, addon, widget)
 	 * @param string $module 불러올 대상의 이름
@@ -1323,11 +1323,13 @@ class iModule {
 		 * 기본 스타일시트를 불러온다.
 		 * 사이트가 존재하고, 사이트템플릿에 common.css 파일이 정의되어 있을 경우 사이트템플릿의 common.css 파일을 불러온다.
 		 */
-		if ($this->site != null && is_file($this->getTempletPath().'/styles/common.css') == true) {
-			$this->addHeadResource('style',$this->getTempletPath().'/styles/common.css');
+		if ($this->site != null && is_file($this->getSiteTemplet()->getPath().'/styles/common.css') == true) {
+			$this->addHeadResource('style',$this->getSiteTemplet()->getPath().'/styles/common.css');
 		} else {
 			$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		}
+		
+		$this->addHeadResource('style',__IM_DIR__.'/styles/responsive.css');
 		
 		/**
 		 * 자바스크립트 언어셋 요청이 있을 경우 언어셋파일을 자바스크립트로 불러온다.
@@ -1401,7 +1403,7 @@ class iModule {
 			$message = $code->message;
 			$description = $code->description;
 		} else {
-			$error = $this->getErrorMessage($code,$value,$message,true);
+			$error = $this->getErrorText($code,$value,$message,true);
 			$message = $error->message;
 			$description = $error->description;
 		}
@@ -1411,8 +1413,8 @@ class iModule {
 		 */
 		ob_start();
 		$IM = $this;
-		if (is_file($this->getTempletPath().'/error.php') == true) {
-			INCLUDE $this->getTempletPath().'/error.php';
+		if (is_file($this->getSiteTemplet()->getPath().'/error.php') == true) {
+			INCLUDE $this->getSiteTemplet()->getPath().'/error.php';
 		} else {
 			$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
 			INCLUDE __IM_PATH__.'/includes/error.php';
@@ -1445,7 +1447,7 @@ class iModule {
 			$message = $code->message;
 			$description = $code->description;
 		} else {
-			$error = $this->getErrorMessage($code,$value,$message,true);
+			$error = $this->getErrorText($code,$value,$message,true);
 			$message = $error->message;
 			$description = $error->description;
 		}
@@ -1523,21 +1525,9 @@ class iModule {
 		}
 		
 		/**
-		 * 헤더 PHP 파일에서 iModule 코어클래스에 접근하기 위한 변수 선언
+		 * 템플릿을 불러온다.
 		 */
-		$IM = $this;
-		
-		ob_start();
-		if ($this->useTemplet == false || file_exists($this->getTempletPath().'/header.php') == false) {
-			INCLUDE __IM_PATH__.'/includes/header.php';
-		} else {
-			INCLUDE $this->getTempletPath().'/header.php';
-		}
-		
-		$header = ob_get_contents();
-		ob_end_clean();
-		
-		return $header;
+		return $this->getSiteTemplet()->getHeader(get_defined_vars());
 	}
 	
 	/**
@@ -1550,21 +1540,9 @@ class iModule {
 		$site = $this->getSite();
 		
 		/**
-		 * 푸터 PHP 파일에서 iModule 코어클래스에 접근하기 위한 변수 선언
+		 * 템플릿을 불러온다.
 		 */
-		$IM = $this;
-		
-		ob_start();
-		if ($this->useTemplet == false || file_exists($this->getTempletPath().'/footer.php') == false) {
-			INCLUDE __IM_PATH__.'/includes/footer.php';
-		} else {
-			INCLUDE $this->getTempletPath().'/footer.php';
-		}
-		
-		$footer = ob_get_contents();
-		ob_end_clean();
-		
-		return $footer;
+		return $this->getSiteTemplet()->getFooter(get_defined_vars());
 	}
 	
 	/**
@@ -1579,7 +1557,7 @@ class iModule {
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
 		$config = $page == null ? $this->getMenus($menu) : $this->getPages($menu,$page);
-		if ($config == null) return null;
+		if ($config == null) return $this->printError('NOT_FOUND_PAGE',$this->getUrl());
 		
 		/**
 		 * 가져올 컨텍스트에 따라 웹브라우저에서 표시될 사이트제목을 설정한다.
@@ -1642,33 +1620,16 @@ class iModule {
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
 		$config = $page == null ? $this->getMenus($menu) : $this->getPages($menu,$page);
-		if ($config == null) return null;
+		if ($config == null) return $context;
 		
 		/**
 		 * 사이트 레이아웃을 사용하지 않는다고 선언된 경우 ($this->useTemplet 값이 false) 컨텍스트 HTML 코드를 그대로 반환한다.
 		 */
 		if ($this->useTemplet == false) return $context;
-		
 		/**
-		 * 사이트 템플릿의 layouts 폴더에 정의된 레이아웃 파일이 없을 경우 에러메세지를 출력한다.
+		 * 템플릿의 레이아웃을 불러온다.
 		 */
-		if (is_file($this->getTempletPath().'/layouts/'.$config->layout.'.php') == false) $this->printError('NOT_FOUND_LAYOUT : '.$config->layout);
-		
-		/**
-		 * 레이아웃 파일에서 iModule core 에 접근할 수 있도록 $IM 변수를 선언한다.
-		 */
-		$IM = $this;
-		
-		/**
-		 * 레이아웃 파일을 불러온다.
-		 * 레이아웃 파일안에서 $context 변수를 이용하여 페이지의 컨텍스트 HTML 코드가 나타날 곳을 정의할 수 있다.
-		 */
-		ob_start();
-		INCLUDE $this->getTempletPath().'/layouts/'.$config->layout.'.php';
-		$layout = ob_get_contents();
-		ob_end_clean();
-		
-		return $layout;
+		return $this->getSiteTemplet()->getLayout($config->layout,$context);
 	}
 	
 	/**
@@ -1679,43 +1640,22 @@ class iModule {
 	 */
 	function getExternalContext($external) {
 		/**
-		 * 외부 PHP파일에서 iModule core 에 접근할 수 있도록 $IM 변수를 선언한다.
+		 * 파일명이 @ 로 시작할 경우 사이트 템플릿의 external 파일을 불러온다.
 		 */
-		$IM = $this;
-		$context = '';
-		
-		/**
-		 * 파일명이 @ 로 시작할 경우 사이트 템플릿의 externals 폴더에서 파일을 찾는다.
-		 * 예를 들어 현재 사이트의 템플릿명이 default 이고 $external 값이 @foo.php 라면,
-		 * /templets/default/externals/foo.php 파일을 불러온다.
-		 */
-		if (preg_match('/^@/',$external) == true) {
-			$templetPath = $this->getTempletPath().'/externals';
-			$templetDir = $this->getTempletDir().'/externals';
-			
-			if (file_exists($this->getTempletPath().'/externals/'.preg_replace('/^@/','',$external)) == true) {
-				ob_start();
-				INCLUDE $this->getTempletPath().'/externals/'.preg_replace('/^@/','',$external);
-				$context = ob_get_contents();
-				ob_end_clean();
-			}
-		}
-		/**
-		 * 파일명이 @ 로 시작하지 않을 경우 /externals 폴더에서 파일을 찾는다.
-		 */
-		else {
-			$templetPath = __IM_PATH__.'/externals';
-			$templetDir = __IM_DIR__.'/externals';
-			
+		if (strpos($external,'@') === 0) {
+			return $this->getSiteTemplet()->getExternal(substr($external,1));
+		} else {
 			if (file_exists(__IM_PATH__.'/externals/'.$external) == true) {
 				ob_start();
 				INCLUDE __IM_PATH__.'/externals/'.$external;
-				$context = ob_get_contents();
+				$html = ob_get_contents();
 				ob_end_clean();
+				
+				return $html;
+			} else {
+				return $this->getError('NOT_FOUND_EXTERNAL_FILE',__IM_PATH__.'/externals/'.$external);
 			}
 		}
-		
-		return $context;
 	}
 	
 	/**
@@ -1826,12 +1766,12 @@ class iModule {
 		
 		// check unknown code
 		if (preg_match('/\{(.*?)\}/',$permissionString,$match) == true) {
-			return str_replace('{code}',$match[0],$this->getErrorMessage('UNKNWON_CODE_IN_PERMISSION_STRING',$match[0]));
+			return str_replace('{code}',$match[0],$this->getErrorText('UNKNWON_CODE_IN_PERMISSION_STRING',$match[0]));
 		}
 		
 		// check doubleQuotation
 		if (preg_match('/"/',$permissionString) == true) {
-			return $this->getErrorMessage('NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING');
+			return $this->getErrorText('NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING');
 		}
 		
 		// eval check
@@ -1840,8 +1780,8 @@ class iModule {
 		$content = ob_get_contents();
 		ob_end_clean();
 		
-		if ($content) return $this->getErrorMessage('PERMISSION_STRING_PARSING_FAILED');
-		if (is_bool($check) == false) return $this->getLanguage('NOT_BOOLEAN_PERMISSION_STRING_RESULT');
+		if ($content) return $this->getErrorText('PERMISSION_STRING_PARSING_FAILED');
+		if (is_bool($check) == false) return $this->getText('NOT_BOOLEAN_PERMISSION_STRING_RESULT');
 		
 		return true;
 	}

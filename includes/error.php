@@ -20,5 +20,5 @@ $IM->loadWebFont('OpenSans');
 	<h2><?php echo $message; ?></h2>
 	<?php if ($description) { ?><p><?php echo $description; ?></p><?php } ?>
 	
-	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $IM->getLanguage('button/back_to_main'); ?></a>
+	<a href="<?php echo $IM->getUrl(false); ?>"><?php echo $IM->getText('button/back_to_main'); ?></a>
 </div>

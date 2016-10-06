@@ -18,7 +18,7 @@ var ENV = {
 		return ENV.DIR+"/"+ENV.LANGUAGE+"/process/"+module+"/"+action;
 	},
 	getApiUrl:function(module,api) {
-		return this.DIR+"/"+ENV.LANGUAGE+"/api/"+module+"/"+api;
+		return ENV.DIR+"/api/"+module+"/"+api;
 	},
 	getModuleUrl:function(module,container,idx,isFullUrl,domain,language) {
 		var container = container ? container : null;

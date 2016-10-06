@@ -250,6 +250,10 @@
 					"length":20,
 					"default":"default"
 				},
+				"templet_configs":{
+					"type":"text",
+					"is_null":true
+				},
 				"image":{
 					"type":"int",
 					"length":11,
@@ -277,8 +281,8 @@
 				},
 				"member":{
 					"type":"enum",
-					"length":"'UNIQUE','MERGE'",
-					"default":"MERGE"
+					"length":"'UNIQUE','UNIVERSAL'",
+					"default":"UNIVERSAL"
 				},
 				"is_ssl":{
 					"type":"enum",
@@ -289,9 +293,6 @@
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
 					"default":"FALSE"
-				},
-				"templetConfigs":{
-					"type":"longtext"
 				},
 				"sort":{
 					"type":"int",

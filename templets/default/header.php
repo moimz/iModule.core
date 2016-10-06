@@ -26,40 +26,7 @@ if ($IM->language == 'ko') {
 } else {
 	$IM->loadWebFont('OpenSans',true);
 }
-
-/**
- * 템플릿 전용 자바스크립트와 스타일시트를 불러온다.
- * common.css 파일은 iModule core 에 의하여 자동으로 로딩된다.
- * @see /styles/common.css
- * @see /templets/default/styles/common.css.sample
- */
-$IM->addHeadResource('style',$IM->getTempletDir().'/styles/style.css');
-$IM->addHeadResource('script',$IM->getTempletDir().'/scripts/script.js');
 ?>
-<!DOCTYPE HTML>
-<html lang="<?php echo $IM->language; ?>">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
-<title><?php echo $IM->getSiteTitle(); ?></title>
-<?php
-/**
- * 사이트 <HEAD> 태그 내부의 리소스를 출력한다.
- * <HEAD> 태그 내부 리소스는 iModule core 에 의하여 관리됩니다.
- * @see /classes/iModule.class.php -> getHeadResource()
- */
-echo $IM->getHeadResource();
-
-/**
- * 사이트 템플릿 설정에서 head 값을 가져온다.
- * @see /templets/default/package.json -> configs
- * @see /classes/iModule.class.php -> getSiteTempletConfig()
- */
-echo $IM->getSiteTempletConfig('head');
-?>
-</head>
-<body>
-
 <header style="width:300px; overflow:hidden;">
 	<?php
 	/**
