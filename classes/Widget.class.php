@@ -140,8 +140,8 @@ class Widget {
 		 */
 		$temp = explode('.',$widget);
 		if (count($temp) == 1) {
-			$this->widgetPath = __IM_PATH__.'/widgets/'.$this->widget;
-			$this->widgetDir = __IM_DIR__.'/widgets/'.$this->widget;
+			$this->widgetPath = __IM_PATH__.'/widgets/'.$widget;
+			$this->widgetDir = __IM_DIR__.'/widgets/'.$widget;
 		} else {
 			$this->widgetPath = __IM_PATH__.'/modules/'.$temp[0].'/widgets/'.$temp[1];
 			$this->widgetDir = __IM_DIR__.'/modules/'.$temp[0].'/widgets/'.$temp[1];
