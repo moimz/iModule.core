@@ -491,6 +491,22 @@ function AntiXSS($data) {
 }
 
 /**
+ * 자동링크를 생성한다.
+ *
+ * @param string $text 본문내용
+ * @param string $linkText 링크태그가 추가된 본문내용 
+ */
+function AutoLink($text) {
+	$pattern = '/(http|https|ftp|mms):\/\/[0-9a-z-]+(\.[_0-9a-z-]+)+(:[0-9]{2,4})?\/?';
+	$pattern.= '([\.~_0-9a-z-]+\/?)*';
+	$pattern.= '(\S+\.[_0-9a-z]+)?';
+	$pattern.= '(\?[_0-9a-z#%&=\-\+]+)*/i';
+	$replacement = '<a href="\\0" target="_blank">\\0</a>';
+
+	return preg_replace($pattern,$replacement,$text,-1);
+}
+
+/**
  * 폴더의 용량을 구한다.
  *
  * @param string $path 폴더
