@@ -137,7 +137,7 @@
 				/**
 				 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
 				 */
-				if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null) {
+				if (iModule.isMobile == true) {
 					$select.on("focus",function() {
 						var $parent = $(this).parent();
 						var $button = $("button",$parent).addClass("focus");
@@ -338,7 +338,7 @@
 					/**
 					 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
 					 */
-					if (navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null) {
+					if (iModule.isMobile == true) {
 						$input.attr("type","text").prop("readonly",true);
 						
 						var $date = $("<input>").attr("type","date");
@@ -580,6 +580,44 @@
 					}
 				});
 			}
+		}
+		
+		/**
+		 * 객체가 tab 일 경우
+		 */
+		if (this.is("ul[data-role=tab]") == true) {
+			var $tab = this;
+			var $tabBox = $("div[data-role=tab][data-name="+$tab.attr("data-name")+"]");
+			
+			if ($("li.selected",$tab).length == 0) {
+				var $first = $("li",$tab).first();
+				$first.addClass("selected");
+				$tabBox.tab($first.attr("data-tab"));
+			}
+			
+			$("li[data-tab] > button",$tab).on("click",function() {
+				var tab = $(this).parent().attr("data-tab");
+				var name = $(this).parent().parent().attr("data-name");
+				var $tabBox = $("div[data-role=tab][data-name="+name+"]");
+				
+				console.log($tabBox,tab,name);
+				$tabBox.tab(tab);
+			})
+		}
+		
+		if (this.is("div[data-role=tab]") == true) {
+			var $tabBox = this;
+			var $tab = $("ul[data-role=tab][data-name="+$tabBox.attr("data-name")+"]");
+			
+			if ($("li.selected",$tab).length == 0) {
+				var tab = $("li",$tab).first().attr("data-tab");
+			} else {
+				var tab = $("li.selected",$tab).attr("data-tab");
+			}
+			
+			$("div[data-tab]",$tab).hide();
+			this.data("isInit",true);
+			$tabBox.tab(tab);
 		}
 		
 		this.data("isInit",true);
@@ -848,7 +886,26 @@
 		}
 	};
 	
-	
+	/**
+	 * 탭을 한다.
+	 *
+	 * @param string name 탭이름
+	 */
+	$.fn.tab = function(tab) {
+		if (this.is("div[data-role=tab]") == false || this.data("isInit") == false) return;
+		var $tab = $("ul[data-role=tab][data-name="+this.attr("data-name")+"]");
+		var $box = $("div[data-tab="+tab+"]",this);
+		if ($box.length == 1) {
+			$("div[data-tab]:visible",this).hide();
+			$("div[data-tab]:visible",this).triggerHandler("hide");
+			
+			$("div[data-tab="+tab+"]",this).show();
+			$("div[data-tab="+tab+"]",this).triggerHandler("show");
+			
+			$("li.selected",$tab).removeClass("selected");
+			$("li[data-tab="+tab+"]").addClass("selected");
+		}
+	};
 	
 	/**
 	 * jQuery ajax 확장
@@ -857,11 +914,12 @@
 	 * @param object data 전송할 데이터 (data 가 없을 경우 2번째 인자가 콜백함수가 될 수 있다.)
 	 * @param function callback 콜백함수
 	 */
-	$.send = function(url,data,callback) {
+	$.send = function(url,data,callback,count) {
 		if (typeof data == "function") {
 			callback = data;
 			data = null;
 		}
+		var count = count ? count : 0;
 		
 		$.ajax({
 			type:"POST",
@@ -869,10 +927,14 @@
 			data:data,
 			dataType:"json",
 			success:function(result) {
-				callback(result);
+				if (typeof callback == "function") callback(result);
 			},
 			error:function() {
-				iModule.alert.show("error","Server Connect Error!",5);
+				if (count == 3) {
+					iModule.alert.show("error","Server Connect Error!",5);
+				} else {
+					setTimeout(function(url,data,callback,count) { $.send(url,data,callback,count); },1000,url,data,callback,++count);
+				}
 			}
 		});
 	};
@@ -883,11 +945,13 @@
 	 * @param string url 전송할 URL
 	 * @param function callback 전송이 완료된 후 처리할 콜백함수
 	 */
-	$.fn.send = function(url,callback) {
+	$.fn.send = function(url,callback,count) {
 		/**
 		 * 전송대상이 form 이 아닐경우 아무런 행동을 하지 않는다.
 		 */
 		if (this.is("form") == false) return;
+		
+		var count = count ? count : 0;
 		var $form = this;
 		var data = $form.serialize();
 		
@@ -914,8 +978,15 @@
 				if (result.message) iModule.alert.show("error",result.message);
 			},
 			error:function() {
-				$form.status("default");
-				iModule.alert.show("error","Server Connect Error!",5);
+				/**
+				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
+				 */
+				if (count == 3) {
+					$form.status("default");
+					iModule.alert.show("error","Server Connect Error!",5);
+				} else {
+					setTimeout(function($form,url,callback,count) { $form.send(url,callback,count); },1000,$form,url,callback,++count);
+				}
 			}
 		});
 	};
@@ -986,7 +1057,7 @@
 					 * Form 내부의 input, textarea 객체에 대해서 처리
 					 */
 					$("input,textarea,select",$(this)).status(status,message);
-					$("button[type=submit]").status(status);
+					$("button[type=submit]",$(this)).status(status);
 				}
 			}
 			
@@ -1111,6 +1182,19 @@
 		$("body").on("click",function(e) {
 			$("div[data-role=input]").removeClass("extend");
 			$("div[data-role=picker]").remove();
+		});
+		
+		/**
+		 * tab 객체 초기화
+		 */
+		$("*[data-role=tab]").inits();
+		
+		$(window).on("resize",function() {
+			iModule.modal.init();
+		});
+		
+		$(document).on("touchstart",function(e) {
+			if (e.touches.length >1) e.preventDefault();
 		});
 	});
 	/*

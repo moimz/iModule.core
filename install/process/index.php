@@ -55,7 +55,17 @@ if ($action == 'config') {
 	$config = Request('config');
 	$results->success = true;
 	$results->config = $config;
-	$results->not_exists = !file_exists(__IM_PATH__.DIRECTORY_SEPARATOR.'configs'.DIRECTORY_SEPARATOR.$config.'.config.php');
+	$results->not_exists = !is_file(__IM_PATH__.DIRECTORY_SEPARATOR.'configs'.DIRECTORY_SEPARATOR.$config.'.config.php');
+}
+
+if ($action == 'preset') {
+	$preset = Request('preset');
+	$results->success = true;
+	$results->preset = $preset;
+	$results->not_exists = !is_file(__IM_PATH__.DIRECTORY_SEPARATOR.$preset.'.preset.php');
+	$results->configs = new stdClass();
+	$results->configs->key = $_CONFIGS->presets->key;
+	$results->configs->db = $_CONFIGS->presets->db;
 }
 
 if ($action == 'install') {
@@ -65,7 +75,9 @@ if ($action == 'install') {
 	$package = json_decode(file_get_contents(__IM_PATH__.'/package.json'));
 	
 	$errors = array();
-	if (file_exists(__IM_PATH__.'/configs/key.config.php') == true) {
+	if ($_CONFIGS->presets->key == true) {
+		if (Request('key') != $_CONFIGS->key) $errors['key'] = 'key_preset';
+	} elseif (file_exists(__IM_PATH__.'/configs/key.config.php') == true) {
 		$keyFile = explode("\n",file_get_contents(__IM_PATH__.'/configs/key.config.php'));
 		$key = $keyFile[1];
 		if (Request('key') != $key) $errors['key'] = 'key_exists';
@@ -77,7 +89,9 @@ if ($action == 'install') {
 	$admin_name = Request('admin_name') ? Request('admin_name') : $errors['admin_name'] = 'admin_name';
 	$admin_nickname = Request('admin_nickname') ? Request('admin_nickname') : $errors['admin_nickname'] = 'admin_nickname';
 	
-	if (file_exists(__IM_PATH__.'/configs/db.config.php') == true) {
+	if ($_CONFIGS->presets->key == true) {
+		$db = $_CONFIGS->db;
+	} elseif (file_exists(__IM_PATH__.'/configs/db.config.php') == true) {
 		$dbFile = explode("\n",file_get_contents(__IM_PATH__.'/configs/db.config.php'));
 		$db = json_decode(Decoder($dbFile[1],$key));
 	} else {
@@ -108,8 +122,10 @@ if ($action == 'install') {
 	if (count($errors) == 0) {
 		$results->success = false;
 		
-		$keyFile = @file_put_contents(__IM_PATH__.'/configs/key.config.php','<?php /*'.PHP_EOL.$key.PHP_EOL.'*/ ?>');
-		$dbFile = @file_put_contents(__IM_PATH__.'/configs/db.config.php','<?php /*'.PHP_EOL.Encoder(json_encode($db),$key).PHP_EOL.'*/ ?>');
+		if ($_CONFIGS->presets->key == false) $keyFile = @file_put_contents(__IM_PATH__.'/configs/key.config.php','<?php /*'.PHP_EOL.$key.PHP_EOL.'*/ ?>');
+		else $keyFile = true;
+		if ($_CONFIGS->presets->db == false) $dbFile = @file_put_contents(__IM_PATH__.'/configs/db.config.php','<?php /*'.PHP_EOL.Encoder(json_encode($db),$key).PHP_EOL.'*/ ?>');
+		else $dbFile = true;
 		
 		if (is_dir(__IM_PATH__.'/attachments/cache') == false) {
 			mkdir(__IM_PATH__.'/attachments/cache',0707);
@@ -136,6 +152,15 @@ if ($action == 'install') {
 				
 				$results->success = true;
 				if ($results->success == true) {
+					$installed = $IM->Module->install('attachment');
+					if ($installed !== true) {
+						$results->success = false;
+						$results->message = $installed;
+						$results->target = 'attachment';
+					}
+				}
+				
+				if ($results->success == true) {
 					$installed = $IM->Module->install('push');
 					if ($installed !== true) {
 						$results->success = false;
@@ -150,15 +175,6 @@ if ($action == 'install') {
 						$results->success = false;
 						$results->message = $installed;
 						$results->target = 'keyword';
-					}
-				}
-				
-				if ($results->success == true) {
-					$installed = $IM->Module->install('attachment');
-					if ($installed !== true) {
-						$results->success = false;
-						$results->message = $installed;
-						$results->target = 'attachment';
 					}
 				}
 				
@@ -181,7 +197,7 @@ if ($action == 'install') {
 				}
 				
 				if ($results->success == true) {
-					$installed = $IM->Module->install('member');
+					$installed = $IM->Module->install('member',null,'default',false);
 					if ($installed !== true) {
 						$results->success = false;
 						$results->message = $installed;
@@ -191,10 +207,12 @@ if ($action == 'install') {
 						$password = $mHash->password_hash($admin_password);
 						
 						if ($dbConnect->select('member_table')->where('idx',1)->has() == true) {
-							$dbConnect->update('member_table',array('domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'status'=>'ACTIVE'))->where('idx',1)->execute();
+							$dbConnect->update('member_table',array('domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'status'=>'ACTIVATED'))->where('idx',1)->execute();
 						} else {
-							$dbConnect->insert('member_table',array('idx'=>1,'domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'reg_date'=>time(),'status'=>'ACTIVE'))->execute();
+							$dbConnect->insert('member_table',array('idx'=>1,'domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'reg_date'=>time(),'status'=>'ACTIVATED'))->execute();
 						}
+						
+						$IM->Module->updateSize('member');
 					}
 				}
 				

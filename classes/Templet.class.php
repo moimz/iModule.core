@@ -92,7 +92,7 @@ class Templet {
 				/**
 				 * 사이트템플릿명이 없을 경우, 현재 사이트의 템플릿을 사용한다.
 				 */
-				if (count($temp) == 0) {
+				if (count($temp) == 1) {
 					$siteTemplet = $this->IM->getSite()->templet;
 					$moduleTemplet = $temp[0];
 				} else {
@@ -100,8 +100,8 @@ class Templet {
 					$moduleTemplet = $temp[1];
 				}
 				
-				$this->templetPath = __IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/templets/'.$moduleTemplet;
-				$this->templetDir = __IM_DIR__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/templets/'.$moduleTemplet;
+				$this->templetPath = __IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/'.$moduleTemplet;
+				$this->templetDir = __IM_DIR__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/'.$moduleTemplet;
 			} else {
 				$this->templetPath = $caller->getPath().'/templets/'.$templet;
 				$this->templetDir = $caller->getDir().'/templets/'.$templet;
@@ -162,7 +162,7 @@ class Templet {
 	 * @return string $language 실제 언어셋 텍스트
 	 */
 	function getText($code,$replacement=null) {
-		if ($this->lang == null) {
+		if ($this->isLoaded() === true && $this->lang == null) {
 			if (is_file($this->getPath().'/languages/'.$this->IM->language.'.json') == true) {
 				$this->lang = json_decode(file_get_contents($this->getPath().'/languages/'.$this->IM->language.'.json'));
 				if ($this->IM->language != $this->getPackage()->language && is_file($this->getPath().'/languages/'.$this->getPackage()->language.'.json') == true) {
@@ -278,11 +278,11 @@ class Templet {
 			$siteTemplets = @opendir(__IM_PATH__.'/templets');
 			while ($siteTemplet = @readdir($siteTemplets)) {
 				if ($siteTemplet != '.' && $siteTemplet != '..' && is_dir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName()) == true) {
-					$templetsPath = @opendir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'');
+					$templetsPath = @opendir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName());
 					while ($templetName = @readdir($templetsPath)) {
 						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/'.$templetName) == true) {
 							$templet = $this->IM->getTemplet($caller,'@'.$siteTemplet.'.'.$templetName);
-							if ($templet === true) $templets[] = $templet;
+							if ($templet->isLoaded() === true) $templets[] = $templet;
 						}
 					}
 					@closedir($templetsPath);
@@ -684,8 +684,7 @@ class Templet {
 		
 		ob_start();
 		INCLUDE $this->getPath().'/layouts/'.$layout.'.php';
-		$html = ob_get_contents();
-		ob_end_clean();
+		$html = ob_get_clean();
 		
 		return $html;
 	}
@@ -753,8 +752,7 @@ class Templet {
 			
 			ob_start();
 			INCLUDE $this->getPath().'/'.$file.'.php';
-			$html.= ob_get_contents();
-			ob_end_clean();
+			$html.= ob_get_clean();
 			
 			$html.= $footer;
 		}
@@ -809,8 +807,7 @@ class Templet {
 		
 		ob_start();
 		INCLUDE $this->getPath().'/externals/'.$file;
-		$html = ob_get_contents();
-		ob_end_clean();
+		$html = ob_get_clean();
 		
 		return $html;
 	}

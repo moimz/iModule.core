@@ -16,12 +16,39 @@
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333;}
 body {overflow:auto;}
+body > div[data-role=wrapper] {width:100%; height:100%;}
 input, textarea, button, select {font-family:inherit; outline:none;}
+
 
 /**
  * alert 영역 디자인 정의
  */
 div[data-role=alert] {position:fixed; top:0; left:0; width:100%;}
+
+
+/**
+ * 모달창
+ */
+
+/*
+body.disabled {overflow:hidden; height:100%; -webkit-overflow-scrolling:auto;}
+body.disabled > div[data-role=wrapper] {filter:blur(5px); overflow:auto; -webkit-overflow-scrolling:auto;}
+body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); color:#fff; font-size:50px; -webkit-overflow-scrolling:touch;}
+body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; overflow:auto;}
+
+div[data-role=modal] {margin:20px auto; width:200px; font-size:20px; line-height:1.6; color:#fff; background:#fff; border:1px solid red;}
+*/
+
+body.disabled {overflow:hidden;}
+body.disabled > div[data-role=wrapper] {filter:blur(5px); transform:translate3d(0, 0, 0);}
+body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); color:#fff; font-size:50px;}
+body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch;}
+body.disabled.mobile {}
+body.disabled.mobile > div[data-role=wrapper] {overflow:hidden;}
+body.disabled.mobile > div[data-role=disabled] {position:absolute;}
+body.disabled.mobile > div[data-role=disabled] > div[data-role=box] {padding:5px; height:auto; overflow:visible;}
+
+div[data-role=modal] {margin:10px auto; width:200px; font-size:20px; line-height:1.6; color:#000; background:#fff; border:1px solid red; text-align:center;  position:relative;}
 
 /**
  * Form 객체 기본 디자인 정의

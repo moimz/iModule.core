@@ -10,5 +10,7 @@
  * @version 3.0.0.160905
  */
 ?>
+	</div>
+	<!--// iModule Wrapper -->
 </body>
 </html>

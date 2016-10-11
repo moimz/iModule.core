@@ -519,7 +519,7 @@ function GetFolderSize($path) {
 	while ($file = @readdir($openDir)) {
 		if ($file != '.' && $file != '..' && is_dir($path.'/'.$file) == true) {
 			$size+= GetFolderSize($path.'/'.$file);
-		} elseif (is_file($file) == true) {
+		} elseif (is_file($path.'/'.$file) == true) {
 			$size+= filesize($path.'/'.$file);
 		}
 	}

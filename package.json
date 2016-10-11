@@ -24,6 +24,7 @@
 		"configs":"0707"
 	},
 	"configs":["key","db"],
+	"preset":"iModule",
 	"databases":{
 		"addon_table":{
 			"columns":{

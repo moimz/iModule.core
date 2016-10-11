@@ -421,6 +421,10 @@ class iModule {
 			} else {
 				$description = null;
 				switch ($code) {
+					case 'PHP_ERROR' :
+						$description = nl2br(str_replace(array('<','>'),array('&lt;','&gt;'),$value['message']));
+						break;
+						
 					default :
 						if ($value != null && is_string($value) == true) $description = $value;
 				}
@@ -794,6 +798,16 @@ class iModule {
 		$this->site->description = $this->site->description ? $this->site->description : null;
 		
 		return $this->site;
+	}
+	
+	/**
+	 * 현재 페이지의 정보를 가공하여 가져온다.
+	 */
+	function getPage() {
+		if ($this->site == null) return null;
+		
+		if ($this->page == null) return $this->getMenus($this->menu);
+		else return $this->getPages($this->menu,$this->page);
 	}
 	
 	/**
@@ -1433,7 +1447,19 @@ class iModule {
 	 * @param string $message(옵션) 변환된 에러메세지
 	 * @return null
 	 */
-	function printError($code,$value=null,$message=null) {
+	function printError($code=null,$value=null,$message=null) {
+		/**
+		 * PHP 에러 발생으로 중단시
+		 */
+		if ($code == 'PHP_EXIT') {
+			$error = error_get_last();
+			if ($error == null || $error['type'] == E_NOTICE) return;
+			
+			ob_clean();
+			$this->printError('PHP_ERROR',$error);
+			exit;
+		}
+		
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
@@ -1702,7 +1728,9 @@ class iModule {
 		 * 웹폰트 아이콘일 경우
 		 * fa, xi, xi2 의 경우만 현재 지원한다.
 		 */
-		if (preg_match('/^(fa|xi|xi2) /i',$icon) == true) {
+		if (preg_match('/^(fa|xi|xi2) /i',$icon,$match) == true) {
+			$fontName = array('fa'=>'FontAwesome','xi'=>'XEIcon','xi2'=>'XEIcon2');
+			$this->loadWebFont($fontName[$match[1]]);
 			return '<i class="icon '.$icon.'"></i>';
 		}
 		
@@ -1800,6 +1828,11 @@ class iModule {
 			header('location:'.__IM_DIR__.'/install');
 			exit;
 		}
+		
+		/**
+		 * PHP 실행마침에 대한 에러핸들러를 지정한다.
+		 */
+		register_shutdown_function(array($this,'printError'),'PHP_EXIT');
 		
 		/**
 		 * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.

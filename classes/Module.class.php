@@ -565,9 +565,11 @@ class Module {
 	 *
 	 * @param string $module 설치할 모듈명
 	 * @param object $configs 사이트관리자로부터 넘어온 모듈환경설정값
+	 * @param string $database 설치할 데이터베이스 코드
+	 * @param boolean $isUpdateSize(옵션, 기본값 true) 모듈설치후 모듈이 사용하는 용량을 업데이트할지 여부
 	 * @return boolean $success
 	 */
-	function install($module,$configDatas=null,$database='default') {
+	function install($module,$configDatas=null,$database='default',$isUpdateSize=true) {
 		/**
 		 * 모듈의 package.json 파일을 확인하고, 설치조건을 확인한다.
 		 */
@@ -644,7 +646,7 @@ class Module {
 			))->where('module',$module)->execute();
 		}
 		
-		$this->updateSize($module);
+		if ($isUpdateSize === true) $this->updateSize($module);
 		
 		return true;
 	}
@@ -666,13 +668,17 @@ class Module {
 			}
 		}
 		
-		$mAttachment = $this->IM->getModule('attachment');
-		$attachment = $mAttachment->db()->select($mAttachment->getTable('attachment'),'SUM(size) as size')->where('module',$module)->getOne();
-		$attachment_size = isset($attachment->size) == true ? $attachment->size : 0;
-		
-		if (isset($package->attachments) == true) {
-			foreach ($package->attachments as $path) {
-				$attachment_size+= GetFolderSize($this->IM->getAttachmentPath().'/'.$path);
+		if ($module == 'attachment') {
+			$attachment_size = 0;
+		} else {
+			$mAttachment = $this->IM->getModule('attachment');
+			$attachment = $mAttachment->db()->select($mAttachment->getTable('attachment'),'SUM(size) as size')->where('module',$module)->getOne();
+			$attachment_size = isset($attachment->size) == true && $attachment->size ? $attachment->size : 0;
+			
+			if (isset($package->attachments) == true) {
+				foreach ($package->attachments as $path) {
+					$attachment_size+= GetFolderSize($this->IM->getAttachmentPath().'/'.$path);
+				}
 			}
 		}
 		

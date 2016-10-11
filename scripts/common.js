@@ -10,6 +10,7 @@
  * @version 3.0.0.160904
  */
 var iModule = {
+	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
 	/**
 	 * 자바스크립트에서 모듈 언어셋이 필요할 경우, iModule 코어에 의하여 언어셋파일을 로드한다.
 	 *
@@ -216,6 +217,165 @@ var iModule = {
 				$("#iModuleAlertMessageProgress-"+id).fadeOut(3000,function() {
 					$(this).remove();
 				});
+			}
+		}
+	},
+	enable:function() {
+		var $disabled = $("body > div[data-role=disabled]");
+		if ($disabled.length == 1) {
+			if ($("body").hasClass("mobile") == true) {
+				$("body").removeClass("disabled");
+				$("body").scrollTop($("body").data("position"));
+			}
+			$("body").removeClass("disabled").removeClass("mobile");//.scrollTop($disabled.data("position"));
+			$disabled.remove();
+		}
+	},
+	disable:function() {
+		var $disabled = $("body > div[data-role=disabled]");
+		var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+		
+		if ($disabled.length == 0) {
+			var $disabled = $("<div>").attr("data-role","disabled");
+			$("body").append($disabled);
+			
+			var position = $("body").scrollTop();
+			$("body").addClass("disabled");
+//			$("body > div[data-role=wrapper]").scrollTop(position);
+			
+			var $box = $("<div>").attr("data-role","box");
+			$disabled.data("position",position);
+			$disabled.append($box);
+			
+//			$disabled.css("background","rgba(0,0,0,0.3)");
+		}
+		
+		$box.empty();
+		
+		/*
+		$box.data("scroll",false);
+		$box.data("touch",false);
+		$box.data("up",false);
+		$box.data("down",false);
+		$box.data("bounce",true);
+		
+		$(document).on("touchstart",function(e) {
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			if ($box.length == 0 || $box.data("touch") == true) return;
+			
+			if ($box.scrollTop() <= 0) $box.data("up",false);
+			else $box.data("up",true);
+			
+			if ($box.prop("scrollHeight") <= $box.height() + $box.scrollTop()) $box.data("down",false);
+			else $box.data("down",true);
+			
+			$box.data("start",e.pageY);
+		});
+		
+		$(document).on("touchmove",function(e) {
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			if ($box.length == 0 || $box.data("touch") == true) return;
+			
+			var isUp = e.pageY > $box.data("start");
+			var isDown = e.pageY < $box.data("start");
+			
+			if ((isUp == true && $box.data("up") == false) || (isDown == true && $box.data("down") == false)) {
+				if ($box.data("scroll") == true) {
+					$box.css("marginTop",(e.pageY - $box.data("start")) / 2);
+					$box.data("bounce",true);
+				}
+				e.preventDefault();
+			}
+		});
+		
+		$(document).on("touchend",function(e) {
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			if ($box.length == 0 || $box.data("touch") == true) return;
+			
+			if ($box.data("bounce") == true) {
+				$box.animate({marginTop:0},"slow");
+				$box.data("bounce",false);
+			}
+		});
+		*/
+	},
+	modal:{
+		init:function() {
+			var $disabled = $("body > div[data-role=disabled]");
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
+			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
+			
+			if (iModule.isMobile == false) {
+				if ($modal.outerHeight() + 40 < $box.innerHeight()) {
+//					$modal.css("margin",(($box.innerHeight() - $modal.outerHeight()) / 2)+"px auto");
+//					$modal.css("left","calc(50% - "+($modal.outerWidth()/2)+"px)");
+					$modal.css("margin",(($box.innerHeight() - $modal.outerHeight(true)) / 2)+"px auto");
+				} else {
+					$modal.css("margin","20px auto");
+				}
+			}
+			
+			if ($modal.data("isInit") == true) return;
+			
+			$modal.on("click",function(e) {
+				e.stopPropagation();
+			});
+			
+			$box.on("click",function() {
+				iModule.modal.close();
+			});
+			
+			$modal.data("isInit",true);
+		},
+		show:function(isContent) {
+			iModule.disable();
+			
+			var $disabled = $("body > div[data-role=disabled]");
+			var $box = $("div[data-role=disabled] > div[data-role=box]");
+			$box.empty();
+			
+			var $modal = $("<div>").attr("data-role","modal");
+			
+			if (isContent == true) {
+				var content = "";
+				for (var i=0;i<100;i++) content+= i+"<br>";
+			
+				$modal.html(content);
+			} else {
+				$modal.html('<br><br><div data-role="input"><input type="text"></div><br><br><br><br><br><br><select><option>dkasdkasd</option></select><br><br><br>');
+			}
+			
+			$box.append($modal);
+			
+			$("div[data-role=input]",$modal).inits();
+			
+			if (iModule.isMobile == true) {
+				var position = $("body").scrollTop();
+				$("body").data("position",position);
+				$("body").addClass("mobile");
+				$("body > div[data-role=wrapper]").height(Math.max($(window).height(),$box.outerHeight(true))).scrollTop(position);
+				$("body").scrollTop(0);
+				$disabled.height(Math.max($(window).height(),$box.outerHeight(true)));
+				
+				$box.css("marginTop",-$box.outerHeight(true));
+				$box.animate({marginTop:0});
+			}
+			
+			iModule.modal.init();
+		},
+		close:function() {
+			var $disabled = $("body > div[data-role=disabled]");
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
+			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
+			
+			if (iModule.isMobile == true) {
+				$box.animate({marginTop:-$box.outerHeight(true)},"",function() {
+					iModule.enable();
+				});
+			} else {
+				iModule.enable();
 			}
 		}
 	}

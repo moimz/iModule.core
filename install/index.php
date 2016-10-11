@@ -56,6 +56,9 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					<?php foreach ($package->configs as $config) { ?>
 					<li data-config="<?php echo $config; ?>"></li>
 					<?php } ?>
+					<?php if (isset($package->preset) == true && $package->preset) { ?>
+					<li data-preset="<?php echo $package->preset; ?>"></li>
+					<?php } ?>
 				</ul>
 			</article>
 			
@@ -66,7 +69,7 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					<div data-role="input">
 						<label data-language="key"></label>
 						<input type="text" name="key" class="inputControl">
-						<div class="helpBlock" data-config="key" data-language="key_help" data-language-exists="key_exists_help"></div>
+						<div class="helpBlock" data-config="key" data-language="key_help" data-language-exists="key_exists_help" data-language-preset="key_preset_help"></div>
 					</div>
 					
 					<hr>
@@ -89,7 +92,7 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					<div data-role="input">
 						<label data-language="db_name"></label>
 						<input type="text" name="db_name" class="inputControl">
-						<div class="helpBlock" data-config="db" data-language="db_help" data-language-exists="db_exists_help"></div>
+						<div class="helpBlock" data-config="db" data-language="db_help" data-language-exists="db_exists_help" data-language-preset="db_preset_help"></div>
 					</div>
 					
 					<hr>
