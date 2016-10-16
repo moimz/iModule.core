@@ -12,53 +12,55 @@
 (function($) {
 	$.propHooks.disabled = {
 		set:function(el,value) {
-			if (el.disabled !== value) {
-				el.disabled = value;
-				value && $(el).trigger("disable");
-				!value && $(el).trigger("enable");
-			}
+			el.disabled = value;
+			if (value == true) $(el).trigger("disable");
+			else $(el).trigger("enable");
 		}
 	};
 	
 	$.attrHooks.disabled = {
 		set:function(el,value) {
-			if (el.disabled !== value) {
-				el.disabled = value;
-				value && $(el).trigger("disable");
-				!value && $(el).trigger("enable");
-			}
+			el.disabled = value;
+			if (value == true) $(el).trigger("disable");
+			else $(el).trigger("enable");
 		}
 	};
 	
 	/**
 	 * 특정 객체나 오브젝트를 초기화한다.
 	 */
-	$.fn.inits = function() {
+	$.fn.inits = function(arg) {
 		if (typeof this != "object") return;
+		
+		var callback = arg !== undefined && typeof arg == "function" ? arg : null;
+		var is_reset = callback === null && arg === true;
 		
 		if (this.length > 1) {
 			this.each(function() {
-				$(this).inits();
+				$(this).inits(arg);
 			});
 			return;
 		} else {
-			if (this.data("isInit") === true) return;
+			if (this.data("isInit") === true && is_reset == false) return;
 		}
+		
+		if (this.is("select, input, textarea") == true && this.parent().is("div[data-role=input]") == true) {
+			this.parent().inits(arg);
+			return;
+		}
+		
+		is_reset = is_reset == true && this.data("isInit") === true;
 		
 		/**
 		 * 객체가 form 일 경우, submit 함수를 받아 form 을 초기화한다.
 		 */
 		if (this.is("form") == true) {
 			/**
-			 * 매개변수 처리
-			 */
-			var submit = arguments.length > 0 ? arguments[0] : null;
-			/**
 			 * submit 함수가 전달되었다면, 폼 submit 시 이벤트를 발생시킨다.
 			 */
-			if (submit != null && typeof submit == "function") {
+			if (callback !== null) {
 				this.on("submit",function() {
-					submit($(this));
+					callback($(this));
 					return false;
 				});
 			}
@@ -73,7 +75,7 @@
 			/**
 			 * div[data-role=input] 하위에는 자식이 1개 있어야 한다.
 			 */
-			if (this.children().length !== 1) return;
+			if (this.children().length !== 1 && is_reset == false) return;
 			
 			/**
 			 * 자식노드가 버튼인 경우
@@ -89,9 +91,16 @@
 			 */
 			if (this.children().is("select") == true) {
 				var $container = this;
+				
+				if (is_reset == true) {
+					var $select = $("select",this).clone();
+					$container.empty().append($select);
+				}
+				
 				var $select = this.children();
 				$container.attr("data-type","select");
-			
+				if ($select.attr("name")) $container.attr("data-name",$select.attr("name"));
+				
 				var $value = $("option",$select).filter(":selected");
 				var $button = $("<button>").attr("type","button");
 				if ($value.length == 0) {
@@ -104,19 +113,19 @@
 				$button.append($text).append($arrow);
 				$container.append($button);
 				if ($select.is(":disabled") == true) {
-					$button.attr("disabled",true);
+					$button.disable();
 				}
 				
 				$select.data("submitValue",null);
 				
 				$select.on("disable",function() {
 					var $parent = $(this).parent();
-					var $button = $("button",$parent).prop("disabled",true);
+					var $button = $("button",$parent).disable();
 				});
 				
 				$select.on("enable",function() {
 					var $parent = $(this).parent();
-					var $button = $("button",$parent).prop("disabled",false);
+					var $button = $("button",$parent).enable();
 				});
 			
 				$select.on("change",function() {
@@ -307,6 +316,7 @@
 				var $container = this;
 				var $input = this.children();
 				$container.attr("data-type","input");
+				if ($input.attr("name")) $container.attr("data-name",$input.attr("name"));
 				
 				if ($input.is(":disabled") == true) {
 					$container.addClass("disabled");
@@ -465,6 +475,7 @@
 				var $container = this;
 				var $textarea = this.children();
 				$container.attr("data-type","textarea");
+				if ($textarea.attr("name")) $container.attr("data-name",$textarea.attr("name"));
 				
 				if ($textarea.is(":disabled") == true) {
 					$container.addClass("disabled");
@@ -600,7 +611,6 @@
 				var name = $(this).parent().parent().attr("data-name");
 				var $tabBox = $("div[data-role=tab][data-name="+name+"]");
 				
-				console.log($tabBox,tab,name);
 				$tabBox.tab(tab);
 			})
 		}
@@ -621,6 +631,42 @@
 		}
 		
 		this.data("isInit",true);
+	};
+	
+	/**
+	 * 객체의 값을 초기화한다.
+	 */
+	$.fn.reset = function() {
+		if (this.length > 1) {
+			this.each(function() {
+				$(this).reset();
+			});
+			return;
+		}
+		
+		if (this.is("form")) {
+			$("input, textarea, select",this).each(function() {
+				$(this).reset();
+			});
+			
+			this.status("default");
+		} else if (this.is("input") == true && (this.attr("type") == "radio" || this.attr("type") == "checkbox")) {
+			if (this.attr("checked") == "checked") {
+				this.prop("checked",true);
+			} else {
+				this.prop("checked",false);
+			}
+			this.trigger("change");
+		} else if (this.is("select") == true) {
+			var $option = $("option",this).first();
+			this.val($option.attr("value"));
+			this.trigger("change");
+		} else if (this.is("input") == true) {
+			this.val("");
+			this.trigger("change");
+		}
+		
+		return this;
 	};
 	
 	/**
@@ -927,11 +973,13 @@
 			data:data,
 			dataType:"json",
 			success:function(result) {
-				if (typeof callback == "function") callback(result);
+				if (typeof callback == "function" && callback(result) === false) return false;
+				if (result.success == false && result.message) iModule.alert.show("error",result.message,5);
 			},
 			error:function() {
 				if (count == 3) {
 					iModule.alert.show("error","Server Connect Error!",5);
+					if (typeof callback == "function") callback({success:false});
 				} else {
 					setTimeout(function(url,data,callback,count) { $.send(url,data,callback,count); },1000,url,data,callback,++count);
 				}
@@ -972,9 +1020,7 @@
 			dataType:"json",
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
-				if (result.success == false && result.errors) {
-					$form.status("error",result.errors);
-				}
+				if (result.success == false && result.errors) $form.status("error",result.errors);
 				if (result.message) iModule.alert.show("error",result.message);
 			},
 			error:function() {
@@ -982,10 +1028,9 @@
 				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
 				 */
 				if (count == 3) {
-					$form.status("default");
 					iModule.alert.show("error","Server Connect Error!",5);
 				} else {
-					setTimeout(function($form,url,callback,count) { $form.send(url,callback,count); },1000,$form,url,callback,++count);
+					setTimeout(function($form,url,callback,count) { $form.status("default"); $form.send(url,callback,count); },1000,$form,url,callback,++count);
 				}
 			}
 		});
@@ -1066,12 +1111,12 @@
 			 */
 			if ($(this).is("button") == true || $(this).is("input[type=submit]") == true) {
 				if (status == "loading") {
-					$(this).data("defaultHtml",$(this).html());
+					if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
 					$(this).html('<i class="mi mi-loading"></i>');
-					$(this).prop("disabled",true);
+					$(this).disable();
 				} else {
-					if ($(this).data("defaultHtml")) $(this).html($(this).data("defaultHtml"));
-					$(this).prop("disabled",false);
+					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
+					$(this).enable();
 				}
 			}
 			
@@ -1080,9 +1125,9 @@
 			 */
 			if ($(this).is("input,textarea,select") == true) {
 				if (status == "loading") {
-					$(this).prop("disabled",true);
+					$(this).disable();
 				} else {
-					$(this).prop("disabled",false);
+					$(this).enable();
 				}
 				
 				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
@@ -1174,6 +1219,48 @@
 		this.animate({left:0},interval);
 	};
 	
+	/**
+	 * 폼 요소를 JSON 데이터로 변경한다.
+	 *
+	 * @param boolean isIncludeId 폼의 ID 를 포함할지 여부
+	 */
+	$.fn.serializeJson = function(isIncludeId) {
+		if (this.is("form") == false) return null;
+		
+		var o = {};
+		var a = this.serializeArray();
+		$.each(a, function() {
+			if (o[this.name] !== undefined) {
+				if (!o[this.name].push) {
+					o[this.name] = [o[this.name]];
+				}
+				o[this.name].push(this.value || '');
+			} else {
+				o[this.name] = this.value || '';
+			}
+		});
+		
+		if (isIncludeId === true && o.id === undefined) o.id = this.attr("id");
+		return o;
+	};
+	
+	$.fn.enable = function() {
+		if (this.is("input, select, textarea, button") == true) {
+			this.prop("disabled",false);
+		}
+	};
+	
+	$.fn.disable = function() {
+		if (this.is("input, select, textarea, button") == true) {
+			this.prop("disabled",true);
+		}
+	};
+	
+	$.fn.setDisabled = function(value) {
+		if (value == true) this.disable();
+		else this.enable();
+	};
+	
 	$(document).ready(function() {
 		/**
 		 * input 객체 초기화
@@ -1188,6 +1275,13 @@
 		 * tab 객체 초기화
 		 */
 		$("*[data-role=tab]").inits();
+		
+		/**
+		 * 시간출력
+		 */
+		$("*[data-role=time][data-time][data-moment]").each(function() {
+			$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
+		});
 		
 		$(window).on("resize",function() {
 			iModule.modal.init();

@@ -42,7 +42,7 @@ if (preg_match('/^@/',$action) == true && $IM->getModule('member')->isAdmin() ==
 	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
 } else {
 	if (Request('module') != null) {
-		$results = $IM->getModule(Request('module'))->doProcess(Request('action'));
+		$results = $IM->getModule(Request('module'),true)->doProcess(Request('action'));
 		
 		if ($results !== null) {
 			header('Content-type:text/json; charset=utf-8',true);

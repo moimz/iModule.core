@@ -40,6 +40,11 @@ var ENV = {
 		return url;
 	},
 	getUrl:function(menu,page,view,number) {
+		var menu = menu === undefined ? null : menu;
+		var page = page === undefined ? null : page;
+		var view = view === undefined ? null : view;
+		var number = number === undefined ? null : number;
+		
 		menu = menu === null ? ENV.MENU : menu;
 		page = page === null && menu == ENV.MENU ? ENV.PAGE : page;
 		view = view === null && menu == ENV.MENU && page == ENV.PAGE ? ENV.VIEW : view;

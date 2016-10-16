@@ -233,7 +233,6 @@ Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:func
 	if (me.getY() + me.getHeight() > $(window).height()) {
 		me.setY(Math.max(25,$(window).height() - me.getHeight() - 25));
 	}
-	console.log("resize");
 }});
 
 Ext.define("Ext.moimz.container.Container",{override:"Ext.container.Container",afterLayout:function(layout) {

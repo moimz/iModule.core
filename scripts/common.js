@@ -153,23 +153,23 @@ var iModule = {
 		 * @param int time 알림메세지가 사라지기까지 시간 (기본 5)
 		 */
 		show:function(type,message,timer) {
-			if ($("#iModuleAlertMessage").length == 0) {
+			if ($("body > div[data-role=alert]").length == 0) {
 				alert(message);
 			} else {
 				var timer = timer ? timer : 5;
-				var idx = iModule.alertMessage.idx++;
+				var idx = iModule.alert.idx++;
 				var $item = $("<div>").attr("data-idx",idx).addClass(type).addClass("message").css("display","none");
 				$item.html(message);
 				var $close = $("<div>").addClass("close").append($("<i>").addClass("fa fa-times-circle"));
 				$close.on("click",function() {
 					var idx = $(this).parent().attr("data-idx");
-					iModule.alertMessage.close(idx);
+					iModule.alert.close(idx);
 				});
 				$item.append($close);
 				
-				$("#iModuleAlertMessage").append($item);
-				iModule.alertMessage.slideDown(idx);
-				setTimeout(iModule.alertMessage.close,timer * 1000,idx);
+				$("body > div[data-role=alert]").append($item);
+				iModule.alert.slideDown(idx);
+				setTimeout(iModule.alert.close,timer * 1000,idx);
 			}
 		},
 		/**
@@ -178,7 +178,7 @@ var iModule = {
 		 * @param int idx 알림메세지 고유번호
 		 */
 		slideDown:function(idx) {
-			$("#iModuleAlertMessage > div[data-idx="+idx+"]").slideDown();
+			$("body > div[data-role=alert] > div[data-idx="+idx+"]").slideDown();
 		},
 		/**
 		 * 알림메세지를 닫는다.
@@ -186,10 +186,10 @@ var iModule = {
 		 * @param int idx 알림메세지 고유번호
 		 */
 		close:function(idx) {
-			var $item = $("#iModuleAlertMessage > div[data-idx="+idx+"]");
+			var $item = $("body > div[data-role=alert] > div[data-idx="+idx+"]");
 			if ($item.length > 0) {
 				$item.find(".close").css("visibility","hidden");
-				$item.width($("#iModuleAlertMessageItem-"+idx).width());
+				$item.width($("body > div[data-role=alert]Item-"+idx).width());
 				$item.animate({marginLeft:-$item.outerWidth(true),opacity:0},"fast",function() {
 					$(this).remove();
 				});
@@ -203,18 +203,18 @@ var iModule = {
 		 * @param int total 프로그래바 전체값
 		 */
 		progress:function(id,loaded,total) {
-			if ($("#iModuleAlertMessage").length == 0) return;
+			if ($("body > div[data-role=alert]").length == 0) return;
 			
 			if (total > 0 && loaded < total) {
-				if ($("#iModuleAlertMessageProgress-"+id).length == 0) {
-					$("#iModuleAlertMessage").append($("<div>").addClass("progress").attr("id","iModuleAlertMessageProgress-"+id).append($("<span>")));
+				if ($("body > div[data-role=alert]Progress-"+id).length == 0) {
+					$("body > div[data-role=alert]").append($("<div>").addClass("progress").attr("id","iModuleAlertMessageProgress-"+id).append($("<span>")));
 				}
-				$("#iModuleAlertMessageProgress-"+id+" > span").css("width",(loaded/total*100)+"%");
+				$("body > div[data-role=alert]Progress-"+id+" > span").css("width",(loaded/total*100)+"%");
 			} else {
-				if ($("#iModuleAlertMessageProgress-"+id).length == 0) return;
+				if ($("body > div[data-role=alert]Progress-"+id).length == 0) return;
 				
-				$("#iModuleAlertMessageProgress-"+id+" > span").css("width","100%");
-				$("#iModuleAlertMessageProgress-"+id).fadeOut(3000,function() {
+				$("body > div[data-role=alert]Progress-"+id+" > span").css("width","100%");
+				$("body > div[data-role=alert]Progress-"+id).fadeOut(3000,function() {
 					$(this).remove();
 				});
 			}
