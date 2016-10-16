@@ -422,7 +422,12 @@ class iModule {
 				$description = null;
 				switch ($code) {
 					case 'PHP_ERROR' :
-						$description = nl2br(str_replace(array('<','>'),array('&lt;','&gt;'),$value['message']));
+						$description = 'File : '.$value['file'].'<br>Line : '.$value['line'].'<br><br>';
+						$description.= nl2br(str_replace(array('<','>'),array('&lt;','&gt;'),$value['message']));
+						break;
+						
+					case 'NOT_FOUND_PAGE' :
+						$description = $value ? $value : $this->getUrl();
 						break;
 						
 					default :
@@ -448,9 +453,10 @@ class iModule {
 	 * 이미 모듈 클래스가 선언되어 있다면 선언되어 있는 모듈클래스를 반환한다. (중복선언하지 않음)
 	 *
 	 * @param string $module 모듈이름 (/modules 내부의 해당모듈의 폴더명)
+	 * @param boolean $isForceLoad(기본값 false) 모듈이 설치되어 있지 않더라도 모듈 클래스를 호출할지 여부
 	 * @return object $module 모듈클래스
 	 */
-	function getModule($module) {
+	function getModule($module,$isForceLoad=false) {
 		/**
 		 * 선언되어 있는 해당 모듈 클래스가 없을 경우, 새로 선언한다.
 		 */
@@ -459,7 +465,7 @@ class iModule {
 			 * 모듈코어 클래스를 새로 선언하고, 모듈코어 클래스에서 모듈 클래스를 불러온다.
 			 */
 			$class = new Module($this);
-			$this->modules[$module] = $class->load($module);
+			$this->modules[$module] = $class->load($module,$isForceLoad);
 		}
 		
 		/**
@@ -581,6 +587,7 @@ class iModule {
 		$menu = $menu === null ? $this->menu : $menu;
 		$page = $page === null && $menu == $this->menu ? $this->page : $page;
 		$view = $view === null && $menu == $this->menu && $page == $this->page ? $this->view : $view;
+		$number = $number === null && $menu == $this->menu && $page == $this->page && $view == $this->view ? $this->idx : $number;
 		
 		/**
 		 * $domain 의 값이 * 일 경우 현재 사이트의 도메인으로 설정한다.
@@ -1285,8 +1292,9 @@ class iModule {
 	 *
 	 * @param string $type 리소스종류 (style, script, meta or etc)
 	 * @param string[] $value 리소스데이터 (style, script 의 경우 해당 파일의 경로 / 기타 태그의 경우 태그 attribute)
+	 * @param boolean $isFirst 처음 호출할지 여부
 	 */
-	function addHeadResource($type,$value) {
+	function addHeadResource($type,$value,$isFirst=false) {
 		$tag = null;
 		
 		switch ($type) {
@@ -1323,7 +1331,10 @@ class iModule {
 				$tag.= '>';
 		}
 		
-		if ($tag != null && in_array($tag,$this->siteHeader) == false) $this->siteHeader[] = $tag;
+		if ($tag != null && in_array($tag,$this->siteHeader) == false) {
+			if ($isFirst === true) array_unshift($this->siteHeader,$tag);
+			else array_push($this->siteHeader,$tag);
+		}
 	}
 	
 	/**
@@ -1338,12 +1349,12 @@ class iModule {
 		 * 사이트가 존재하고, 사이트템플릿에 common.css 파일이 정의되어 있을 경우 사이트템플릿의 common.css 파일을 불러온다.
 		 */
 		if ($this->site != null && is_file($this->getSiteTemplet()->getPath().'/styles/common.css') == true) {
-			$this->addHeadResource('style',$this->getSiteTemplet()->getPath().'/styles/common.css');
+			$this->addHeadResource('style',$this->getSiteTemplet()->getPath().'/styles/common.css',true);
 		} else {
-			$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
+			$this->addHeadResource('style',__IM_DIR__.'/styles/common.css',true);
 		}
 		
-		$this->addHeadResource('style',__IM_DIR__.'/styles/responsive.css');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/responsive.css',true);
 		
 		/**
 		 * 자바스크립트 언어셋 요청이 있을 경우 언어셋파일을 자바스크립트로 불러온다.
@@ -1454,7 +1465,6 @@ class iModule {
 		if ($code == 'PHP_EXIT') {
 			$error = error_get_last();
 			if ($error == null || $error['type'] == E_NOTICE) return;
-			
 			ob_clean();
 			$this->printError('PHP_ERROR',$error);
 			exit;
@@ -1583,7 +1593,7 @@ class iModule {
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
 		$config = $page == null ? $this->getMenus($menu) : $this->getPages($menu,$page);
-		if ($config == null) return $this->printError('NOT_FOUND_PAGE',$this->getUrl());
+		if ($config == null) return $this->printError('NOT_FOUND_PAGE');
 		
 		/**
 		 * 가져올 컨텍스트에 따라 웹브라우저에서 표시될 사이트제목을 설정한다.
