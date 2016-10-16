@@ -9,14 +9,14 @@
  * @version 3.0.0.160902
  * @see /classes/iModule.class.php -> printError()
  */
-div[data-role=error][data-type=core] {width:100%; height:100%; display:flex; flex-direction:row; justify-content:center; align-items:center; background:#f2f3f5;}
+div[data-role=error][data-type=core] {width:100%; height:100%; background:#f2f3f5;}
+section.errorbox {width:100%; height:100%; display:table;}
+section.errorbox > div {display:table-cell; width:100%; height:100%; vertical-align:middle; text-align:center;}
+section.errorbox > div > div {display:inline-block; margin:50px 0px; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; width:90%; max-width:500px; box-sizing:border-box; text-align:left;}
 
-div.errorbox {margin:20px auto; padding:20px; background:#fff; border:1px solid #c8caca; border-top:2px solid #f44336; max-width:450px;}
-div[data-role=error][data-type=core] > div.errorbox {flex-basis:450px; margin:20px 20px;}
-
-div.errorbox > h1 {font-family:OpenSans; font-size:30px; height:34px; line-height:34px; font-weight:400; margin-bottom:20px;}
-div.errorbox > h1 > i {float:left; width:30px; height:34px; line-height:36px; font-size:32px; margin-right:10px; color:#f44336;}
-div.errorbox > h2 {font-weight:400; font-size:14px; color:#666; line-height:1.6; display:block; text-align:justify;}
-div.errorbox > p {margin-top:10px; font-weight:200; font-size:13px; color:#666; line-height:1.6; display:block; text-align:left;}
-div.errorbox > a {display:block; width:100%; height:40px; line-height:40px; margin-top:20px; background:#f44336; color:#fff; font-size:14px; text-align:center; text-decoration:none;}
-div.errorbox > a:hover {background:#e53935;}
+section.errorbox > div > div > h1 {font-family:OpenSans; font-size:30px; height:34px; line-height:34px; font-weight:400; margin-bottom:20px;}
+section.errorbox > div > div > h1 > i {float:left; width:30px; height:34px; line-height:36px; font-size:32px; margin-right:10px; color:#f44336;}
+section.errorbox > div > div > h2 {font-weight:400; font-size:14px; color:#666; line-height:1.6; display:block; text-align:justify;}
+section.errorbox > div > div > p {margin-top:10px; font-weight:200; font-size:13px; color:#666; line-height:1.6; display:block; text-align:left;}
+section.errorbox > div > div > a {display:block; width:100%; height:40px; line-height:40px; margin-top:20px; background:#f44336; color:#fff; font-size:14px; text-align:center; text-decoration:none;}
+section.errorbox > div > div > a:hover {background:#e53935;}

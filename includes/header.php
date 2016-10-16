@@ -19,5 +19,8 @@
 <?php echo $IM->getHeadResource(); ?>
 </head>
 <body>
+	<!-- iModule Alert -->
+	<div data-role="alert"></div>
+	
 	<!-- iModule Wrapper -->
 	<div data-role="wrapper">
