@@ -18,7 +18,7 @@ RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/([^/]+)/?$ modules/$2/index.p
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/list/([^/]+)/?$ index.php?language=$1&menu=$2&page=$3&view=list&p=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/folder(.*?)$ index.php?language=$1&menu=$2&page=$3&folder=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/tag/(.*?)$ index.php?language=$1&menu=$2&page=$3&tag=$4&%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/([^/]+)/?$ index.php?language=$1&menu=$2&page=$3&view=$4&idx=$5&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/(.*?)$ index.php?language=$1&menu=$2&page=$3&view=$4&idx=$5&%{QUERY_STRING} [L]
 
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ index.php?language=$1&menu=$2&page=$3&view=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/?$ index.php?language=$1&menu=$2&page=$3&%{QUERY_STRING} [L]
