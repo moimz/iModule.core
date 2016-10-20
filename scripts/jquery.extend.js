@@ -510,7 +510,7 @@
 				var $icon = $("<button>").attr("type","button").addClass("checkbox");
 				if ($checkbox.is(":checked") == true) $icon.addClass("on");
 				$checkbox.hide();
-				$label.append($icon);
+				$checkbox.after($icon);
 				
 				if ($checkbox.is(":disabled") == true) {
 					$container.addClass("disabled");
@@ -555,7 +555,7 @@
 				var $icon = $("<button>").attr("type","button").addClass("radio");
 				if ($radio.is(":checked") == true) $icon.addClass("on");
 				$radio.hide();
-				$label.append($icon);
+				$radio.after($icon);
 				
 				if ($radio.is(":disabled") == true) {
 					$container.addClass("disabled");
@@ -939,17 +939,23 @@
 	 */
 	$.fn.tab = function(tab) {
 		if (this.is("div[data-role=tab]") == false || this.data("isInit") == false) return;
+		var $this = this;
 		var $tab = $("ul[data-role=tab][data-name="+this.attr("data-name")+"]");
 		var $box = $("div[data-tab="+tab+"]",this);
 		if ($box.length == 1) {
+			var position = $("body").scrollTop();
 			$("div[data-tab]:visible",this).hide();
 			$("div[data-tab]:visible",this).triggerHandler("hide");
 			
 			$("div[data-tab="+tab+"]",this).show();
 			$("div[data-tab="+tab+"]",this).triggerHandler("show");
 			
+			this.triggerHandler("tabchange",[tab]);
+			
 			$("li.selected",$tab).removeClass("selected");
 			$("li[data-tab="+tab+"]").addClass("selected");
+			
+			$("body").scrollTop(position);
 		}
 	};
 	
@@ -1002,6 +1008,7 @@
 		var count = count ? count : 0;
 		var $form = this;
 		var data = $form.serialize();
+		console.log(data);
 		
 		$("input, select, textarea",$form).each(function() {
 			if ($(this).attr("type") == "checkbox") {
@@ -1021,7 +1028,10 @@
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) $form.status("error",result.errors);
-				if (result.message) iModule.alert.show("error",result.message);
+				if (result.message) {
+					iModule.alert.show("error",result.message);
+					$form.status("default");
+				}
 			},
 			error:function() {
 				/**
@@ -1280,7 +1290,25 @@
 		 * 시간출력
 		 */
 		$("*[data-role=time][data-time][data-moment]").each(function() {
-			$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
+			if ($(this).attr("data-moment") == "fromNow") {
+				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).fromNow());
+			} else {
+				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
+			}
+		});
+		
+		/**
+		 * 비활성링크처리
+		 */
+		$("a[disabled]").on("click",function(e) {
+			e.preventDefault();
+		});
+		
+		/**
+		 * 페이지이동 네비게이션 처리
+		 */
+		$("div[data-role=pagination] > ul > li.disabled > a").on("click",function(e) {
+			e.preventDefault();
 		});
 		
 		$(window).on("resize",function() {
