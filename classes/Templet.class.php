@@ -52,6 +52,12 @@ class Templet {
 	private $isError = false;
 	
 	/**
+	 * 호출한 대상정보
+	 */
+	private $caller = null;
+	private $callerType = null;
+	
+	/**
 	 * class 선언
 	 *
 	 * @param iModule $IM iModule 코어클래스
@@ -75,14 +81,14 @@ class Templet {
 		/**
 		 * $caller 에 따라 템플릿 경로를 지정한다.
 		 */
-		$type = get_class($caller);
+		$this->callerType = get_class($caller);
 		
-		if ($type == 'iModule') {
+		if ($this->callerType == 'iModule') {
 			$this->templetPath = __IM_PATH__.'/templets/'.$templet;
 			$this->templetDir = __IM_DIR__.'/templets/'.$templet;
 		}
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			/**
 			 * 사이트템플릿에 종속되어 있는 위젯템플릿일 경우
 			 */
@@ -108,7 +114,7 @@ class Templet {
 			}
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
 			/**
 			 * 위젯이 로드된 상태가 아니라면
 			 */
@@ -148,6 +154,7 @@ class Templet {
 		}
 		
 		$this->caller = $caller;
+		
 		if (is_file($this->templetPath.'/package.json') == true) $this->loaded = $templet;
 		
 		return $this;
@@ -209,8 +216,8 @@ class Templet {
 		 * 언어셋 텍스트가 없는경우 호출한 객체 클래스에서 불러온다.
 		 */
 		if ($returnString != null) return $returnString;
-		elseif ($this->caller != null && get_class($this->caller) == 'Module') return $this->caller->getClass()->getText($code,$replacement);
-		elseif ($this->caller != null && get_class($this->caller) == 'Widget') return $this->caller->getText($code,$replacement);
+		elseif ($this->caller != null && $this->callerType == 'Module') return $this->caller->getClass()->getText($code,$replacement);
+		elseif ($this->caller != null && $this->callerType == 'Widget') return $this->caller->getText($code,$replacement);
 		else return $replacement == null ? $code : $replacement;
 	}
 	
@@ -247,10 +254,9 @@ class Templet {
 	 * @return Templet[] $templet 템플릿목록
 	 */
 	function getTemplets($caller) {
-		$type = get_class($caller);
 		$templets = array();
 		
-		if ($type == 'iModule') {
+		if ($this->callerType == 'iModule') {
 			$templetsPath = @opendir(__IM_PATH__.'/templets');
 			
 			while ($templetName = @readdir($templetsPath)) {
@@ -262,7 +268,7 @@ class Templet {
 			@closedir($templetsPath);
 		}
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			if ($caller->getName() == false) return array();
 			
 			$templetsPath = @opendir($caller->getPath().'/templets');
@@ -469,9 +475,10 @@ class Templet {
 	 *
 	 * @param string $code 에러코드 (에러코드는 iModule 코어에 의해 해석된다.)
 	 * @param object $value 에러코드에 따른 에러값
+	 * @param boolean $isError 컨텍스트 전체 에러메세지인지 여부
 	 * @return $html 에러메세지 HTML
 	 */
-	function getError($code,$value=null) {
+	function getError($code,$value=null,$isError=true) {
 		/**
 		 * 이미 에러메세지가 출력된 상태라면, 다음 에러메세지는 출력하지 않는다.
 		 */
@@ -480,7 +487,7 @@ class Templet {
 		/**
 		 * iModule 코어를 통해 에러메세지를 구성한다.
 		 */
-		$this->isError = true;
+		$this->isError = $isError;
 		$error = $this->getErrorText($code,$value,true);
 		return $this->IM->getError($error);
 	}
@@ -515,13 +522,13 @@ class Templet {
 			}
 		}
 		
-		$type = get_class($this->caller);
+		$this->callerType = $this->callerType;
 		$values = $this->getValues($values);
 		
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('beforeGetHeader',$this->caller->getName(),'header',$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetHeader',$this->caller->getName(),'header',$values,null);
 		
 		$html = '';
 		
@@ -533,12 +540,12 @@ class Templet {
 		}
 		$IM = $this->IM;
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
 				$me = $Widget->getClass();
@@ -558,7 +565,7 @@ class Templet {
 		/**
 		 * iModule 코어에서 호출했다면, iModule 기본 header 를 추가한다.
 		 */
-		if ($type == 'iModule') {
+		if ($this->callerType == 'iModule') {
 			ob_start();
 			INCLUDE __IM_PATH__.'/includes/header.php';
 			$header = ob_get_contents();
@@ -570,7 +577,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('afterGetHeader',$this->caller->getName(),'header',$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetHeader',$this->caller->getName(),'header',$values,null,$html);
 		
 		return $html;
 	}
@@ -587,13 +594,12 @@ class Templet {
 		 */
 		if ($this->isLoaded() === false) return '';
 		
-		$type = get_class($this->caller);
 		$values = $this->getValues($values);
 		
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('beforeGetFooter',$this->caller->getName(),'footer',$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetFooter',$this->caller->getName(),'footer',$values,null);
 		
 		$html = '';
 		
@@ -605,12 +611,12 @@ class Templet {
 		}
 		$IM = $this->IM;
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
 				$me = $Widget->getClass();
@@ -630,7 +636,7 @@ class Templet {
 		/**
 		 * iModule 코어에서 호출했다면, iModule 기본 footer 를 추가한다.
 		 */
-		if ($type == 'iModule') {
+		if ($this->callerType == 'iModule') {
 			ob_start();
 			INCLUDE __IM_PATH__.'/includes/footer.php';
 			$footer = ob_get_contents();
@@ -642,7 +648,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('afterGetFooter',$this->caller->getName(),'footer',$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetFooter',$this->caller->getName(),'footer',$values,null,$html);
 		
 		return $html;
 	}
@@ -660,19 +666,17 @@ class Templet {
 		 */
 		if (is_file($this->getPath().'/layouts/'.$layout.'.php') == false) return $this->getError('NOT_FOUND_LAYOUT',$this->getDir().'/layouts/'.$layout.'.php');
 		
-		$type = get_class($this->caller);
-		
 		/**
 		 * 레이아웃파일에서 사용할 변수선언
 		 */
 		$IM = $this->IM;
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
 				$me = $Widget->getClass();
@@ -710,13 +714,12 @@ class Templet {
 		 */
 		if (is_file($this->getPath().'/'.$file.'.php') == false) return $this->getError('NOT_FOUND_TEMPLET_FILE',$this->getDir().'/'.$file.'.php');
 		
-		$type = get_class($this->caller);
 		$values = $this->getValues($values);
 		
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('beforeGetContext',$this->caller->getName(),$file,$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetContext',$this->caller->getName(),$file,$values,null);
 		
 		foreach ($values as $key=>$value) {
 			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
@@ -732,12 +735,12 @@ class Templet {
 		}
 		$IM = $this->IM;
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
 				$me = $Widget->getClass();
@@ -760,7 +763,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($type !== 'Widget') $this->IM->fireEvent('afterGetContext',$this->caller->getName(),$file,$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetContext',$this->caller->getName(),$file,$values,null,$html);
 		
 		if ($layout !== null) return $this->getLayout($html);
 		return $html;
@@ -783,19 +786,32 @@ class Templet {
 		 */
 		if (is_file($this->getPath().'/externals/'.$file) == false) return $this->getError('NOT_FOUND_EXTERNAL_FILE',$this->getDir().'/externals/'.$file);
 		
-		$type = get_class($this->caller);
-		
 		/**
-		 * 외부파일에서 사용할 변수선언
+		 * 템플릿파일에서 사용할 변수선언
 		 */
 		$IM = $this->IM;
 		
-		if ($type == 'Module') {
+		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
 		}
 		
-		if ($type == 'Widget') {
+		if ($this->callerType == 'Widget') {
+			$Widget = $this->caller;
+			if ($Widget->getClass() !== null) {
+				$me = $Widget->getClass();
+				$Module = $me->getModule();
+			}
+		}
+		
+		$Templet = $this;
+		
+		if ($this->callerType == 'Module') {
+			$Module = $this->caller;
+			$me = $this->caller->getClass();
+		}
+		
+		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
 				$me = $Widget->getClass();
@@ -808,6 +824,60 @@ class Templet {
 		ob_start();
 		INCLUDE $this->getPath().'/externals/'.$file;
 		$html = ob_get_clean();
+		
+		return $html;
+	}
+	
+	/**
+	 * 페이지이동 네비게이션을 가져온다.
+	 *
+	 * @param int $p 현재페이지
+	 * @param int $total 총 페이지
+	 * @param int $pagenum 페이지이동버튼 갯수
+	 * @param string $link(옵션) 페이지 이동링크 (페이지번호가 들어가는 부분에 {PAGE} 치환자 사용)
+	 * @param string $mode 페이지 표시 형식 (FIXED, CENTER)
+	 * @param string $file(옵션) 페이지 네비게이션 템플릿 파일명 (.php 제외)
+	 * @return string $html
+	 */
+	function GetPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
+		$total = $total == 0 ? 1 : $total;
+	
+		if ($mode == 'LEFT') {
+			$startPage = floor(($p-1)/$pagenum) * $pagenum + 1;
+			$endPage = $startPage + $pagenum - 1 < $total ? $startPage + $pagenum - 1 : $total;
+			$prevPageStart = $startPage - $pagenum > 0 ? $startPage - $pagenum : false;
+			$nextPageStart = $endPage + 1 < $total ? $endPage + 1 : false;
+		} else {
+			$startPage = $p - floor($pagenum/2) > 0 ? $p - floor($pagenum/2) : 1;
+			$endPage = $p + floor($pagenum/2) > $pagenum ? $p + floor($pagenum/2) : $startPage + $pagenum - 1;
+			$prevPageStart = null;
+			$nextPageStart = null;
+		}
+		
+		$prevPage = $p > 1 ? $p - 1 : false;
+		$nextPage = $p < $total ? $p + 1 : false;
+		
+		$IM = $this->IM;
+		$Templet = $this;
+		
+		
+		if ($file == null) {
+			ob_start();
+			if (is_file($this->getPath().'/pagination.php') == true) {
+				INCLUDE $this->getPath().'/pagination.php';
+			} else {
+				INCLUDE __IM_PATH__.'/includes/pagination.php';
+			}
+			$html = ob_get_clean();
+		} else {
+			if (is_file($this->getPath().'/'.$file.'.php') == true) {
+				ob_start();
+				INCLUDE $this->getPath().'/pagination.php';
+				$html = ob_get_clean();
+			} else {
+				return $this->getError('NOT_FOUND_TEMPLET_FILE',$this->getDir().'/'.$file.'.php',false);
+			}
+		}
 		
 		return $html;
 	}
