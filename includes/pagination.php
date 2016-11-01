@@ -8,7 +8,6 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0.160905
- * @see /classes/iModule.class.php -> printError()
  */
 
 if (defined('__IM__') == false) exit;

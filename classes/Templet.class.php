@@ -256,7 +256,8 @@ class Templet {
 	function getTemplets($caller) {
 		$templets = array();
 		
-		if ($this->callerType == 'iModule') {
+		$type = get_class($caller);
+		if ($type == 'iModule') {
 			$templetsPath = @opendir(__IM_PATH__.'/templets');
 			
 			while ($templetName = @readdir($templetsPath)) {
@@ -268,7 +269,7 @@ class Templet {
 			@closedir($templetsPath);
 		}
 		
-		if ($this->callerType == 'Module') {
+		if ($type == 'Module') {
 			if ($caller->getName() == false) return array();
 			
 			$templetsPath = @opendir($caller->getPath().'/templets');
@@ -766,6 +767,47 @@ class Templet {
 		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetContext',$this->caller->getName(),$file,$values,null,$html);
 		
 		if ($layout !== null) return $this->getLayout($html);
+		return $html;
+	}
+	
+	/**
+	 * 모달 컨텍스트를 가져온다.
+	 *
+	 * @param
+	 */
+	function getModal($title,$content,$is_closable=true,$is_fullsize=true,$buttons=array()) {
+		if ($buttons === null) {
+			$buttons = array();
+		} else {
+			if (count($buttons) == 0) {
+				if ($is_closable == true) {
+					$button = new stdClass();
+					$button->type = 'close';
+					$button->text = $this->IM->getText('button/close');
+					$buttons[] = $button;
+				}
+				
+				$button = new stdClass();
+				$button->type = 'submit';
+				$button->text = $this->IM->getText('button/confirm');
+				$buttons[] = $button;
+			}
+		}
+		
+		ob_start();
+		
+		$IM = $this->IM;
+		$Templet = $this;
+		$header = PHP_EOL.'<form id="iModuleModalForm">'.PHP_EOL;
+		$footer = PHP_EOL.'</form>'.PHP_EOL;
+		
+		if (is_file($this->IM->getSiteTemplet()->getPath().'/modal.php') == true) {
+			INCLUDE $this->IM->getSiteTemplet()->getPath().'/modal.php';
+		} else {
+			INCLUDE __IM_PATH__.'/includes/modal.php';
+		}
+		$html = ob_get_clean();
+		
 		return $html;
 	}
 	
