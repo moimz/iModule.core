@@ -332,8 +332,8 @@
 					$(this).parent().removeClass("disabled");
 				});
 				
-				$input.on("keyup",function() {
-					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
+				$input.on("keyup",function(e) {
+					if (e.keyCode != 13 && $(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
 						$(this).status("default");
 					}
 				});
@@ -1272,43 +1272,11 @@
 	};
 	
 	$(document).ready(function() {
-		/**
-		 * input 객체 초기화
-		 */
-		$("div[data-role=input]").inits();
-		$("body").on("click",function(e) {
+		iModule.init();
+		
+		$(document).on("click",function(e) {
 			$("div[data-role=input]").removeClass("extend");
 			$("div[data-role=picker]").remove();
-		});
-		
-		/**
-		 * tab 객체 초기화
-		 */
-		$("*[data-role=tab]").inits();
-		
-		/**
-		 * 시간출력
-		 */
-		$("*[data-role=time][data-time][data-moment]").each(function() {
-			if ($(this).attr("data-moment") == "fromNow") {
-				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).fromNow());
-			} else {
-				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
-			}
-		});
-		
-		/**
-		 * 비활성링크처리
-		 */
-		$("a[disabled]").on("click",function(e) {
-			e.preventDefault();
-		});
-		
-		/**
-		 * 페이지이동 네비게이션 처리
-		 */
-		$("div[data-role=pagination] > ul > li.disabled > a").on("click",function(e) {
-			e.preventDefault();
 		});
 		
 		$(window).on("resize",function() {

@@ -12,6 +12,47 @@
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
 	/**
+	 * 아이모듈 DOM 객체를 초기화한다.
+	 */
+	init:function(container) {
+		var $container = container ? $(document) : container;
+		
+		/**
+		 * input 객체 초기화
+		 */
+		$("div[data-role=input]",$container).inits();
+		
+		/**
+		 * tab 객체 초기화
+		 */
+		$("*[data-role=tab]",$container).inits();
+		
+		/**
+		 * 시간출력
+		 */
+		$("*[data-role=time][data-time][data-moment]",$container).each(function() {
+			if ($(this).attr("data-moment") == "fromNow") {
+				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).fromNow());
+			} else {
+				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
+			}
+		});
+		
+		/**
+		 * 비활성링크처리
+		 */
+		$("a[disabled]",$container).on("click",function(e) {
+			e.preventDefault();
+		});
+		
+		/**
+		 * 페이지이동 네비게이션 처리
+		 */
+		$("div[data-role=pagination] > ul > li.disabled > a",$container).on("click",function(e) {
+			e.preventDefault();
+		});
+	},
+	/**
 	 * 자바스크립트에서 모듈 언어셋이 필요할 경우, iModule 코어에 의하여 언어셋파일을 로드한다.
 	 *
 	 * @param string module 모듈명
@@ -220,6 +261,9 @@ var iModule = {
 			}
 		}
 	},
+	/**
+	 * 아이모듈 전체 컨텍스트를 활성화한다.
+	 */
 	enable:function() {
 		var $disabled = $("body > div[data-role=disabled]");
 		if ($disabled.length == 1) {
@@ -227,13 +271,19 @@ var iModule = {
 				$("body").removeClass("disabled");
 				$("body").scrollTop($("body").data("position"));
 			}
-			$("body").removeClass("disabled").removeClass("mobile");//.scrollTop($disabled.data("position"));
+			$("body").removeClass("disabled").removeClass("mobile");
 			$disabled.remove();
 		}
 	},
-	disable:function() {
+	/**
+	 * 아이모듈 전체 컨텍스트를 비활성화한다.
+	 *
+	 * @param boolean is_loading 로딩 인디케이터를 보일지 여부 (기본값 false)
+	 */
+	disable:function(is_loading) {
 		var $disabled = $("body > div[data-role=disabled]");
 		var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+		$box.removeClass("loading modal");
 		
 		if ($disabled.length == 0) {
 			var $disabled = $("<div>").attr("data-role","disabled");
@@ -241,70 +291,32 @@ var iModule = {
 			
 			var position = $("body").scrollTop();
 			$("body").addClass("disabled");
-//			$("body > div[data-role=wrapper]").scrollTop(position);
 			
 			var $box = $("<div>").attr("data-role","box");
 			$disabled.data("position",position);
 			$disabled.append($box);
-			
-//			$disabled.css("background","rgba(0,0,0,0.3)");
 		}
 		
 		$box.empty();
-		
-		/*
-		$box.data("scroll",false);
-		$box.data("touch",false);
-		$box.data("up",false);
-		$box.data("down",false);
-		$box.data("bounce",true);
-		
-		$(document).on("touchstart",function(e) {
-			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
-			if ($box.length == 0 || $box.data("touch") == true) return;
-			
-			if ($box.scrollTop() <= 0) $box.data("up",false);
-			else $box.data("up",true);
-			
-			if ($box.prop("scrollHeight") <= $box.height() + $box.scrollTop()) $box.data("down",false);
-			else $box.data("down",true);
-			
-			$box.data("start",e.pageY);
-		});
-		
-		$(document).on("touchmove",function(e) {
-			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
-			if ($box.length == 0 || $box.data("touch") == true) return;
-			
-			var isUp = e.pageY > $box.data("start");
-			var isDown = e.pageY < $box.data("start");
-			
-			if ((isUp == true && $box.data("up") == false) || (isDown == true && $box.data("down") == false)) {
-				if ($box.data("scroll") == true) {
-					$box.css("marginTop",(e.pageY - $box.data("start")) / 2);
-					$box.data("bounce",true);
-				}
-				e.preventDefault();
-			}
-		});
-		
-		$(document).on("touchend",function(e) {
-			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
-			if ($box.length == 0 || $box.data("touch") == true) return;
-			
-			if ($box.data("bounce") == true) {
-				$box.animate({marginTop:0},"slow");
-				$box.data("bounce",false);
-			}
-		});
-		*/
+		if (is_loading == true) {
+			$disabled.addClass("loading");
+			$box.append($("<i>").addClass("mi mi-loading"));
+		} else {
+			$disabled.removeClass("loading");
+		}
 	},
+	/**
+	 * 모달창 관련
+	 */
 	modal:{
 		init:function() {
 			var $disabled = $("body > div[data-role=disabled]");
 			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
 			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
+			
+			$disabled.addClass("modal");
+/*
 			
 			if (iModule.isMobile == false) {
 				if ($modal.outerHeight() + 40 < $box.innerHeight()) {
@@ -315,40 +327,69 @@ var iModule = {
 					$modal.css("margin","20px auto");
 				}
 			}
+*/
 			
 			if ($modal.data("isInit") == true) return;
+			
+			iModule.init($modal);
+			
+			if ($("div[data-role=input]",$modal).length > 0) {
+				var $input = $("div[data-role=input]",$modal).first();
+				if ($input.attr("data-type") == "select") {
+					$("button",$input).focus();
+				} else if ($input.attr("data-type") == "textarea") {
+					$("textarea",$input).focus();
+				} else {
+					$("input",$input).focus();
+				}
+			}
+			
+			$("button[data-action]",$modal).on("click",function() {
+				if ($(this).attr("data-action") == "close") {
+					iModule.modal.close();
+				}
+			});
 			
 			$modal.on("click",function(e) {
 				e.stopPropagation();
 			});
 			
-			$box.on("click",function() {
-				iModule.modal.close();
-			});
+			if ($modal.attr("data-closable") == "TRUE") {
+				$box.on("click",function() {
+					iModule.modal.close();
+				});
+			}
 			
 			$modal.data("isInit",true);
 		},
-		show:function(isContent) {
+		/**
+		 * 모달창을 서버로 부터 가져온다.
+		 *
+		 * @param string url 모달창을 가져올 주소
+		 * @param object data 전달할 데이터
+		 */
+		get:function(url,data,callback) {
+			iModule.disable(true);
+			var data = data && typeof data == "object" ? data : {};
+			
+			$.send(url,data,function(result) {
+				if (result.success == true) {
+					iModule.modal.showHtml(result.modalHtml,callback);
+				} else {
+					iModule.enable();
+				}
+			});
+		},
+		showHtml:function(html,callback) {
 			iModule.disable();
 			
 			var $disabled = $("body > div[data-role=disabled]");
 			var $box = $("div[data-role=disabled] > div[data-role=box]");
 			$box.empty();
 			
-			var $modal = $("<div>").attr("data-role","modal");
-			
-			if (isContent == true) {
-				var content = "";
-				for (var i=0;i<100;i++) content+= i+"<br>";
-			
-				$modal.html(content);
-			} else {
-				$modal.html('<br><br><div data-role="input"><input type="text"></div><br><br><br><br><br><br><select><option>dkasdkasd</option></select><br><br><br>');
-			}
-			
+			var $modal = $(html);
 			$box.append($modal);
-			
-			$("div[data-role=input]",$modal).inits();
+/*
 			
 			if (iModule.isMobile == true) {
 				var position = $("body").scrollTop();
@@ -361,8 +402,17 @@ var iModule = {
 				$box.css("marginTop",-$box.outerHeight(true));
 				$box.animate({marginTop:0});
 			}
+*/
 			
 			iModule.modal.init();
+			var $form = $("#iModuleModalForm");
+			
+			if (typeof callback == "function" && callback($modal,$form) === false) return;
+			
+			$form.on("submit",function(e) {
+				e.preventDefault();
+				iModule.modal.close();
+			});
 		},
 		close:function() {
 			var $disabled = $("body > div[data-role=disabled]");
