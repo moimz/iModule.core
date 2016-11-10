@@ -16,7 +16,7 @@
  *
  * @see /configs/init.config.php
  */
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'index.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+REQUIRE_ONCE dirname($_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
 
 /**
  * iModule 코어를 선언하고, 레이아웃을 불러온다.

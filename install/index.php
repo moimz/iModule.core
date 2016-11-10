@@ -1,5 +1,15 @@
 <?php
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'index.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule의 설치작업을 처리한다.
+ * 
+ * @file index.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.161110
+ */
+REQUIRE_ONCE str_replace('/install','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 $package = json_decode(file_get_contents(__IM_PATH__.'/package.json'));
 $language = Request('language') ? Request('language') : 'en';

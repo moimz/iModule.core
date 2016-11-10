@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.160905
  */
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'process'.DIRECTORY_SEPARATOR.'index.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+REQUIRE_ONCE str_replace('/process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 /**
  * iModule 코어클래스를 선언한다.

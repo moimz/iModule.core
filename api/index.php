@@ -1,10 +1,21 @@
 <?php
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule의 API요청을 처리한다.
+ * 
+ * @file index.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.161110
+ */
+
 header('Access-Control-Allow-Origin:*');
 header('Access-Control-Allow-Headers:Authorization');
 header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control:post-check=0, pre-check=0', false);
 header('Pragma:no-cache');
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'api'.DIRECTORY_SEPARATOR.'index.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+REQUIRE_ONCE str_replace('/api','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 $IM = new iModule();
 $headers = getallheaders();
