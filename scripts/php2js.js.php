@@ -1,5 +1,16 @@
 <?php
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts'.DIRECTORY_SEPARATOR.'php2js.js.php','',$_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * PHP에서 사용중인 변수를 자바스크립트에 등록한다.
+ * 
+ * @file /scripts/php2js.js.php
+ * @author Arzz (arzz@arzz.com)
+ * @license MIT License
+ * @version 3.0.0.161110
+ */
+ 
+REQUIRE_ONCE str_replace('/scripts','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');
 
 $menu = Request('menu');
