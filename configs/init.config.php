@@ -41,7 +41,7 @@ header("Pragma: no-cache");
 define('__IM__',true);
 define('__IM_VERSION__','3.0.0');
 define('__IM_DB_PREFIX__','im_');
-if (defined('__IM_PATH__') == false) define('__IM_PATH__',str_replace(DIRECTORY_SEPARATOR.'configs','',__DIR__));
+if (defined('__IM_PATH__') == false) define('__IM_PATH__',str_replace('/configs','',str_replace(DIRECTORY_SEPARATOR,'/',__DIR__)));
 if (defined('__IM_DIR__') == false) define('__IM_DIR__',str_replace($_SERVER['DOCUMENT_ROOT'],'',__IM_PATH__));
 
 /**
