@@ -75,12 +75,15 @@ class iModule {
 	 * 현재 접속한 사이트주소에 따라 접근한 사이트관련 정보들을 정의한다.
 	 *
 	 * @public object $site 현재 사이트에 관련된 모든 RAW 정보
+	 * @public boolean $useTemplet 사이트템플릿 사용여부
 	 * @private string $siteTitle 웹브라우저에 표시되는 사이트제목
 	 * @private string $siteDescription SEO를 위한 META 태그에 정의될 사이트소개
 	 * @private string $siteCanonical SEO를 위한 현재 페이지에 접근할 수 있는 유니크한 사이트주소 (필수 GET 변수만 남겨둔 페이지 URL)
 	 * @private string $siteImage OG META 태그를 위한 사이트 이미지 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
 	 */
 	public $site;
+	public $useTemplet = true;
+	
 	private $siteTitle = null;
 	private $siteDescription = null;
 	private $siteCanonical = null;
@@ -88,7 +91,6 @@ class iModule {
 	
 	private $siteHeader = array();
 	private $siteTemplet = null;
-	private $useTemplet = true;
 	private $javascriptLanguages = array();
 	private $webFont = array('moimz'); // Moimz 폰트아이콘은 기본적으로 포함된다.
 	private $webFontDefault = null;

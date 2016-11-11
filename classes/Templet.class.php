@@ -559,8 +559,7 @@ class Templet {
 		if (is_file($this->getPath().'/header.php') == true) {
 			ob_start();
 			INCLUDE $this->getPath().'/header.php';
-			$html.= ob_get_contents();
-			ob_clean();
+			$html.= ob_get_clean();
 		}
 		
 		/**
@@ -569,10 +568,16 @@ class Templet {
 		if ($this->callerType == 'iModule') {
 			ob_start();
 			INCLUDE __IM_PATH__.'/includes/header.php';
-			$header = ob_get_contents();
-			ob_clean();
+			$header = ob_get_clean();
 			
-			$html = $header.PHP_EOL.$html;
+			/**
+			 * 사이트템플릿을 사용할 경우
+			 */
+			if ($this->caller->useTemplet == true) {
+				$html = $header.PHP_EOL.$html;
+			} else {
+				$html = $header;
+			}
 		}
 		
 		/**
@@ -630,8 +635,7 @@ class Templet {
 		if (is_file($this->getPath().'/footer.php') == true) {
 			ob_start();
 			INCLUDE $this->getPath().'/footer.php';
-			$html.= ob_get_contents();
-			ob_clean();
+			$html.= ob_get_clean();
 		}
 		
 		/**
@@ -640,10 +644,16 @@ class Templet {
 		if ($this->callerType == 'iModule') {
 			ob_start();
 			INCLUDE __IM_PATH__.'/includes/footer.php';
-			$footer = ob_get_contents();
-			ob_clean();
+			$footer = ob_get_clean();
 			
-			$html = $html.PHP_EOL.$footer;
+			/**
+			 * 사이트템플릿을 사용할 경우
+			 */
+			if ($this->caller->useTemplet == true) {
+				$html = $html.PHP_EOL.$footer;
+			} else {
+				$html = $footer;
+			}
 		}
 		
 		/**
