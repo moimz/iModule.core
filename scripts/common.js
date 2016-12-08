@@ -247,15 +247,15 @@ var iModule = {
 			if ($("body > div[data-role=alert]").length == 0) return;
 			
 			if (total > 0 && loaded < total) {
-				if ($("body > div[data-role=alert]Progress-"+id).length == 0) {
-					$("body > div[data-role=alert]").append($("<div>").addClass("progress").attr("id","iModuleAlertMessageProgress-"+id).append($("<span>")));
+				if ($("body > div[data-role=alert] > div[data-progress="+id+"]").length == 0) {
+					$("body > div[data-role=alert]").append($("<div>").addClass("progress").attr("data-progress",id).append($("<span>")));
 				}
-				$("body > div[data-role=alert]Progress-"+id+" > span").css("width",(loaded/total*100)+"%");
+				$("body > div[data-role=alert] > div[data-progress="+id+"] > span").css("width",(loaded/total*100)+"%");
 			} else {
-				if ($("body > div[data-role=alert]Progress-"+id).length == 0) return;
+				if ($("body > div[data-role=alert] > div[data-progress="+id+"]").length == 0) return;
 				
-				$("body > div[data-role=alert]Progress-"+id+" > span").css("width","100%");
-				$("body > div[data-role=alert]Progress-"+id).fadeOut(3000,function() {
+				$("body > div[data-role=alert] > div[data-progress="+id+"] > span").css("width","100%");
+				$("body > div[data-role=alert] > div[data-progress="+id+"]").fadeOut(3000,function() {
 					$(this).remove();
 				});
 			}
