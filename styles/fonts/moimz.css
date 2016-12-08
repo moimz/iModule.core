@@ -56,6 +56,11 @@
 .mi-remove:before {content:"\eb08"}
 .mi-search:before {content:"\eb09"}
 .mi-check:before {content:"\eb10"}
+.mi-ellipsis-v:before {content:"\eb11"}
+.mi-ellipsis-h:before {content:"\eb12"}
+.mi-bars:before {content:"\eb13"}
+.mi-view-card:before {content:"\eb14"}
+.mi-view-grid:before {content:"\eb15"}
 .mi-user:before {content:"\ec00"}
 .mi-group:before {content:"\ec01"}
 .mi-home:before {content:"\ec02"}
@@ -70,4 +75,7 @@
 .mi-download:before {content:"\ec11"}
 .mi-calendar:before {content:"\ec12"}
 .mi-time:before {content:"\ec13"}
+.mi-folder:before { content: '\ec14'; } /* '' */
+.mi-folder_share:before { content: '\ec15'; } /* '' */
+.mi-trash:before { content: '\ec16'; } /* '' */
 .mi-loading:before {content:"\ed00"}
