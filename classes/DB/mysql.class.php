@@ -4,7 +4,7 @@
  *
  * @file mysql.class.php
  * @author Arzz
- * @version 1.1.6
+ * @version 1.1.7
  * @license MIT License
  */
 class mysql {
@@ -343,34 +343,17 @@ class mysql {
 	
 	public function insert($table,$data) {
 		if ($this->isSubQuery == true) return;
-		/*
-		$desc = $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
-		for ($i=0, $loop=count($desc);$i<$loop;$i++) {
-			if (isset($data[$desc[$i]->Field]) == false && $desc[$i]->Null == 'NO' && $desc[$i]->Default === null) {
-				if (preg_match('/[^\(]+/',$desc[$i]->Type,$match) == true) {
-					$type = $match[0];
-					
-					switch ($type) {
-						case 'int' :
-							$data[$desc[$i]->Field] = 0;
-							break;
-						
-						case 'date' :
-							$data[$desc[$i]->Field] = '0000-00-00';
-							break;
-							
-						case 'datetime' :
-							$data[$desc[$i]->Field] = '0000-00-00 00:00:00';
-							break;
-							
-						default :
-							$data[$desc[$i]->Field] = '';
-					}
-				}
-			}
-		}
-		*/
+		
 		$this->_query = 'INSERT into '.$this->_prefix.$table;
+		$this->_tableDatas = $data;
+		
+		return $this;
+	}
+	
+	public function replace($table,$data) {
+		if ($this->isSubQuery == true) return;
+		
+		$this->_query = 'REPLACE into '.$this->_prefix.$table;
 		$this->_tableDatas = $data;
 		
 		return $this;
@@ -565,7 +548,7 @@ class mysql {
 	private function _buildTableData($tableData) {
 		if (is_array($tableData) == false) return;
 		
-		$isInsert = strpos($this->_query,'INSERT');
+		$isInsert = strpos($this->_query,'INSERT') !== false || strpos($this->_query,'REPLACE') !== false;
 		$isUpdate = strpos($this->_query,'UPDATE');
 		if ($isInsert !== false) {
 			$this->_query.= '(`'.implode(array_keys($tableData),'`,`').'`)';
