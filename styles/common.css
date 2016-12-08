@@ -75,7 +75,7 @@ div[data-role=modal] > form > header > button:hover {color:#333;}
 div[data-role=modal][data-closable=FALSE] > form > header > button {display:none;}
 div[data-role=modal] > form > main {padding:0px 20px; box-sizing:border-box; width:100%; height:auto; font-size:13px; color:#333; text-align:left;}
 div[data-role=modal] > form > main > label {display:block; height:30px; line-height:30px; font-weight:bold;}
-div[data-role=modal] > form > main > .text {font-size:13px; line-height:1.6;}
+div[data-role=modal] > form > main > div[data-role=message] {font-size:13px; line-height:1.6;}
 div[data-role=modal] > form > footer {display:table; table-layout:fixed; width:100%; background:transparent; margin-top:20px;}
 div[data-role=modal] > form > footer > div {display:table-cell; width:100%; vertical-align:middle;}
 div[data-role=modal] > form > footer > div > button {display:block; width:100%; height:42px; box-sizing:border-box; cursor:pointer; font-size:13px; line-height:42px; border:0; background:#bdbdbd; color:#fff;}
@@ -148,7 +148,7 @@ div[data-role=input][data-type=input] > div[data-role=picker] {position:absolute
 div[data-role=input][data-type=input].extend > div[data-role=picker] {display:block;}
 
 div[data-role=input][data-type=textarea] {height:auto;}
-div[data-role=input][data-type=textarea] > textarea {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:18px; border-radius:0px; min-height:100px; resize:none;}
+div[data-role=input][data-type=textarea] > textarea {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:18px; border-radius:0px; min-height:100px; resize:none; display:block;}
 div[data-role=input][data-type=textarea] > textarea:focus, div[data-role=input][data-type=textarea] > textarea.focus {border-color:#66afe9;}
 div[data-role=input][data-type=textarea].error > textarea {border-color:#f44336;}
 div[data-role=input][data-type=textarea].success > textarea {border-color:#4caf50;}
