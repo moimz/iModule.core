@@ -588,6 +588,18 @@ function CreateDirectory($path) {
 }
 
 /**
+ * 버퍼크기와 관계없이 강제로 출력된 데이터를 FLUSH한다.
+ */
+function ForceFlush() {
+	ob_start();
+	ob_end_clean();
+	flush();
+	set_error_handler(function() {});
+	ob_end_flush();
+	restore_error_handler();
+}
+
+/**
  * getallheaders function is apache only
  *
  * @see http://php.net/getallheaders
