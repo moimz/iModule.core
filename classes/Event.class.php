@@ -123,9 +123,16 @@ class Event {
 		/**
 		 * 이벤트 종류에 따라 이벤트 발생대상으로 부터 넘어온 변수를 적절히 변환한다.
 		 */
-		
 		if ($event == 'init') {
 			$init = $caller;
+			unset($caller,$context,$results);
+		}
+		
+		/**
+		 * 데이터처리
+		 */
+		if ($event == 'beforeGetData' || $event == 'afterGetData') {
+			$get = $caller;
 			unset($caller,$context,$results);
 		}
 		
