@@ -86,7 +86,7 @@ if ($_CONFIGS->db === null || $_CONFIGS->db === false) $_CONFIGS->installed = fa
  * 우선적으로 /classes 폴더를 우선탐색하며, class 이름이 Module 로 시작할 경우 각 모듈의 최상위폴더의 Module[모듈명].class.php 파일을 탐색한다.
  * 모든 class 파일은 [클래스명].class.php 파일명의 규칙을 지켜야한다.
  */
-function __autoload($class) {
+function iModuleAutoLoader($class) {
 	if ($class != 'Module' && preg_match('/^Module/',$class) == true) {
 		$module = strtolower(preg_replace('/^Module/','',$class));
 		if (file_exists(__IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php';
@@ -98,6 +98,7 @@ function __autoload($class) {
 		if (file_exists(__IM_PATH__.'/classes/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/classes/'.$class.'.class.php';
 	}
 }
+spl_autoload_register('iModuleAutoLoader');
 
 /**
  * session 기본 설정
