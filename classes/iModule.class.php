@@ -1472,6 +1472,12 @@ class iModule {
 			exit;
 		}
 		
+		if (preg_match('/^NOT_FOUND/',$code) == true) {
+			header('HTTP/1.1 404 Not Found');
+		} elseif (preg_match('/^FORBIDDEN/',$code) == true) {
+			header('HTTP/1.1 403 Forbidden');
+		}
+		
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
