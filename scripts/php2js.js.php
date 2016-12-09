@@ -68,8 +68,8 @@ var ENV = {
 		url+= "/" + page;
 		if (view === null || view === false) return url;
 		url+= "/" + view;
-		if (number === null || number === false) return url;
-		url+= "/" + number;
+		if (idx === null || idx === false) return url;
+		url+= "/" + idx;
 		
 		return url;
 	}
