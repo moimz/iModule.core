@@ -316,20 +316,11 @@ var iModule = {
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
 			
 			$disabled.addClass("modal");
-/*
 			
-			if (iModule.isMobile == false) {
-				if ($modal.outerHeight() + 40 < $box.innerHeight()) {
-//					$modal.css("margin",(($box.innerHeight() - $modal.outerHeight()) / 2)+"px auto");
-//					$modal.css("left","calc(50% - "+($modal.outerWidth()/2)+"px)");
-					$modal.css("margin",(($box.innerHeight() - $modal.outerHeight(true)) / 2)+"px auto");
-				} else {
-					$modal.css("margin","20px auto");
-				}
+			if ($modal.data("isInit") == true) {
+				iModule.modal.set();
+				return;
 			}
-*/
-			
-			if ($modal.data("isInit") == true) return;
 			
 			iModule.init($modal);
 			
@@ -361,6 +352,52 @@ var iModule = {
 			}
 			
 			$modal.data("isInit",true);
+			iModule.modal.set();
+		},
+		/**
+		 * 모달창의 크기와 위치를 정의한다.
+		 */
+		set:function() {
+			var $disabled = $("body > div[data-role=disabled]");
+			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
+			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
+			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
+			
+			var width = parseInt($modal.attr("data-width"));
+			var height = parseInt($modal.attr("data-height"));
+			var maxWidth = parseInt($modal.attr("data-max-width"));
+			var maxHeight = parseInt($modal.attr("data-max-height"));
+			var is_fullsize = $modal.attr("data-fullsize") == "TRUE";
+			
+			var $content = $("form > main",$modal).children(":visible").eq(0);
+			if ($content.attr("data-fullsize") == "TRUE") {
+				$("form > main",$modal).attr("data-fullsize","TRUE");
+			}
+			
+			$modal.css("minWidth","").css("width","").css("minHeight","").css("height","");
+			
+			if ($modal.width() < maxWidth) {
+				if (width < $(window).width()) {
+					$modal.css("minWidth",maxWidth+"px").css("width",maxWidth+"px");
+				} else {
+					$modal.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
+				}
+			}
+			
+			if ($modal.height() < maxHeight) {
+				if (height < $(window).height()) {
+					$modal.css("minHeight",maxHeight+"px").css("height",maxHeight+"px");
+				} else {
+					$modal.css("minHeight",($(window).width() - 20)+"px").css("height",($(window).height() - 20)+"px");
+				}
+			}
+			
+			if (is_fullsize == true) {
+				if (iModule.isMobile == true || ($modal.width() < width || $modal.height() < height)) {
+					$modal.css("minWidth","100%").css("width","100%").css("minHeight","100%").css("height","100%");
+					$("body").attr("data-scroll",$("body").scrollTop());
+				}
+			}
 		},
 		/**
 		 * 모달창을 서버로 부터 가져온다.
@@ -419,6 +456,12 @@ var iModule = {
 			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
 			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
+			
+			if ($("body").attr("data-scroll") !== undefined) {
+				var scroll = $("body").attr("data-scroll");
+				$("body").attr("data-scroll",null);
+				$("body").scrollTop(scroll);
+			}
 			
 			if (iModule.isMobile == true) {
 				$box.animate({marginTop:-$box.outerHeight(true)},"",function() {

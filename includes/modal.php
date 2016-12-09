@@ -12,7 +12,7 @@
 
 if (defined('__IM__') == false) exit;
 ?>
-<div data-role="modal" data-closable="<?php echo $is_closable == true ? 'TRUE' : 'FALSE'; ?>">
+<div data-role="modal" data-closable="<?php echo $is_closable == true ? 'TRUE' : 'FALSE'; ?>" data-fullsize="<?php echo $is_fullsize == true ? 'TRUE' : 'FALSE'; ?>" data-width="<?php echo $width; ?>" data-height="<?php echo $height; ?>" data-max-width="<?php echo $max_width; ?>" data-max-height="<?php echo $max_height; ?>">
 	<?php echo $header; ?>
 	<header>
 		<h1><?php echo $title; ?></h1>

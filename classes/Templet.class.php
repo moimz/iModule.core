@@ -785,7 +785,14 @@ class Templet {
 	 *
 	 * @param
 	 */
-	function getModal($title,$content,$is_closable=true,$is_fullsize=true,$buttons=array()) {
+	function getModal($title,$content,$is_closable=true,$size=array(),$buttons=array()) {
+		$size = $size == null ? array() : $size;
+		$width = isset($size['width']) == true ? $size['width'] : 0;
+		$height = isset($size['height']) == true ? $size['height'] : 0;
+		$max_width = isset($size['maxWidth']) == true ? $size['maxWidth'] : $width;
+		$max_height = isset($size['maxHeight']) == true ? $size['maxHeight'] : $height;
+		$is_fullsize = isset($size['is_fullsize']) == true && $size['is_fullsize'] === true;
+		
 		if ($buttons === null) {
 			$buttons = array();
 		} else {

@@ -1445,6 +1445,15 @@
 		$(document).on("touchstart",function(e) {
 			if (e.touches.length >1) e.preventDefault();
 		});
+		
+		/**
+		 * 단축키
+		 */
+		$(document).on("keydown",function(e) {
+			if (e.keyCode == 27) {
+				iModule.modal.close();
+			}
+		});
 	});
 	/*
 	$.fn.positionScroll = function() {
