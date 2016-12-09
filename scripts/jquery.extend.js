@@ -18,11 +18,27 @@
 		}
 	};
 	
+	$.propHooks.checked = {
+		set:function(el,value) {
+			el.checked = value;
+			if (value == true) $(el).trigger("change");
+			else $(el).trigger("change");
+		}
+	};
+	
 	$.attrHooks.disabled = {
 		set:function(el,value) {
 			el.disabled = value;
 			if (value == true) $(el).trigger("disable");
 			else $(el).trigger("enable");
+		}
+	};
+	
+	$.attrHooks.checked = {
+		set:function(el,value) {
+			el.checked = value;
+			if (value == true) $(el).trigger("change");
+			else $(el).trigger("change");
 		}
 	};
 	
@@ -1389,13 +1405,25 @@
 		if (this.is("input, select, textarea, button") == true) {
 			this.prop("disabled",false);
 		}
+		
+		return this;
 	};
 	
 	$.fn.disable = function() {
 		if (this.is("input, select, textarea, button") == true) {
 			this.prop("disabled",true);
 		}
+		
+		return this;
 	};
+	
+	$.fn.checked = function(checked) {
+		if (this.is("input[type=radio]") == true || this.is("input[type=checkbox]") == true) {
+			this.prop("checked",checked);
+		}
+		
+		return this;
+	}
 	
 	$.fn.setDisabled = function(value) {
 		if (value == true) this.disable();
