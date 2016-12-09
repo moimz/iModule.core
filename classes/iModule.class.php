@@ -31,6 +31,8 @@ class iModule {
 	public $view;
 	public $idx;
 	
+	private $container = null;
+	
 	/**
 	 * DB접근을 줄이기 위해 DB에서 불러온 데이터를 저장할 변수를 정의한다.
 	 *
@@ -582,14 +584,19 @@ class iModule {
 	 * @param string $language 현재 접속한 언어설정이 아닌 다른 언어의 사이트로 연결하고자 할 경우 해당 언어셋 코드
 	 * @return string $url;
 	 */
-	function getUrl($menu=null,$page=null,$view=null,$number=null,$isFullUrl=false,$domain=null,$language=null) {
+	function getUrl($menu=null,$page=null,$view=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
+		if ($this->container != null) {
+			$container = explode('/',$this->container);
+			return $this->getModuleUrl($container[0],$container[1],$view,$idx,$isFullUrl,$domain,$language);
+		}
+		
 		/**
 		 * 전달된 값이 없거나, NULL 일 경우 현재 페이지의 값으로 설정한다.
 		 */
 		$menu = $menu === null ? $this->menu : $menu;
 		$page = $page === null && $menu == $this->menu ? $this->page : $page;
 		$view = $view === null && $menu == $this->menu && $page == $this->page ? $this->view : $view;
-		$number = $number === null && $menu == $this->menu && $page == $this->page && $view == $this->view ? $this->idx : $number;
+		$idx = $idx === null && $menu == $this->menu && $page == $this->page && $view == $this->view ? $this->idx : $idx;
 		
 		/**
 		 * $domain 의 값이 * 일 경우 현재 사이트의 도메인으로 설정한다.
@@ -623,8 +630,8 @@ class iModule {
 		$url.= '/'.$page;
 		if ($view === null || $view === false) return $url;
 		$url.= '/'.$view;
-		if ($number === null || $number === false) return $url;
-		$url.= '/'.$number;
+		if ($idx === null || $idx === false) return $url;
+		$url.= '/'.$idx;
 		
 		return $url;
 	}
@@ -657,14 +664,18 @@ class iModule {
 	 *
 	 * @param string $module 모듈이름
 	 * @param string $container 모듈의 index 파일이 처리할 컨테이너코드
+	 * @param string $view 모듈 컨텍스트의 View 값
 	 * @param string $idx 모듈별로 요구하는 고유값
 	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 제외한 URL(기본)
 	 * @param string $domain 현재 접속한 도메인이 아닌 다른 사이트로 연결하고자 할 경우 해당 사이트의 도메인
 	 * @param string $language 현재 접속한 언어설정이 아닌 다른 언어의 사이트로 연결하고자 할 경우 해당 언어셋 코드
 	 */
-	function getModuleUrl($module,$container=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
-		$domain = $domain == '*' ? $this->site->domain : $domain;
-		if ($isFullUrl == true || $domain !== $this->site->domain) {
+	function getModuleUrl($module,$container,$view=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
+		$domain = $domain == '*' || $domain == null ? $_SERVER['HTTP_HOST'] : $domain;
+		$view = $view === null ? $this->view : $view;
+		$idx = $idx === null ? $this->idx : $idx;
+		
+		if ($isFullUrl == true || $domain !== $_SERVER['HTTP_HOST']) {
 			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
 			if ($check == null) {
 				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
@@ -678,9 +689,13 @@ class iModule {
 		}
 		
 		$url.= '/'.($language == null ? $this->language : $language);
-		$url.= '/module/'.$module;
-		if ($container != null) $url.= '/'.$container;
-		if ($idx != null) $url.= '/'.$idx;
+		$url.= '/module/'.$module.'/'.$container;
+		
+		if ($view == null || $view == false) return $url;
+		$url.= '/'.$view;
+		
+		if ($idx == null || $idx == false) return $url;
+		$url.= '/'.$idx;
 		
 		return $url;
 	}
@@ -1243,6 +1258,13 @@ class iModule {
 	}
 	
 	/**
+	 * 모듈의 컨테이너모드를 활성화한다.
+	 */
+	function setContainerMode($module,$container) {
+		$this->container = $module.'/'.$container;
+	}
+	
+	/**
 	 * 사이트관리자에서는 기본적으로 ExtJS 라이브러리를 사용하나, 기타 사용자페이지에서 ExtJS 라이브러리를 로드할 경우 사용한다.
 	 * ExtJS라이브러리의 기본적인 스타일시트와 현재 설정된 사이트 언어셋에 따른 언어셋을 호출한다.
 	 */
@@ -1370,7 +1392,7 @@ class iModule {
 		/**
 		 * PHP 설정값들 중 자바스크립트에 필수적으로 필요한 정보를 불러온다.
 		 */
-		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null ? $this->menu : '').'&page='.($this->page != null ? $this->page : '').'&view='.($this->view != null ? $this->view : ''));
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null ? $this->menu : '').'&page='.($this->page != null ? $this->page : '').'&view='.($this->view != null ? $this->view : '').'&container='.($this->container != null ? $this->container : ''));
 		
 		/**
 		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.

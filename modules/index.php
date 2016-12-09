@@ -23,12 +23,14 @@ $IM = new iModule();
  */
 $module = Request('module');
 $container = Request('container');
+$view = Request('view');
 $idx = Request('idx');
+$IM->setContainerMode($module,$container);
 
 /**
  * 호출변수가 없거나 호출하려는 모듈이 설치가 되어 있지 않은 경우, 에러메세지를 출력한다.
  */
-if ($module === null || $container === null || $IM->getModule($module) === null) {
+if ($module === null || $container == null || $IM->getModule($module) === null) {
 	return $IM->printError('NOT_FOUND_MODULE');
 }
 
@@ -42,5 +44,5 @@ if (method_exists($IM->getModule($module),'getContainer') === false) {
 /**
  * 외부 컨테이너를 호출하여 출력한다.
  */
-echo $IM->getModule($module)->getContainer($container,$idx);
+echo $IM->getModule($module)->getContainer($container);
 ?>

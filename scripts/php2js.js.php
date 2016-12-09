@@ -16,6 +16,7 @@ header('Content-Type: application/x-javascript; charset=utf-8');
 $menu = Request('menu');
 $page = Request('page');
 $view = Request('view');
+$container = Request('container');
 $IM = new iModule();
 ?>
 var ENV = {
@@ -25,36 +26,35 @@ var ENV = {
 	MENU:<?php echo $menu ? '"'.$menu.'"' : 'null'; ?>,
 	PAGE:<?php echo $page ? '"'.$page.'"' : 'null'; ?>,
 	VIEW:<?php echo $view ? '"'.$view.'"' : 'null'; ?>,
+	CONTAINER:<?php echo $container ? '"'.$container.'"' : 'null'; ?>,
 	getProcessUrl:function(module,action) {
 		return ENV.DIR+"/"+ENV.LANGUAGE+"/process/"+module+"/"+action;
 	},
 	getApiUrl:function(module,api) {
 		return ENV.DIR+"/api/"+module+"/"+api;
 	},
-	getModuleUrl:function(module,container,idx,isFullUrl,domain,language) {
-		var container = container ? container : null;
-		var idx = idx ? idx : null;
-		var isFullUrl = isFullUrl === true;
-		var domain = domain ? domain : null;
-		var language = language ? language : ENV.LANGUAGE;
+	getModuleUrl:function(module,container,view,idx) {
+		var view = view === undefined ? null : view;
+		var idx = idx === undefined ? null : idx;
 		
-		var url = "";
-		if (isFullUrl == true || domain !== null) {
-			url+= domain ? domain : location.protocol+"//"+location.host;
-		}
-		url+= ENV.DIR;
+		view = view === null && menu == ENV.MENU && page == ENV.PAGE ? ENV.VIEW : view;
 		
-		url+= "/"+language+"/module/"+module;
-		if (container != null) url+= "/"+container;
-		if (idx != null) url+= "/"+idx;
+		var url = ENV.DIR;
+		url+= "/" + ENV.LANGUAGE + "/module/" + module + "/" + container;
+		if (view === null || view === false) return url
+		url+= "/"+view;
+		if (idx === null || idx === false) return url;
+		url+= "/"+idx;
 		
 		return url;
 	},
-	getUrl:function(menu,page,view,number) {
+	getUrl:function(menu,page,view,idx) {
+		if (ENV.CONTAINER !== null) return ENV.getModuleUrl(ENV.CONTAINER.split("/").shift(),ENV.CONTAINER.split("/").pop(),view,idx);
+		
 		var menu = menu === undefined ? null : menu;
 		var page = page === undefined ? null : page;
 		var view = view === undefined ? null : view;
-		var number = number === undefined ? null : number;
+		var idx = idx === undefined ? null : idx;
 		
 		menu = menu === null ? ENV.MENU : menu;
 		page = page === null && menu == ENV.MENU ? ENV.PAGE : page;
