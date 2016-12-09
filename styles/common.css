@@ -158,7 +158,7 @@ div[data-role=input][data-type=checkbox] > label > button.checkbox {display:inli
 div[data-role=input][data-type=checkbox] > label > button.checkbox.on {background:#43b3ec; border-color:#5891dd; font-family:moimz; line-height:22px; color:#fff; text-align:center; padding-right:1px;}
 div[data-role=input][data-type=checkbox] > label > button.checkbox.on:before {content:"\eb10";}
 div[data-role=input][data-type=checkbox] > label > button.checkbox:focus {border-color:#66afe9;}
-div[data-role=input][data-type=checkbox].disabled > label {opacity:0.5;}
+div[data-role=input][data-type=checkbox].disabled > label {opacity:0.5; cursor:not-allowed;}
 div[data-role=input][data-type=checkbox].disabled > label > button {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
 div[data-role=input][data-type=checkbox].error > label {color:#f44336;}
 div[data-role=input][data-type=checkbox].error > label > button {border-color:#f44336;}
