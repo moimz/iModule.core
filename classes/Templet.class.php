@@ -47,9 +47,9 @@ class Templet {
 	private $loaded = false;
 	
 	/**
-	 * 에러발생여부
+	 * 마지막에 발생한 에러메세지
 	 */
-	private $isError = false;
+	private $lastError = null;
 	
 	/**
 	 * 호출한 대상정보
@@ -476,21 +476,21 @@ class Templet {
 	 *
 	 * @param string $code 에러코드 (에러코드는 iModule 코어에 의해 해석된다.)
 	 * @param object $value 에러코드에 따른 에러값
-	 * @param boolean $isError 컨텍스트 전체 에러메세지인지 여부
 	 * @return $html 에러메세지 HTML
 	 */
-	function getError($code,$value=null,$isError=true) {
+	function getError($code,$value=null) {
 		/**
 		 * 이미 에러메세지가 출력된 상태라면, 다음 에러메세지는 출력하지 않는다.
 		 */
-		if ($this->isError === true) return '';
+		if ($this->lastError !== null) return $this->lastError;
 		
 		/**
 		 * iModule 코어를 통해 에러메세지를 구성한다.
 		 */
-		$this->isError = $isError;
 		$error = $this->getErrorText($code,$value,true);
-		return $this->IM->getError($error);
+		
+		$this->lastError = $this->IM->getError($error);
+		return $this->lastError;
 	}
 	
 	/**
@@ -718,7 +718,7 @@ class Templet {
 		/**
 		 * 에러메세지가 출력된 상태라면, 템플릿 컨텍스트를 반환하지 않는다.
 		 */
-		if ($this->isError === true) return '';
+		if ($this->lastError !== null) return $this->lastError;
 		
 		/**
 		 * 템플릿폴더에 파일이 없다면 에러메세지를 출력한다.
@@ -831,7 +831,7 @@ class Templet {
 		/**
 		 * 에러메세지가 출력된 상태라면, 템플릿 컨텍스트를 반환하지 않는다.
 		 */
-		if ($this->isError === true) return '';
+		if ($this->lastError !== null) return $this->lastError;
 		
 		/**
 		 * 템플릿폴더에 외부파일이 없다면 에러메세지를 출력한다.
