@@ -153,7 +153,7 @@ function GetTime($format,$time=null) {
 		'U' => 'X'
 	);
 	$momentFormat = strtr($format,$replacements);
-	return '<time data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
+	return '<time datetime="'.date('c',$time).'" data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
 }
 
 function GetString($str,$code) {
