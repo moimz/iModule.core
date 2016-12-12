@@ -307,13 +307,27 @@ class mysql {
 	}
 	
 	public function has() {
-		$this->getOne();
-		return $this->count >= 1;
+		return $this->count() > 0;
 	}
 	
 	public function count() {
-		$this->get();
-		return $this->count;
+		if (count($this->_groupBy) == 0) {
+			$this->_query = preg_replace('/SELECT (.*?) FROM /','SELECT COUNT(*) AS ROW_COUNT FROM ',$this->_query);
+			$stmt = $this->_buildQuery();
+			$stmt->execute();
+			$result = $this->_dynamicBindResults($stmt);
+			
+			return $result[0]->ROW_COUNT;
+		} else {
+			$this->_query = preg_replace('/SELECT (.*?) FROM /','SELECT '.$this->_groupBy[0].' FROM ',$this->_query);
+			$stmt = $this->_buildQuery();
+			$stmt->execute();
+			$stmt->store_result();
+			$count = $stmt->num_rows;
+			
+			$stmt->free_result();
+			return $count;
+		}
 	}
 	
 	public function get() {
