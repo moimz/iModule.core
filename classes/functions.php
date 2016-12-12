@@ -153,12 +153,19 @@ function GetTime($format,$time=null) {
 		'U' => 'X'
 	);
 	$momentFormat = strtr($format,$replacements);
-	return '<span class="moment" data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</span>';
+	return '<time data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
 }
 
 function GetString($str,$code) {
 	switch ($code) {
 		case 'inputbox' :
+			$str = str_replace('<','&lt;',$str);
+			$str = str_replace('>','&gt;',$str);
+			$str = str_replace('"','&quot;',$str);
+			$str = str_replace("'",'\'',$str);
+		break;
+		
+		case 'input' :
 			$str = str_replace('<','&lt;',$str);
 			$str = str_replace('>','&gt;',$str);
 			$str = str_replace('"','&quot;',$str);

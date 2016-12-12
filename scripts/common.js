@@ -30,7 +30,7 @@ var iModule = {
 		/**
 		 * 시간출력
 		 */
-		$("*[data-role=time][data-time][data-moment]",$container).each(function() {
+		$("time[data-time][data-moment]",$container).each(function() {
 			if ($(this).attr("data-moment") == "fromNow") {
 				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).fromNow());
 			} else {
