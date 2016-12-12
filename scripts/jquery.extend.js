@@ -1455,6 +1455,37 @@
 			}
 		});
 	});
+	
+	/**
+	 * postMessage 이벤트처리
+	 */
+	$(window).on("message",function(e) {
+		if (e.originalEvent.data) {
+			var event = e.originalEvent.data.event;
+			
+			if (event == "init") {
+				var url = e.originalEvent.data.url;
+				
+				var parser = document.createElement("a");
+				parser.href = url;
+				
+				var $iframe = $("iframe[src^='"+parser.href+"']");
+				$iframe = $iframe.length == 0 ? $("iframe[src^='"+decodeURIComponent(parser.href)+"']") : $iframe;
+				$iframe = $iframe.length == 0 ? $("iframe[src^='"+parser.pathname+"']") : $iframe;
+				$iframe = $iframe.length == 0 ? $("iframe[src^='"+decodeURIComponent(parser.pathname)+"']") : $iframe;
+				
+				if ($iframe.length > 0) {
+					$iframe.triggerHandler("init");
+				}
+			} else {
+				var id = e.originalEvent.data.id;
+				var data = e.originalEvent.data.data;
+				var $iframe = $("#"+id);
+				if ($iframe.length == 0) return;
+				$iframe.triggerHandler(event,data);
+			}
+		}
+	});
 	/*
 	$.fn.positionScroll = function() {
 		if (this.offset().top < $("body").scrollTop() + $("#iModuleNavigation.fixed").outerHeight() + 50) {
