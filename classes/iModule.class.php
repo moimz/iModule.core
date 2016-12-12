@@ -1483,17 +1483,6 @@ class iModule {
 	 * @return null
 	 */
 	function printError($code=null,$value=null,$message=null) {
-		/**
-		 * PHP 에러 발생으로 중단시
-		 */
-		if ($code == 'PHP_EXIT') {
-			$error = error_get_last();
-			if ($error == null || $error['type'] == E_NOTICE) return;
-			ob_clean();
-			$this->printError('PHP_ERROR',$error);
-			exit;
-		}
-		
 		if (preg_match('/^NOT_FOUND/',$code) == true) {
 			header('HTTP/1.1 404 Not Found');
 		} elseif (preg_match('/^FORBIDDEN/',$code) == true) {
@@ -1870,11 +1859,6 @@ class iModule {
 		}
 		
 		/**
-		 * PHP 실행마침에 대한 에러핸들러를 지정한다.
-		 */
-		register_shutdown_function(array($this,'printError'),'PHP_EXIT');
-		
-		/**
 		 * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.
 		 */
 		$this->Module->loadGlobals();
@@ -1930,9 +1914,14 @@ class iModule {
 		$this->fireEvent('afterDoLayout','core','*',null,null,$html);
 		
 		/**
-		 * 사이트 HTML 코드를 출력한다.
+		 * PHP 에러가 발생하지 않았다면, 사이트 HTML 코드를 출력한다.
 		 */
-		echo $html;
+		$error = error_get_last();
+		if ($error == null || $error['type'] == E_NOTICE) {
+			echo $html;
+		} else {
+			$this->printError('PHP_ERROR',$error);
+		}
 	}
 	
 	/**
