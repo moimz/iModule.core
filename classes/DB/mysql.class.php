@@ -316,7 +316,7 @@ class mysql {
 			$stmt = $this->_buildQuery();
 			$stmt->execute();
 			$result = $this->_dynamicBindResults($stmt);
-			
+			$this->reset();
 			return $result[0]->ROW_COUNT;
 		} else {
 			$this->_query = preg_replace('/SELECT (.*?) FROM /','SELECT '.$this->_groupBy[0].' FROM ',$this->_query);
@@ -324,8 +324,8 @@ class mysql {
 			$stmt->execute();
 			$stmt->store_result();
 			$count = $stmt->num_rows;
-			
 			$stmt->free_result();
+			$this->reset();
 			return $count;
 		}
 	}
