@@ -898,9 +898,9 @@ class Templet {
 	 * @param string $file(옵션) 페이지 네비게이션 템플릿 파일명 (.php 제외)
 	 * @return string $html
 	 */
-	function GetPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
+	function getPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
 		$total = $total == 0 ? 1 : $total;
-	
+		
 		if ($mode == 'LEFT') {
 			$startPage = floor(($p-1)/$pagenum) * $pagenum + 1;
 			$endPage = $startPage + $pagenum - 1 < $total ? $startPage + $pagenum - 1 : $total;
@@ -909,6 +909,7 @@ class Templet {
 		} else {
 			$startPage = $p - floor($pagenum/2) > 0 ? $p - floor($pagenum/2) : 1;
 			$endPage = $p + floor($pagenum/2) > $pagenum ? $p + floor($pagenum/2) : $startPage + $pagenum - 1;
+			$endPage = $endPage > $total ? $total : $endPage;
 			$prevPageStart = null;
 			$nextPageStart = null;
 		}
@@ -918,7 +919,6 @@ class Templet {
 		
 		$IM = $this->IM;
 		$Templet = $this;
-		
 		
 		if ($file == null) {
 			ob_start();
