@@ -144,7 +144,7 @@ class Event {
 			unset($values->results);
 			
 			foreach ($values as $key=>$value) {
-				if (is_object($value) == true && get_class($value) != 'Event') unset($values->$key);
+				if (is_object($value) == true && get_class($value) == 'Event') unset($values->$key);
 			}
 		
 			$action = $caller;
