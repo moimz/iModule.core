@@ -377,7 +377,7 @@ var iModule = {
 			$modal.css("minWidth","").css("width","").css("minHeight","").css("height","");
 			
 			if ($modal.width() < maxWidth) {
-				if (width < $(window).width()) {
+				if (maxWidth < $(window).width()) {
 					$modal.css("minWidth",maxWidth+"px").css("width",maxWidth+"px");
 				} else {
 					$modal.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
@@ -385,10 +385,10 @@ var iModule = {
 			}
 			
 			if ($modal.height() < maxHeight) {
-				if (height < $(window).height()) {
+				if (maxHeight < $(window).height()) {
 					$modal.css("minHeight",maxHeight+"px").css("height",maxHeight+"px");
 				} else {
-					$modal.css("minHeight",($(window).width() - 20)+"px").css("height",($(window).height() - 20)+"px");
+					$modal.css("minHeight",($(window).height() - 20)+"px").css("height",($(window).height() - 20)+"px");
 				}
 			}
 			
@@ -411,7 +411,14 @@ var iModule = {
 			
 			$.send(url,data,function(result) {
 				if (result.success == true) {
-					iModule.modal.showHtml(result.modalHtml,callback);
+					if (result.modalHtml) {
+						iModule.modal.showHtml(result.modalHtml,callback);
+					} else if (result.open) {
+						window.open(result.open);
+						iModule.enable();
+					} else {
+						iModule.enable();
+					}
 				} else {
 					iModule.enable();
 				}
