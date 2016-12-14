@@ -478,5 +478,41 @@ var iModule = {
 				iModule.enable();
 			}
 		}
+	},
+	/**
+	 * 팝업창을 연다.
+	 *
+	 * @param string url 페이지 URL
+	 * @param int width 가로크기
+	 * @param int height 가로크기
+	 * @param boolean scroll 스크롤바여부
+	 * @param string name 창이름
+	 */
+	openPopup:function(url,width,height,scroll,name) {
+		var windowLeft = (screen.width - width) / 2;
+		var windowTop = (screen.height - height) / 2;
+		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
+		var opener = window.open("", name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
+		
+		if (opener) {
+			setTimeout(iModule.resizePopup,500,opener,url,width,height);
+		}
+	},
+	/**
+	 * 브라우져에 따라 팝업창 크기가 다르므로, 팝업창이 열린 후 정확한 사이트로 리사이징한다.
+	 *
+	 * @param DOM window 팝업 Window DOM 객체
+	 * @param string url 페이지 URL
+	 * @param int width 가로크기
+	 * @param int height 가로크기
+	 * @param boolean scroll 스크롤바여부
+	 * @param string name 창이름
+	 */
+	resizePopup:function(popup,url,width,height) {
+		var resizeWidth = width - $(popup.window).width();
+		var resizeHeight = height - $(popup.window).height();
+		
+		popup.window.resizeBy(resizeWidth,resizeHeight);
+		popup.location.href = url;
 	}
 };
