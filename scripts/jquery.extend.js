@@ -151,7 +151,7 @@
 					
 					var $parent = $(this).parent();
 					var $button = $("button",$parent);
-					var $item = $("option[value="+$(this).val()+"]",$(this));
+					var $item = $("option[value='"+$(this).val()+"']",$(this));
 					if ($item.length == 0) {
 					
 					} else {
@@ -198,10 +198,10 @@
 							$("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",1);
 						}
 						
-						if ($("li[data-value="+$value.attr("value")+"]",$lists).length == 0) {
+						if ($("li[data-value='"+$value.attr("value")+"']",$lists).length == 0) {
 							$(this).focus();
 						} else {
-							$("li[data-value="+$value.attr("value")+"]",$lists).focus();
+							$("li[data-value='"+$value.attr("value")+"']",$lists).focus();
 						}
 						e.preventDefault();
 						e.stopPropagation();
@@ -1137,11 +1137,15 @@
 			if ($(this).is("button") == true || $(this).is("input[type=submit]") == true) {
 				if (status == "loading") {
 					if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
+					$(this).attr("data-loading","TRUE");
 					$(this).html('<i class="mi mi-loading"></i>');
 					$(this).disable();
 				} else {
 					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
-					$(this).enable();
+					if ($(this).attr("data-loading") == "TRUE") {
+						$(this).enable();
+						$(this).attr("data-loading",null);
+					}
 				}
 			}
 			
@@ -1150,9 +1154,13 @@
 			 */
 			if ($(this).is("input,textarea,select") == true) {
 				if (status == "loading") {
+					$(this).attr("data-loading","TRUE");
 					$(this).disable();
 				} else {
-					$(this).enable();
+					if ($(this).attr("data-loading") == "TRUE") {
+						$(this).enable();
+						$(this).attr("data-loading",null);
+					}
 				}
 				
 				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
