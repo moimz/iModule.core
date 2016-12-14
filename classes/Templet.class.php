@@ -899,6 +899,8 @@ class Templet {
 	 * @return string $html
 	 */
 	function getPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
+		$link = $link.$this->IM->getQueryString();
+		
 		$total = $total == 0 ? 1 : $total;
 		
 		if ($mode == 'LEFT') {
