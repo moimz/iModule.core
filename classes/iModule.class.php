@@ -30,8 +30,7 @@ class iModule {
 	public $page;
 	public $view;
 	public $idx;
-	
-	private $container = null;
+	public $container = null;
 	
 	/**
 	 * DB접근을 줄이기 위해 DB에서 불러온 데이터를 저장할 변수를 정의한다.
@@ -709,7 +708,7 @@ class iModule {
 	 */
 	function getQueryString($query=array(),$queryString=null) {
 		$queryString = $queryString == null ? $_SERVER['QUERY_STRING'] : $queryString;
-		$query = array_merge(array('menu'=>'','page'=>'','view'=>'','idx'=>'','p'=>'','language'=>''),$query);
+		$query = array_merge(array('menu'=>'','page'=>'','view'=>'','idx'=>'','module'=>'','container'=>'','language'=>''),$query);
 		
 		if (isset($_SERVER['REDIRECT_URL']) == true && preg_match('/\/module\/([^\/]+)/',$_SERVER['REDIRECT_URL']) == true) $query = array_merge(array('container'=>'','idx'=>'','language'=>''),$query);
 		$querys = explode('&',$queryString);
@@ -1483,10 +1482,12 @@ class iModule {
 	 * @return null
 	 */
 	function printError($code=null,$value=null,$message=null) {
-		if (preg_match('/^NOT_FOUND/',$code) == true) {
-			header('HTTP/1.1 404 Not Found');
-		} elseif (preg_match('/^FORBIDDEN/',$code) == true) {
-			header('HTTP/1.1 403 Forbidden');
+		if (is_string($code) == true) {
+			if (preg_match('/^NOT_FOUND/',$code) == true) {
+				header('HTTP/1.1 404 Not Found');
+			} elseif (preg_match('/^FORBIDDEN/',$code) == true) {
+				header('HTTP/1.1 403 Forbidden');
+			}
 		}
 		
 		$this->setSiteTitle('ERROR!');
