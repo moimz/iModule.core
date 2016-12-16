@@ -32,7 +32,7 @@ function Request($var,$type='request') {
 function Encoder($value,$key='') {
 	global $_CONFIGS;
 	
-	$key = $key ? (strlen($key) == 32 ? $key : md5($key)) : md5($_CONFIGS->key);
+	$key = $key ? md5($key) : md5($_CONFIGS->key);
 	$padSize = 16 - (strlen($value) % 16);
 	$value = $value.str_repeat(chr($padSize),$padSize);
 	$output = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
@@ -42,7 +42,7 @@ function Encoder($value,$key='') {
 function Decoder($value,$key='') {
 	global $_CONFIGS;
 	
-	$key = $key ? (strlen($key) == 32 ? $key : md5($key)) : md5($_CONFIGS->key);
+	$key = $key ? md5($key) : md5($_CONFIGS->key);
 	$value = base64_decode(str_replace(' ','+',$value));
 	$output = mcrypt_decrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
 	$valueLen = strlen($output);
