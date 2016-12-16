@@ -489,6 +489,9 @@ var iModule = {
 	 * @param string name 창이름
 	 */
 	openPopup:function(url,width,height,scroll,name) {
+		if (screen.width < width) width = screen.width - 50;
+		if (screen.height < height) height = screen.height - 50;
+		
 		var windowLeft = (screen.width - width) / 2;
 		var windowTop = (screen.height - height) / 2;
 		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
