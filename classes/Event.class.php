@@ -129,6 +129,15 @@ class Event {
 		}
 		
 		/**
+		 * 회원인증
+		 */
+		if ($event == 'authorization') {
+			$type = $caller;
+			$token = $values;
+			unset($caller,$context,$results,$values);
+		}
+		
+		/**
 		 * 데이터처리
 		 */
 		if ($event == 'beforeGetData' || $event == 'afterGetData') {
