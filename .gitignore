@@ -14,3 +14,4 @@
 /widgets/*
 !/widgets/index.php
 .project
+iModule.preset.php
