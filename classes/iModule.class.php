@@ -279,8 +279,34 @@ class iModule {
 		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+			
+			/**
+			 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
+			 */
+			if (strpos($this->sites[$i]->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->sites[$i]->templet,1)) == true) {
+				$mModule = $this->getModule(substr($this->sites[$i]->templet,1));
+				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
+				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
+			} else {
+				$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+				
+				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
+					$sitemap[$j]->context = $sitemap[$j]->context == '' ? null : json_decode($sitemap[$j]->context);
+					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
+					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
+					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
+					
+					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+					
+					if ($sitemap[$j]->page == '') {
+						$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
+					} else {
+						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
+					}
+				}
+			}
 		}
-		
+		/*
 		$pages = $this->db()->select($this->table->sitemap)->orderBy('sort','asc')->get();
 		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
 			if ($pages[$i]->page == '') {
@@ -302,6 +328,7 @@ class iModule {
 				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu][] = $pages[$i];
 			}
 		}
+		*/
 	}
 	
 	/**
@@ -455,11 +482,13 @@ class iModule {
 	 * 모듈 클래스를 불러온다.
 	 * 이미 모듈 클래스가 선언되어 있다면 선언되어 있는 모듈클래스를 반환한다. (중복선언하지 않음)
 	 *
-	 * @param string $module 모듈이름 (/modules 내부의 해당모듈의 폴더명)
+	 * @param string $module(옵션) 모듈이름 (/modules 내부의 해당모듈의 폴더명)
 	 * @param boolean $isForceLoad(기본값 false) 모듈이 설치되어 있지 않더라도 모듈 클래스를 호출할지 여부
 	 * @return object $module 모듈클래스
 	 */
-	function getModule($module,$isForceLoad=false) {
+	function getModule($module=null,$isForceLoad=false) {
+		if ($module == null) return $this->Module;
+		
 		/**
 		 * 선언되어 있는 해당 모듈 클래스가 없을 경우, 새로 선언한다.
 		 */
@@ -541,6 +570,8 @@ class iModule {
 	 * @tode 첨부파일 저장되는 경로를 변경할 수 있는 설정값 추가
 	 */
 	function getAttachmentPath() {
+		global $_CONFIGS;
+		if (isset($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true) return $_CONFIGS->attachment->path;
 		return __IM_PATH__.'/attachments';
 	}
 	
@@ -552,6 +583,8 @@ class iModule {
 	 * @tode 첨부파일 저장되는 경로를 변경할 수 있는 설정값 추가
 	 */
 	function getAttachmentDir() {
+		global $_CONFIGS;
+		if (isset($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->dir) == true) return $_CONFIGS->attachment->dir;
 		return __IM_DIR__.'/attachments';
 	}
 	
@@ -829,8 +862,13 @@ class iModule {
 	function getPage() {
 		if ($this->site == null) return null;
 		
-		if ($this->page == null) return $this->getMenus($this->menu);
-		else return $this->getPages($this->menu,$this->page);
+		if ($this->page == null) {
+			$menu = $this->getMenus($this->menu);
+			if ($menu->type == 'PAGE') return $this->getPages($this->menu,$menu->context->page);
+			else return $menu;
+		} else {
+			return $this->getPages($this->menu,$this->page);
+		}
 	}
 	
 	/**
@@ -1610,6 +1648,13 @@ class iModule {
 	 */
 	function getPageContext($menu,$page) {
 		/**
+		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈의 컨텍스트를 호출한다.
+		 */
+		if (strpos($this->getSite()->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->getSite()->templet,1)) == true) {
+			return $this->getModule(substr($this->getSite()->templet,1))->getContext();
+		}
+		
+		/**
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
 		$config = $page == null ? $this->getMenus($menu) : $this->getPages($menu,$page);
@@ -1672,6 +1717,13 @@ class iModule {
 	 * @return string $layout 레이아웃 HTML
 	 */
 	function getContextLayout($menu,$page,$context) {
+		/**
+		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈에서 레이아웃을 처리한다.
+		 */
+		if (strpos($this->getSite()->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->getSite()->templet,1)) == true) {
+			return $context;
+		}
+		
 		/**
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
@@ -1862,7 +1914,7 @@ class iModule {
 		/**
 		 * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.
 		 */
-		$this->Module->loadGlobals();
+		$this->getModule()->loadGlobals();
 		
 		$site = $this->getSite();
 		

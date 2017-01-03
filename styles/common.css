@@ -130,7 +130,7 @@ div[data-role=input][data-type=select] > button > i {display:inline-block; width
 div[data-role=input][data-type=select] > button:focus, div[data-role=input][data-type=select] > button:active, div[data-role=input][data-type=select] > button.focus {border-color:#66afe9;}
 div[data-role=input][data-type=select] > button:focus > i, div[data-role=input][data-type=select] > button:active > i, div[data-role=input][data-type=select] > button.focus > i {color:#428bca;}
 div[data-role=input][data-type=select] > button:disabled {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
-div[data-role=input][data-type=select] > ul {list-style:none; border:1px solid #66afe9; box-sizing:border-box; width:100%; position:absolute; top:39px; left:0; z-index:10; background:#fff; display:none;}
+div[data-role=input][data-type=select] > ul {list-style:none; border:1px solid #66afe9; box-sizing:border-box; width:100%; position:absolute; top:39px; left:0; z-index:10; background:#fff; display:none; text-align:left;}
 div[data-role=input][data-type=select] > ul > li {height:38px; line-height:38px; padding:0px 10px; border-bottom:1px solid #e1e1e1; cursor:pointer; outline:none; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
 div[data-role=input][data-type=select] > ul > li:last-child {border-bottom:0px;}
 div[data-role=input][data-type=select] > ul > li:focus {color:#fff; background-color:#428bca;}
@@ -247,29 +247,32 @@ div[data-role=calendar] > div.dates > button:hover {background:#ff7829 !importan
  */
 ul[data-role=table] {list-style:none; min-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 
-ul[data-role=table] > li {display:table; width:100%; font-size:13px; min-height:60px; table-layout:fixed; box-sizing:border-box;}
+ul[data-role=table] > li {display:table; width:100%; font-size:13px; table-layout:fixed; box-sizing:border-box;}
 ul[data-role=table].inner > li {border-bottom:1px solid #e3e4e5;}
 ul[data-role=table].outer > li {border-left:1px solid #e3e4e5; border-right:1px solid #e3e4e5;}
 ul[data-role=table].inner.outer > li {border-right:0px;}
+ul[data-role=table].inner.outer > li > span:last-child {border-right:1px solid #e3e4e5;}
 
-ul[data-role=table] > li > span, ul[data-role=table] > li.thead > a {display:table-cell; vertical-align:top; box-sizing:border-box;}
+ul[data-role=table] > li > span, ul[data-role=table] > li.thead > a {display:table-cell; vertical-align:top; box-sizing:border-box; height:60px;}
 ul[data-role=table] > li > span.thead {background:#f4f4f4; font-weight:bold;}
 ul[data-role=table] > li.thead {border-top:2px solid transparent; border-bottom:1px solid #e3e4e5;}
 ul[data-role=table].red > li.thead {border-top-color:#f44336;}
 ul[data-role=table].black > li.thead {border-top-color:#222;}
 
-ul[data-role=table] > li.thead > span, ul[data-role=table] > li.thead > a {background:#f4f4f4; font-weight:bold; text-align:center; height:60px; vertical-align:middle; line-height:1.6; padding:10px 0px;}
+ul[data-role=table] > li.thead > span, ul[data-role=table] > li.thead > a {background:#f4f4f4; font-weight:bold; text-align:center; vertical-align:middle; line-height:1.6; padding:10px 0px;}
 ul[data-role=table] > li.thead > a {color:#333; text-decoration:none;}
 ul[data-role=table] > li.thead > a > i {margin-left:5px;}
-ul[data-role=table] > li.tbody {border-bottom:1px solid #e3e4e5;}
-ul[data-role=table] > li.tbody > span {height:40px; vertical-align:middle; padding:0px 10px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
-ul[data-role=table] > li.tbody > span.multiline {line-height:20px; white-space:normal;}
+ul[data-role=table] > li.tbody {border-bottom:1px solid #e3e4e5; background:#fff;}
+ul[data-role=table] > li.tbody > span {vertical-align:middle; padding:0px 10px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
+ul[data-role=table] > li.tbody > span.multiline {line-height:20px; padding:10px; height:auto; white-space:normal;}
 ul[data-role=table] > li.tbody > span.center {text-align:center;}
 
 ul[data-role=table].inner > li > span, ul[data-role=table].inner > li > a {border-right:1px solid #e3e4e5;}
 ul[data-role=table].inner > li > span:last-child {border-right:0px;}
 ul[data-role=table].view > li > span.thead {width:160px; padding-left:15px; line-height:40px;}
-ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-height:1.6;}
+ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-height:1.6; background:#fff;}
+
+ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
 
 /**
  * 폼 테이블
@@ -324,4 +327,9 @@ div[data-role=pagination] > div > ul > li.disabled > a:hover {border-color:trans
 	ul[data-role=form] > li > label:after {content:" :";}
 	ul[data-role=form] > li > div {display:block; padding:5px 0px 10px 0px; min-height:40px; line-height:40px;}
 	ul[data-role=form] > li > label + div {padding-left:0px;}
+	
+	/**
+	 * 테이블
+	 */
+	ul[data-role=table] > li > span, ul[data-role=table] > li.thead > a {height:50px; font-size:12px;}
 }

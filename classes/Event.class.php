@@ -194,7 +194,7 @@ class Event {
 			/**
 			 * 사이트관리자 사이트맵 관리에서 설정된 환경설정
 			 */
-			$configs = $values->configs;
+			$configs = isset($values->configs) == true ? $values->configs : null;
 			unset($values->configs);
 			
 			if (strpos($event,'before') === 0) unset($html);

@@ -84,13 +84,21 @@ class Templet {
 		$this->callerType = get_class($caller);
 		
 		if ($this->callerType == 'iModule') {
-			$this->templetPath = __IM_PATH__.'/templets/'.$templet;
-			$this->templetDir = __IM_DIR__.'/templets/'.$templet;
+			/**
+			 * 사이트모듈일 경우
+			 */
+			if (strpos($templet,'#') === 0) {
+				$this->templetPath = __IM_PATH__.'/modules/'.substr($templet,1).'/templets';
+				$this->templetDir = __IM_DIR__.'/modules/'.substr($templet,1).'/templets';
+			} else {
+				$this->templetPath = __IM_PATH__.'/templets/'.$templet;
+				$this->templetDir = __IM_DIR__.'/templets/'.$templet;
+			}
 		}
 		
 		if ($this->callerType == 'Module') {
 			/**
-			 * 사이트템플릿에 종속되어 있는 위젯템플릿일 경우
+			 * 사이트템플릿에 종속되어 있는 모듈템플릿일 경우
 			 */
 			if (preg_match('/^@/',$templet) == true) {
 				$temp = explode('.',preg_replace('/^@/','',$templet));
@@ -105,9 +113,13 @@ class Templet {
 					$siteTemplet = $temp[0];
 					$moduleTemplet = $temp[1];
 				}
+				$siteTemplet = $this->IM->getTemplet($this->IM,$siteTemplet);
 				
-				$this->templetPath = __IM_PATH__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/'.$moduleTemplet;
-				$this->templetDir = __IM_DIR__.'/templets/'.$siteTemplet.'/modules/'.$caller->getName().'/'.$moduleTemplet;
+				$this->templetPath = $siteTemplet->getPath().'/modules/'.$caller->getName().'/'.$moduleTemplet;
+				$this->templetDir = $siteTemplet->getDir().'/modules/'.$caller->getName().'/'.$moduleTemplet;
+			} elseif ($templet == '#') {
+				$this->templetPath = $caller->getPath().'/templets';
+				$this->templetDir = $caller->getDir().'/templets';
 			} else {
 				$this->templetPath = $caller->getPath().'/templets/'.$templet;
 				$this->templetDir = $caller->getDir().'/templets/'.$templet;
@@ -125,6 +137,7 @@ class Templet {
 			 */
 			if (preg_match('/^@/',$templet) == true) {
 				$temp = explode('.',preg_replace('/^@/','',$templet));
+				
 				/**
 				 * 사이트템플릿명이 없을 경우, 현재 사이트의 템플릿을 사용한다.
 				 */
@@ -136,8 +149,10 @@ class Templet {
 					$widgetTemplet = $temp[1];
 				}
 				
-				$this->templetPath = __IM_PATH__.'/templets/'.$siteTemplet.'/widgets/'.$caller->getName().'/'.$widgetTemplet;
-				$this->templetDir = __IM_DIR__.'/templets/'.$siteTemplet.'/widgets/'.$caller->getName().'/'.$widgetTemplet;
+				$siteTemplet = $this->IM->getTemplet($this->IM,$siteTemplet);
+				
+				$this->templetPath = $siteTemplet->getPath().'/widgets/'.$caller->getName().'/'.$widgetTemplet;
+				$this->templetDir = $siteTemplet->getDir().'/widgets/'.$caller->getName().'/'.$widgetTemplet;
 			} else {
 				/**
 				 * 모듈에 종속된 위젯의 경우
@@ -267,6 +282,15 @@ class Templet {
 				}
 			}
 			@closedir($templetsPath);
+			
+			/**
+			 * 사이트를 구성하는 모듈을 찾는다.
+			 */
+			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->where('is_templet','TRUE')->get();
+			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
+				$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module);
+				$templets[] = $templet;
+			}
 		}
 		
 		if ($type == 'Module') {
@@ -556,10 +580,15 @@ class Templet {
 		
 		$Templet = $this;
 		
-		if (is_file($this->getPath().'/header.php') == true) {
-			ob_start();
-			INCLUDE $this->getPath().'/header.php';
-			$html.= ob_get_clean();
+		/**
+		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getHeader 메소드가 있는 경우 iModule 코어에서는 템플릿 header 파일을 불러오지 않는다.
+		 */
+		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(substr($this->getName(),1)),'getHeader') == false) {
+			if (is_file($this->getPath().'/header.php') == true) {
+				ob_start();
+				INCLUDE $this->getPath().'/header.php';
+				$html.= ob_get_clean();
+			}
 		}
 		
 		/**
@@ -632,10 +661,15 @@ class Templet {
 		
 		$Templet = $this;
 		
-		if (is_file($this->getPath().'/footer.php') == true) {
-			ob_start();
-			INCLUDE $this->getPath().'/footer.php';
-			$html.= ob_get_clean();
+		/**
+		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getFooter 메소드가 있는 경우 iModule 코어에서는 템플릿 footer 파일을 불러오지 않는다.
+		 */
+		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(substr($this->getName(),1)),'getFooter') == false) {
+			if (is_file($this->getPath().'/footer.php') == true) {
+				ob_start();
+				INCLUDE $this->getPath().'/footer.php';
+				$html.= ob_get_clean();
+			}
 		}
 		
 		/**

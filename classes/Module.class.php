@@ -70,9 +70,18 @@ class Module {
 		
 		/**
 		 * 설치된 모듈에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
-		 * DB접근을 줄이기 위하여 60초동안 모든 모듈에 대한 이벤트 리스너를 캐싱한다.
 		 */
-		if ($this->IM->cache()->check('core','modules','all') > time() - 60) {
+		$this->addEventListener();
+	}
+	
+	/**
+	 * 설치된 모듈에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
+	 * DB접근을 줄이기 위하여 60초동안 모든 모듈에 대한 이벤트 리스너를 캐싱한다.
+	 *
+	 * @param boolean $is_force_update 캐싱된 사항을 무시하고 강제로 업데이트할지 여부(기본값 : false)
+	 */
+	function addEventListener($is_force_update=false) {
+		if ($is_force_update == false && $this->IM->cache()->check('core','modules','all') > time() - 60) {
 			$modules = json_decode($this->IM->cache()->get('core','modules','all'));
 		} else {
 			$modules = $this->IM->db()->select($this->table->module)->get();
@@ -512,6 +521,17 @@ class Module {
 	}
 	
 	/**
+	 * [코어/모듈내부] 모듈이 사이트맵 구성을 처리하는지 여부를 확인한다.
+	 *
+	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
+	 * @return boolean $sitemap
+	 */
+	function isSitemap($module=null) {
+		$installed = $this->getInstalled($module);
+		return $installed->is_sitemap == 'TRUE';
+	}
+	
+	/**
 	 * [사이트관리자] 모듈의 설치조건이 만족하는지 확인한다.
 	 *
 	 * @param string $module 모듈명
@@ -616,7 +636,6 @@ class Module {
 		
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
-		// insert module table
 		if ($this->isInstalled($module) == false) {
 			$this->IM->db()->insert($this->table->module,array(
 				'module'=>$module,
@@ -628,9 +647,13 @@ class Module {
 				'is_context'=>isset($package->context) == true && $package->context === true ? 'TRUE' : 'FALSE',
 				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
+				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
+				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
 				'targets'=>$targets
 			))->execute();
+			
+			$mode = 'install';
 		} else {
 			$this->IM->db()->update($this->table->module,array(
 				'hash'=>$this->getHash($module),
@@ -641,12 +664,22 @@ class Module {
 				'is_context'=>isset($package->context) == true && $package->context === true ? 'TRUE' : 'FALSE',
 				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
+				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
+				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
 				'targets'=>$targets
 			))->where('module',$module)->execute();
+			
+			$mode = 'update';
 		}
 		
 		if ($isUpdateSize === true) $this->updateSize($module);
+		
+		/**
+		 * 이벤트리스너를 업데이트하고 이벤트를 발생시킨다.
+		 */
+		$this->addEventListener();
+		$this->IM->fireEvent('afterInstall','core',$mode);
 		
 		return true;
 	}

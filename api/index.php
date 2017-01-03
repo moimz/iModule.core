@@ -18,7 +18,7 @@ REQUIRE_ONCE str_replace('/api','',dirname($_SERVER['SCRIPT_FILENAME'])).'/confi
 $IM = new iModule();
 $headers = getallheaders();
 
-header('Access-Control-Allow-Origin:'.$headers['Origin']);
+header('Access-Control-Allow-Origin:'.(isset($headers['Origin']) == true ? $headers['Origin'] : '*'));
 header('Access-Control-Allow-Credentials:true');
 header('Access-Control-Allow-Headers:Authorization');
 header('Access-Control-Allow-Methods:*');

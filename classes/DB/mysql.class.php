@@ -37,7 +37,7 @@ class mysql {
 			$this->isSubQuery = $isSubQuery;
 			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port) or $this->error('There was a problem connecting to the database');
 			
-			$this->version = $this->_mysqli->server_version;
+			$this->version = $this->_mysqli->server_info;
 			if (version_compare($this->version,'5.6.4','>=') == true) $this->engine = 'InnoDB';
 			else $this->engine = 'MyISAM';
 			if (version_compare($this->version,'5.5.3','>=') == true) {
