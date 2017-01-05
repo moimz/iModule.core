@@ -571,6 +571,10 @@ class mysql {
 		
 		foreach ($tableData as $column=>$value) {
 			if ($isUpdate !== false) $this->_query.= '`'.$column.'` = ';
+			if (is_null($value) == true) {
+				$this->_query.= 'NULL,';
+				continue;
+			}
 			if (is_object($value) == true) {
 				$this->_query.= $this->_buildPair('',$value).',';
 				continue;
