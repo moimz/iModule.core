@@ -15,6 +15,7 @@
 		"close":"닫기",
 		"login":"로그인",
 		"logout":"로그아웃",
+		"delete":"삭제",
 		"back_to_main":"메인페이지로 돌아가기"
 	},
 	"action":{
