@@ -448,6 +448,8 @@
 									$(this).val(value.format(format));
 									$(this).data("wait",true);
 									
+									$(this).triggerHandler("change",[value.format(format)]);
+									
 									setTimeout(function($this) { $this.data("wait",false); },50,$(this));
 								}
 							}
@@ -475,6 +477,7 @@
 										$parent.removeClass("extend");
 										$input.focus();
 									}
+									$input.triggerHandler("change",[value]);
 								});
 							}
 							
@@ -796,7 +799,7 @@
 					$parent.data("moveInterval",null);
 				}
 				
-				setTimeout(function($this) {
+				var timeout = setTimeout(function($this) {
 					var interval = setInterval(function($this) {
 						$this.data("year",$this.data("year") - 1);
 						$this.calendar();
@@ -804,27 +807,45 @@
 					
 					$parent.data("moveInterval",interval);
 				},500,$parent);
+				$parent.data("moveTimeout",timeout);
 			});
 			$prev.on("mouseup",function(e) {
 				var $parent = $(this).parents("div[data-role=calendar]");
 				
-				if ($parent.data("moveInterval")) {
-					clearInterval($parent.data("moveInterval"));
-					$parent.data("moveInterval",null);
-					
-					e.stopPropagation();
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
 				}
-			});
-			$prev.on("mouseout",function(e) {
-				var $parent = $(this).parents("div[data-role=calendar]");
 				
 				if ($parent.data("moveInterval")) {
 					clearInterval($parent.data("moveInterval"));
 					$parent.data("moveInterval",null);
 				}
+				
+				e.stopPropagation();
+			});
+			$prev.on("mouseout",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
+				}
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				e.stopPropagation();
 			});
 			$prev.on("click",function(e) {
 				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
+				}
 				
 				if ($parent.data("moveInterval")) {
 					clearInterval($parent.data("moveInterval"));
@@ -857,7 +878,7 @@
 					$parent.data("moveInterval",null);
 				}
 				
-				setTimeout(function($this) {
+				var timeout = setTimeout(function($this) {
 					var interval = setInterval(function($this) {
 						$this.data("year",$this.data("year") + 1);
 						$this.calendar();
@@ -865,27 +886,45 @@
 					
 					$parent.data("moveInterval",interval);
 				},500,$parent);
+				$parent.data("moveTimeout",timeout);
 			});
 			$next.on("mouseup",function(e) {
 				var $parent = $(this).parents("div[data-role=calendar]");
 				
-				if ($parent.data("moveInterval")) {
-					clearInterval($parent.data("moveInterval"));
-					$parent.data("moveInterval",null);
-					
-					e.stopPropagation();
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
 				}
-			});
-			$next.on("mouseout",function(e) {
-				var $parent = $(this).parents("div[data-role=calendar]");
 				
 				if ($parent.data("moveInterval")) {
 					clearInterval($parent.data("moveInterval"));
 					$parent.data("moveInterval",null);
 				}
+				
+				e.stopPropagation();
+			});
+			$next.on("mouseout",function(e) {
+				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
+				}
+				
+				if ($parent.data("moveInterval")) {
+					clearInterval($parent.data("moveInterval"));
+					$parent.data("moveInterval",null);
+				}
+				
+				e.stopPropagation();
 			});
 			$next.on("click",function(e) {
 				var $parent = $(this).parents("div[data-role=calendar]");
+				
+				if ($parent.data("moveTimeout")) {
+					clearTimeout($parent.data("moveTimeout"));
+					$parent.data("moveTimeout",null);
+				}
 				
 				if ($parent.data("moveInterval")) {
 					clearInterval($parent.data("moveInterval"));
