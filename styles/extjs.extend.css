@@ -15,6 +15,11 @@
 .x-grid-button .x-grid-cell-inner button.red[disabled] {background:#e08485 !important;}
 
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
+.x-form-display-field-default {margin-top:0px; padding-top:8px;}
+/*
+.x-form-fieldset-grid {padding:5px 0px 0px 0px;}
+.x-form-fieldset-grid > legend {margin:0px 15px 0px 15px;}
+*/
 .x-legend-panel .x-panel-body-default {border-color:#fff !important;}
 .x-small-header .x-panel-header {padding:6px 8px !important;}
 .x-small-header .x-panel-header .x-panel-header-title-default {font-size:13px !important;}
@@ -45,5 +50,6 @@
 
 .x-main-panel .x-panel-header-default {background:#48535f; border:1px solid #2d3844;}
 .x-main-panel .x-panel-header-title-default {color:#adb3b8;}
-.x-menu-title {height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0;}
+.x-menu-title {max-width:250px; height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 .x-form-help {margin-top:5px; line-height:1.6; font-size:11px; color:#666;}
+.x-box-default {padding:8px; font-size:12px; line-height:1.6; background:#ffffef; color:#666;}
