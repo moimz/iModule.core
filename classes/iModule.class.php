@@ -1747,23 +1747,7 @@ class iModule {
 	 * @return string $context 컨텍스트 HTML
 	 */
 	function getExternalContext($external) {
-		/**
-		 * 파일명이 @ 로 시작할 경우 사이트 템플릿의 external 파일을 불러온다.
-		 */
-		if (strpos($external,'@') === 0) {
-			return $this->getSiteTemplet()->getExternal(substr($external,1));
-		} else {
-			if (file_exists(__IM_PATH__.'/externals/'.$external) == true) {
-				ob_start();
-				INCLUDE __IM_PATH__.'/externals/'.$external;
-				$html = ob_get_contents();
-				ob_end_clean();
-				
-				return $html;
-			} else {
-				return $this->getError('NOT_FOUND_EXTERNAL_FILE',__IM_PATH__.'/externals/'.$external);
-			}
-		}
+		return $this->getSiteTemplet()->getExternal($external);
 	}
 	
 	/**
@@ -1840,7 +1824,7 @@ class iModule {
 		// replace code
 		if ($member->idx == 0) {
 			$permissionString = str_replace('{$member.level}','0',$permissionString);
-			$permissionString = str_replace('{$member.type}',"'GURST'",$permissionString);
+			$permissionString = str_replace('{$member.type}',"'GUEST'",$permissionString);
 			$permissionString = str_replace('{$member.email}',"''",$permissionString);
 			$permissionString = str_replace('{$member.label}',"''",$permissionString);
 		} else {
