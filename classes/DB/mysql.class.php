@@ -26,6 +26,9 @@ class mysql {
 	private $_bindParams = array('');
 	private $_tableDatas = array();
 	private $_stmtError;
+	
+	private $_tableLockMethod = 'READ';
+	
 	private $isSubQuery = false;
 	public $count = 0;
 
@@ -63,6 +66,10 @@ class mysql {
 		return $this;
 	}
 	
+	function getTable($table) {
+		return $this->_prefix.$table;
+	}
+	
 	function error($msg,$query='') {
 		die($msg.'<br>'.$query);
 	}
@@ -95,6 +102,15 @@ class mysql {
 		$this->_stmtError = $stmt->error;
 		$this->reset();
 		return $this->_dynamicBindResults($stmt);
+	}
+	
+	public function unpreparedQuery($query) {
+		$stmt = $this->_mysqli->query($query);
+		if(!$stmt){
+			throw new Exception("Unprepared Query Failed, ERRNO: ".$this->_mysqli->errno." (".$this->_mysqli->error.")", $this->_mysqli->errno);
+		};
+		
+		return $stmt;
 	}
 	
 	public function query($query) {
@@ -821,6 +837,63 @@ class mysql {
 		$this->_mysqli->rollback();
 		$this->_transaction_in_progress = false;
 		$this->_mysqli->autocommit(true);
+	}
+	
+	public function setLockMethod($method) {
+		switch(strtoupper($method)) {
+			case 'READ' || 'WRITE':
+				$this->_tableLockMethod = $method;
+				break;
+			default:
+				throw new Exception('Bad lock type: Can be either READ or WRITE');
+				break;
+		}
+		return $this;
+	}
+	
+	public function lock($table) {
+		$this->_query = 'LOCK TABLES';
+		
+		if(gettype($table) == 'array') {
+			foreach($table as $key => $value) {
+				if(gettype($value) == 'string') {
+					if($key > 0) {
+						$this->_query .= ',';
+					}
+					$this->_query .= ' '.$this->_prefix.$value.' '.$this->_tableLockMethod;
+				}
+			}
+		} else{
+			$table = $this->_prefix.$table;
+			$this->_query = 'LOCK TABLES '.$table.' '.$this->_tableLockMethod;
+		}
+		
+		$result = $this->unpreparedQuery($this->_query);
+		$errno  = $this->_mysqli->errno;
+		
+		$this->reset();
+		
+		if ($result) {
+			return true;
+		} else {
+			throw new Exception('Locking of table '.$table.' failed', $errno);
+		}
+		
+		return false;
+	}
+	
+	public function unlock() {
+		$this->_query = 'UNLOCK TABLES';
+		$result = $this->unpreparedQuery($this->_query);
+		$errno  = $this->_mysqli->errno;
+		$this->reset();
+		if ($result) {
+			return $this;
+		} else {
+			throw new Exception('Unlocking of tables failed', $errno);
+		}
+		
+		return $this;
 	}
 	
 	public function _transaction_status_check() {
