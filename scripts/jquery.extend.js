@@ -531,6 +531,12 @@
 				$checkbox.hide();
 				$checkbox.after($icon);
 				
+				$icon.on("click",function(e) {
+					$checkbox.trigger("click");
+					e.preventDefault();
+					e.stopPropagation();
+				});
+				
 				if ($checkbox.is(":disabled") == true) {
 					$container.addClass("disabled");
 				}
