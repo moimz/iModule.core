@@ -624,7 +624,7 @@ class Module {
 				else $value = $type->value;
 				
 				if ($type->type == 'boolean') $value = $value === true || $value === 'on' ? true : false;
-				elseif ($type->type == 'array' && is_array($value) == false) $value = explode(',',$value);
+				elseif ($type->type == 'array' && is_array($value) == false) $value = json_decode($value);
 				elseif ($type->type == 'number' && is_numeric($value) == false) $value = floatVal($value);
 				
 				$configs->$config = $value;
