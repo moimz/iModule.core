@@ -79,7 +79,7 @@ class json {
 		
 		if ($http_code == 200) {
 			$data = json_decode($result);
-			if ($data->success == true) {
+			if ($data != null && $data->success == true) {
 				$this->count = count($data->data);
 				return $data->data;
 			}
