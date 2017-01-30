@@ -14,6 +14,8 @@ Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,en
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
 Ext.define("Ext.moimz.chart.CartesianChart",{override:"Ext.chart.CartesianChart",bodyBorder:false});
+Ext.define("Ext.moimz.form.field.ComboBox",{override:"Ext.form.field.ComboBox",queryMode:"local",editable:false,autoLoadOnValue:true});
+Ext.define("Ext.moimz.form.field.Date",{override:"Ext.form.field.Date",submitFormat:"Y-m-d",format:"Y-m-d"});
 Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",fieldStyle:{textAlign:"right"},
 	allowThousandSeparator:true,
 	submitLocaleSeparator:false,
@@ -165,7 +167,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		}
 	}
 });
-
+/*
 Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",onRender:function() {
 	this.callParent(arguments);
 	this.mixins.labelable.self.initTip();
@@ -174,7 +176,7 @@ Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",onRender:
 		this.setFieldLabel("<i class='required'>*</i>"+this.fieldLabel);
 	}
 }});
-
+*/
 Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:function(ct,position) {
 	var me = this;
 	me.callParent(arguments);
