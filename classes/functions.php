@@ -44,6 +44,7 @@ function Decoder($value,$key='') {
 	
 	$key = $key ? md5($key) : md5($_CONFIGS->key);
 	$value = base64_decode(str_replace(' ','+',$value));
+	
 	$output = mcrypt_decrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
 	$valueLen = strlen($output);
 	if ($valueLen % 16 > 0) return false;
@@ -604,6 +605,34 @@ function ForceFlush() {
 	set_error_handler(function() {});
 	ob_end_flush();
 	restore_error_handler();
+}
+
+/**
+ * HEX 컬러값을 RGB 컬러값으로 변환한다.
+ *
+ * @param string $hex
+ * @param int $opacity (옵션)
+ * @return string $rgb
+ */
+function GetHexToRgb($hex,$opacity=null) {
+	$hex = str_replace('#','',$hex);
+
+	if (strlen($hex) == 3) {
+		$r = hexdec(substr($hex,0,1).substr($hex,0,1));
+		$g = hexdec(substr($hex,1,1).substr($hex,1,1));
+		$b = hexdec(substr($hex,2,1).substr($hex,2,1));
+	} else {
+		$r = hexdec(substr($hex,0,2));
+		$g = hexdec(substr($hex,2,2));
+		$b = hexdec(substr($hex,4,2));
+	}
+	$rgb = array($r,$g,$b);
+	
+	if ($opacity != null) {
+		return $opacity === 1 || $opacity === true ? 'rgb('.$r.','.$g.','.$b.')' : 'rgba('.$r.','.$g.','.$b.','.$opacity.')';
+	} else {
+		return $rgb;
+	}
 }
 
 /**
