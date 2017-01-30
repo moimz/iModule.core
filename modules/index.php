@@ -27,6 +27,8 @@ $view = Request('view');
 $idx = Request('idx');
 $IM->setContainerMode($module,$container);
 
+define('__IS_MODULE_CONTAINER__',true);
+
 /**
  * 호출변수가 없거나 호출하려는 모듈이 설치가 되어 있지 않은 경우, 에러메세지를 출력한다.
  */
