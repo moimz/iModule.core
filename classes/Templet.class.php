@@ -100,7 +100,7 @@ class Templet {
 			/**
 			 * 사이트템플릿에 종속되어 있는 모듈템플릿일 경우
 			 */
-			if (preg_match('/^@/',$templet) == true) {
+			if (strpos($templet,'@') === 0) {
 				$temp = explode('.',preg_replace('/^@/','',$templet));
 				
 				/**
@@ -117,6 +117,19 @@ class Templet {
 				
 				$this->templetPath = $siteTemplet->getPath().'/modules/'.$caller->getName().'/'.$moduleTemplet;
 				$this->templetDir = $siteTemplet->getDir().'/modules/'.$caller->getName().'/'.$moduleTemplet;
+			} elseif (strpos($templet,'#') === 0) {
+				$temp = explode('.',preg_replace('/^#/','',$templet));
+				
+				/**
+				 * 사이트템플릿명이 없을 경우, 현재 사이트의 템플릿을 사용한다.
+				 */
+				if (count($temp) == 1) {
+					$this->templetPath = $caller->getPath().'/templets';
+					$this->templetDir = $caller->getDir().'/templets';
+				} else {
+					$this->templetPath = $this->IM->getModule()->getPath($temp[0]).'/templets/modules/'.$caller->getName().'/'.$temp[1];
+					$this->templetDir = $this->IM->getModule()->getDir($temp[0]).'/templets/modules/'.$caller->getName().'/'.$temp[1];
+				}
 			} elseif ($templet == '#') {
 				$this->templetPath = $caller->getPath().'/templets';
 				$this->templetDir = $caller->getDir().'/templets';
@@ -320,6 +333,23 @@ class Templet {
 				}
 			}
 			@closedir($siteTemplets);
+			
+			/**
+			 * 사이트를 구성하는 모듈을 찾는다.
+			 */
+			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->where('is_templet','TRUE')->get();
+			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
+				if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName()) == true) {
+					$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName());
+					while ($templetName = @readdir($templetsPath)) {
+						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName().'/'.$templetName) == true) {
+							$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName);
+							if ($templet->isLoaded() === true) $templets[] = $templet;
+						}
+					}
+					@closedir($templetsPath);
+				}
+			}
 		}
 		
 		return $templets;
@@ -868,7 +898,7 @@ class Templet {
 	 * @param string $file 확장자를 포함하는 외부파일
 	 * @return string $html 외부파일 HTML
 	 */
-	function getExternal($file) {
+	function getExternal($file,$values=array(),$header='',$footer='') {
 		/**
 		 * 에러메세지가 출력된 상태라면, 템플릿 컨텍스트를 반환하지 않는다.
 		 */
@@ -877,7 +907,23 @@ class Templet {
 		/**
 		 * 템플릿폴더에 외부파일이 없다면 에러메세지를 출력한다.
 		 */
-		if (is_file($this->getPath().'/externals/'.$file) == false) return $this->getError('NOT_FOUND_EXTERNAL_FILE',$this->getDir().'/externals/'.$file);
+		if (is_file(__IM_PATH__.$file) == false) return $this->getError('NOT_FOUND_EXTERNAL_FILE',__IM_DIR__.$file);
+		
+		$values = $this->getValues($values);
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetExternal',$this->caller->getName(),$file,$values,null);
+		
+		foreach ($values as $key=>$value) {
+			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
+		}
+		
+		$oTempletDir = $this->templetDir;
+		$temp = explode('/externals',$file);
+		$this->templetDir = $temp[0];
+		$this->templetPath = __IM_PATH__.$this->templetDir;
 		
 		/**
 		 * 템플릿파일에서 사용할 변수선언
@@ -915,8 +961,16 @@ class Templet {
 		$Templet = $this;
 		
 		ob_start();
-		INCLUDE $this->getPath().'/externals/'.$file;
+		INCLUDE __IM_PATH__.$file;
 		$html = ob_get_clean();
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetExternal',$this->caller->getName(),$file,$values,null,$html);
+		
+		$this->templetDir = $oTempletDir;
+		$this->templetPath = __IM_PATH__.$this->templetDir;
 		
 		return $html;
 	}
