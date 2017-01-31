@@ -669,6 +669,93 @@ class iModule {
 	}
 	
 	/**
+	 * 특정 모듈의 특정 컨텍스트를 사용하도록 설정된 페이지 URL을 반환한다.
+	 *
+	 * @param string $module 모듈명
+	 * @param string $context 컨텍스트명
+	 * @param string[] $extacts 반드시 일치해야하는 컨텍스트 옵션
+	 * @param string[] $options 반드시 일치할 필요는 없는 컨텍스트 옵션
+	 * @param boolean $isSameDomain 현재 도메인 우선모드 (기본값 : false, true 일 경우 같은 도메인일 경우 우선, false 일 경우 $options 설정값에 우선)
+	 */
+	function getContextUrl($module,$context,$exacts=array(),$options=array(),$isSameDomain=false,$matches=array()) {
+		if (count($matches) == 0) {
+			$pages = $this->db()->select($this->table->sitemap)->where('type','MODULE')->get();
+			foreach ($pages as $page) {
+				$page->context = json_decode($page->context);
+				
+				/**
+				 * 반드시 일치해야하는 설정값에 해당하는 페이지를 찾는다.
+				 */
+				if ($page->context->module == $module && $page->context->context == $context) {
+					$isMatched = true;
+					foreach ($exacts as $key=>$value) {
+						if ($page->context->configs->$key != $value) $isMatched = false;
+					}
+					
+					if ($isMatched == true) $matches[] = $page;
+				}
+			}
+		}
+		
+		/**
+		 * 설정과 일치하는 페이지가 없을 경우, NULL 을 반환한다.
+		 */
+		if (count($matches) == 0) return null;
+		
+		/**
+		 * 설정과 일치하는 페이지가 유일할 경우 해당 페이지를 반환한다.
+		 */
+		if (count($matches) == 1) return $matches[0];
+		
+		/**
+		 * 설정과 일치하는 페이지가 2개 이상일 경우, $options 설정이나, $isSameDomain 설정에 따라 최대한 일치하는 페이지를 재탐색한다.
+		 */
+		$filters = array();
+		
+		/**
+		 * 같은 도메인 우선일 경우
+		 */
+		if ($isSameDomain == true) {
+			foreach ($matches as $match) {
+				if ($match->domain == $this->site->domain) $filters[] = $match;
+			}
+			
+			/**
+			 * 같은 도메인에 설정과 일치하는 페이지가 없을 경우, $options 우선모드로 재탐색한다.
+			 */
+			if (count($filters) == 0) return $this->getContextUrl($module,$context,$exacts,$options,false,$matches);
+			
+			/**
+			 * 같은 도메인에 설정과 일치하는 페이지가 유일할 경우, 해당 페이지를 반환한다.
+			 */
+			if (count($filters) == 1) return $filters[0];
+			
+			/**
+			 * 같은 도메인에 설정과 일치하는 페이지가 2개 이상일 경우, $options 설정에 해당하는 것을 재탐색하기 위해 $matches 를 재정의한다.
+			 */
+			$matches = $filters;
+		}
+		
+		/**
+		 * $options 설정과 최대한 많이 일치하는 페이지를 재탐색한다.
+		 */
+		$page = null;
+		foreach ($matches as $match) {
+			/**
+			 * 일치하는 $options 설정값 갯수
+			 */
+			$match->matchCount = 0;
+			foreach ($options as $key=>$value) {
+				if ($match->context->configs->$key == $value) $match->matchCount++;
+			}
+			
+			if ($page == null || $page->matchCount < $match->matchCount) $page = $match;
+		}
+		
+		return $page;
+	}
+	
+	/**
 	 * 명령을 처리할 주소를 반환한다.
 	 *
 	 * @param string $module 모듈이름
