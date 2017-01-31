@@ -477,11 +477,13 @@ class Module {
 	 * [모듈내부] 모듈 템플릿의 package.json 정보를 가져온다.
 	 *
 	 * @param string $templet 템플릿명
+	 * @param object $configs 템플릿설정
 	 * @return Templet $templet 템플릿 객체
 	 */
-	function getTemplet($templet) {
+	function getTemplet($templet,$configs=null) {
 		if (isset($this->loadedTemplets[$templet]) == true) return $this->loadedTemplets[$templet];
 		$this->loadedTemplets[$templet] = $this->IM->getTemplet($this,$templet);
+		if ($configs != null) $this->loadedTemplets[$templet]->setConfigs($configs);
 		
 		return $this->loadedTemplets[$templet];
 	}
