@@ -625,13 +625,13 @@
 			var $tab = this;
 			var $tabBox = $("div[data-role=tab][data-name="+$tab.attr("data-name")+"]");
 			
-			if ($("li.selected",$tab).length == 0) {
-				var $first = $("li",$tab).first();
+			if ($("> li.selected",$tab).length == 0) {
+				var $first = $("> li",$tab).first();
 				$first.addClass("selected");
 				$tabBox.tab($first.attr("data-tab"));
 			}
 			
-			$("li[data-tab] > button",$tab).on("click",function() {
+			$("> li[data-tab] > button",$tab).on("click",function() {
 				var tab = $(this).parent().attr("data-tab");
 				var name = $(this).parent().parent().attr("data-name");
 				var $tabBox = $("div[data-role=tab][data-name="+name+"]");
@@ -644,13 +644,13 @@
 			var $tabBox = this;
 			var $tab = $("ul[data-role=tab][data-name="+$tabBox.attr("data-name")+"]");
 			
-			if ($("li.selected",$tab).length == 0) {
-				var tab = $("li",$tab).first().attr("data-tab");
+			if ($("> li.selected",$tab).length == 0) {
+				var tab = $("> li",$tab).first().attr("data-tab");
 			} else {
-				var tab = $("li.selected",$tab).attr("data-tab");
+				var tab = $("> li.selected",$tab).attr("data-tab");
 			}
 			
-			$("div[data-tab]",$tab).hide();
+			$("> div[data-tab]",$tab).hide();
 			this.data("isInit",true);
 			$tabBox.tab(tab);
 		}
@@ -1002,19 +1002,19 @@
 		if (this.is("div[data-role=tab]") == false || this.data("isInit") == false) return;
 		var $this = this;
 		var $tab = $("ul[data-role=tab][data-name="+this.attr("data-name")+"]");
-		var $box = $("div[data-tab="+tab+"]",this);
+		var $box = $("> div[data-tab="+tab+"]",this);
 		if ($box.length == 1) {
 			var position = $("body").scrollTop();
-			$("div[data-tab]:visible",this).hide();
-			$("div[data-tab]:visible",this).triggerHandler("hide");
+			$("> div[data-tab]:visible",this).hide();
+			$("> div[data-tab]:visible",this).triggerHandler("hide");
 			
-			$("div[data-tab="+tab+"]",this).show();
-			$("div[data-tab="+tab+"]",this).triggerHandler("show");
+			$("> div[data-tab="+tab+"]",this).show();
+			$("> div[data-tab="+tab+"]",this).triggerHandler("show");
 			
 			this.triggerHandler("tabchange",[tab]);
 			
-			$("li.selected",$tab).removeClass("selected");
-			$("li[data-tab="+tab+"]").addClass("selected");
+			$("> li.selected",$tab).removeClass("selected");
+			$("> li[data-tab="+tab+"]",$tab).addClass("selected");
 			
 			$("body").scrollTop(position);
 		}
