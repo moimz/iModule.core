@@ -111,15 +111,19 @@ div[data-role=inputset].inline > div[data-role=input]:first-child {margin-left:0
 div[data-role=inputset].flex {width:100%; min-height:40px; display:table; table-layout:fixed;}
 div[data-role=inputset].flex > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
 div[data-role=inputset].flex > div[data-role=input] > label {white-space:nowrap;}
-/*
-div[data-role=inputset].flex > div[data-role=input].flex {width:100%;}
-div[data-role=inputset].flex > div[data-role=input].flex2 {width:50%;}
-div[data-role=inputset].flex > div[data-role=input].flex3 {width:33.3333%;}
-div[data-role=inputset].flex > div[data-role=input].flex4 {width:25%;}
-div[data-role=inputset].flex > div[data-role=input].flex5 {width:20%;}
-*/
 div[data-role=inputset].flex > div[data-role=input]:first-child {border-left:0px;}
 div[data-role=inputset].flex > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:13px; line-height:40px;}
+
+div[data-role=inputset].grow {width:100%; min-height:40px; display:table;}
+div[data-role=inputset].grow > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
+div[data-role=inputset].grow > div[data-role=input] > label {white-space:nowrap;}
+div[data-role=inputset].grow > div[data-role=input].grow {width:100%;}
+div[data-role=inputset].grow > div[data-role=input].grow2 {width:50%;}
+div[data-role=inputset].grow > div[data-role=input].grow3 {width:33.3333%;}
+div[data-role=inputset].grow > div[data-role=input].grow4 {width:25%;}
+div[data-role=inputset].grow > div[data-role=input].grow5 {width:20%;}
+div[data-role=inputset].grow > div[data-role=input]:first-child {border-left:0px;}
+div[data-role=inputset].grow > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:13px; line-height:40px;}
 
 div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px; line-height:38px; padding:0px 15px; box-sizing:border-box; cursor:pointer; border:1px solid rgba(0,0,0,0.1); color:#666; background:#fff;}
 div[data-role=input][data-type=button] > button:hover {background:#f4f4f4; color:#333;}
@@ -277,6 +281,8 @@ ul[data-role=table].view > li > span.thead {width:160px; padding-left:15px; line
 ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-height:1.6; background:#fff;}
 
 ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
+
+ul[data-role=table] > li.empty {display:block; height:100px; line-height:100px; font-size:13px; color:#666; text-align:center;}
 
 /**
  * 캘린더 테이블
