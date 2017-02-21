@@ -154,7 +154,7 @@ if ($action == 'install') {
 				}
 				
 				if ($dbConnect->select('sitemap_table')->count() == 0) {
-					$dbConnect->insert('sitemap_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'menu'=>'index','page'=>'','title'=>'INDEX','type'=>'EXTERNAL','layout'=>'index','context'=>'{"external":"@index.php"}','sort'=>0))->execute();
+					$dbConnect->insert('sitemap_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'menu'=>'index','page'=>'','title'=>'INDEX','type'=>'EXTERNAL','layout'=>'index','context'=>'{"external":"\/templets\/default\/externals\/index.php"}','sort'=>0))->execute();
 				}
 				
 				$IM = new iModule();
