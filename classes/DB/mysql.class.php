@@ -662,6 +662,12 @@ class mysql {
 					
 					$this->_query.= $comparison;
 					break;
+				case 'is not':
+					$this->_query.= ' IS NOT NULL';
+					break;
+				case 'is':
+					$this->_query.= ' IS NULL';
+					break;
 				case 'not between':
 				case 'between':
 					$this->_query.= " $key ? AND ? ";
