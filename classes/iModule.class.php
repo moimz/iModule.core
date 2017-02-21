@@ -31,6 +31,7 @@ class iModule {
 	public $view;
 	public $idx;
 	public $container = null;
+	public $indexUrl = null;
 	
 	/**
 	 * DB접근을 줄이기 위해 DB에서 불러온 데이터를 저장할 변수를 정의한다.
@@ -1360,6 +1361,71 @@ class iModule {
 	}
 	
 	/**
+	 * view 값을 가져온다.
+	 * $baseUrl 값이 있을 경우, $baseUrl 에 설정된 view 를 무시하고 가져온다.
+	 *
+	 * @param string $baseUrl (옵션)
+	 * @return string $view
+	 */
+	function getView($baseUrl=null) {
+		if ($baseUrl != null) {
+			$baseUrl = explode('/',str_replace($this->getUrl(false),'',$baseUrl));
+			$baseView = count($baseUrl) > 3 ? $baseUrl[3] : null;
+			$baseIdx = count($baseUrl) > 4 ? implode('/',array_slice($baseUrl,4)) : null;
+		} else {
+			$baseView = $baseIdx = null;
+		}
+		
+		if ($baseView == null) return $this->view;
+		
+		$idx = $baseIdx == null ? $this->idx : str_replace($baseIdx,'',$this->idx);
+		$idx = $idx ? explode('/',$idx) : array();
+		
+		return count($idx) > 0 ? $idx[0] : null;
+	}
+	
+	/**
+	 * idx 값을 가져온다.
+	 * $baseUrl 값이 있을 경우, $baseUrl 에 설정된 idx 를 무시하고 가져온다.
+	 *
+	 * @param string $baseUrl (옵션)
+	 * @return string $idx
+	 */
+	function getIdx($baseUrl=null) {
+		if ($baseUrl != null) {
+			$baseUrl = explode('/',str_replace($this->getUrl(false),'',$baseUrl));
+			$baseView = count($baseUrl) > 3 ? $baseUrl[3] : null;
+			$baseIdx = count($baseUrl) > 4 ? implode('/',array_slice($baseUrl,4)) : null;
+		} else {
+			$baseView = $baseIdx = null;
+		}
+		
+		if ($baseUrl == null || $baseView == null) return $this->idx;
+		$idx = $baseIdx == null ? explode('/',$this->idx) : explode('/',str_replace($baseIdx,'',$this->idx));
+		
+		return count($idx) > 1 ? implode('/',array_splice($idx,1)) : null;
+	}
+	
+	/**
+	 * 인덱스 URL을 반환한다.
+	 *
+	 * @return string $url
+	 */
+	function getIndexUrl() {
+		return $this->indexUrl == null ? $this->getUrl(false) : $this->indexUrl;
+	}
+	
+	/**
+	 * 인덱스 페이지 URL 을 변경할 이유가 있을 경우 index url 을 변경한다.
+	 * 에러메세지 템플릿 등에서 이용된다.
+	 *
+	 * @param string $url 변경할 index url
+	 */
+	function setIndexUrl($url) {
+		$this->indexUrl = $url;
+	}
+	
+	/**
 	 * 이 함수가 호출된 이후부터 강제로 $view 를 변경하여 출력한다.
 	 * 한 페이지 내에서 2가지 view 를 사용할 경우 호출한다.
 	 *
@@ -1929,6 +1995,16 @@ class iModule {
 		
 		if (@eval('return '.$permissionString.';') == true) return true;
 		else return false;
+	}
+	
+	/**
+	 * 웹브라우져의 캐싱기능을 막는다.
+	 */
+	function preventCache() {
+		header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
+		header('Cache-Control: no-store, no-cache, must-revalidate');
+		header('Cache-Control: post-check=0, pre-check=0', FALSE);
+		header('Pragma: no-cache');
 	}
 	
 	/**
