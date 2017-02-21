@@ -1152,19 +1152,19 @@ class PHPExcelReader {
 		$this->reader = $reader->load($file);
 	}
 	
-	function CheckReadable() {
+	function checkReadable() {
 		return $this->canRead;
 	}
 
-	function GetExcel() {
+	function getExcel() {
 		return $this->reader;
 	}
 
-	function GetExcelSheetTitle($sheet=0) {
+	function getExcelSheetTitle($sheet=0) {
 		return $this->reader->getSheet($sheet)->getTitle();
 	}
 
-	function GetExcelAllData() {
+	function getExcelAllData() {
 		$data = array();
 		for ($i=0, $loop=$this->reader->getSheetCount();$i<$loop;$i++) {
 			$data[$this->GetExcelSheetTitle($i)] = $this->GetExcelData($i);
@@ -1173,7 +1173,7 @@ class PHPExcelReader {
 		return $data;
 	}
 
-	function GetExcelData($sheet=0) {
+	function getExcelData($sheet=0) {
 		$sheet = $this->reader->getSheet($sheet);
 		$column = $sheet->getHighestColumn();
 		$row = $sheet->getHighestRow();
@@ -1198,7 +1198,7 @@ class PHPExcelWriter {
 		$this->excel = $mPHPExcel;
 	}
 
-	function WriteExcel($name) {
+	function writeExcel($name) {
 		global $IM;
 		
 		$filepath = $IM->getModule('attachment')->getTempPath(true).'/'.$name;
@@ -1208,7 +1208,27 @@ class PHPExcelWriter {
 		return $filepath;
 	}
 	
-	function WritePDF() {
+	function downloadExcel($name) {
+		global $IM;
+		
+		$filepath = $IM->getModule('attachment')->getTempPath(true).'/'.$name;
+		$writer = PHPExcel_IOFactory::createWriter($this->excel,'Excel2007');
+		$writer->save($filepath);
+		
+		header("Pragma: no-cache");
+		header("Expires: 0");
+		header("Content-Type: application/vnd.ms-excel");
+		header("Content-Disposition: attachment; filename=\"".$name."\"; filename*=UTF-8\'\'".rawurlencode($name));
+		header("Content-Transfer-Encoding: binary");
+		header("Content-Length: ".filesize($filepath));
+		header("Connection: Keep-Alive");
+		
+		readfile($filepath);
+		
+		unlink($filepath);
+	}
+	
+	function writePDF() {
 		$filepath = './temps/'.time().'.'.rand(10000,99999).'.pdf';
 		$rendererName = PHPExcel_Settings::PDF_RENDERER_DOMPDF;
 		$rendererLibrary = 'domPDF';
