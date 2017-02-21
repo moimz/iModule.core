@@ -157,6 +157,27 @@ function GetTime($format,$time=null) {
 	return '<time datetime="'.date('c',$time).'" data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
 }
 
+function GetPhoneNumber($phone) {
+	$phone = str_replace('-','',$phone);
+	if (strlen($phone) < 9) return '';
+
+	if (substr($phone,0,2) == '02') {
+		if (strlen($phone) == 10) {
+			$value = substr($phone,0,2).'-'.substr($phone,2,4).'-'.substr($phone,6,4);
+		} else {
+			$value = substr($phone,0,2).'-'.substr($phone,2,3).'-'.substr($phone,5,4);
+		}
+	} else {
+		if (strlen($phone) == 11) {
+			$value = substr($phone,0,3).'-'.substr($phone,3,4).'-'.substr($phone,7,4);
+		} else {
+			$value = substr($phone,0,3).'-'.substr($phone,3,3).'-'.substr($phone,6,4);
+		}
+	}
+
+	return $value;
+}
+
 function GetString($str,$code) {
 	switch ($code) {
 		case 'inputbox' :
@@ -537,13 +558,13 @@ function CheckDirectoryPermission($dir,$permission) {
 function CreateDatabase($dbConnect,$schema) {
 	foreach ($schema as $table=>$structure) {
 		if ($dbConnect->exists($table) == false) {
-			if ($dbConnect->create($table,$structure) == false) return false;
+			if ($dbConnect->create($table,$structure) == false) return $table;
 		} elseif ($dbConnect->compare($table,$structure) == false) {
 			$rename = $table.'_BK'.date('YmdHis');
-			if ($dbConnect->rename($table,$rename) == false) return false;
+			if ($dbConnect->rename($table,$rename) == false) return $table;
 			if ($dbConnect->create($table,$structure) == false) {
 				$dbConnect->rename($rename,$table);
-				return false;
+				return $table;
 			}
 			
 			$data = $dbConnect->select($rename)->get();
