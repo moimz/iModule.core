@@ -436,8 +436,14 @@ class Templet {
 				$this->templetConfigs->$key->name = $key;
 				$this->templetConfigs->$key->type = $value->type;
 				$this->templetConfigs->$key->title = isset($value->title->{$this->IM->language}) == true ? $value->title->{$this->IM->language} : $value->title->{$package->language};
-				$this->templetConfigs->$key->help = isset($value->help->{$this->IM->language}) == true ? $value->help->{$this->IM->language} : $value->help->{$package->language};
-				$this->templetConfigs->$key->value = isset($value->default) == true ? $value->default : '';
+				if (isset($value->help) == true) {
+					$this->templetConfigs->$key->help = isset($value->help->{$this->IM->language}) == true ? $value->help->{$this->IM->language} : $value->help->{$package->language};
+				} else {
+					$this->templetConfigs->$key->help = null;
+				}
+				$this->templetConfigs->$key->default = isset($value->default) == true ? $value->default : null;
+				$this->templetConfigs->$key->is_multiple = isset($this->templetConfigs->$key->is_multiple) == true && $this->templetConfigs->$key->is_multiple === true;
+				if (isset($this->templetConfigs->$key->value) == false) $this->templetConfigs->$key->value = $this->templetConfigs->$key->default;
 			}
 		}
 		
