@@ -614,22 +614,36 @@ class Module {
 		 * 모듈에서 사용하는 DB테이블을 생성한다.
 		 */
 		if (isset($package->databases) == true) {
-			if (CreateDatabase($this->IM->db($database),$package->databases) == false) return 'DATABASE_ERROR';
+			$schema = CreateDatabase($this->IM->db($database),$package->databases);
+			if ($schema !== true) return $this->IM->getErrorText('DB_CREATE_TABLE_ERROR',$schema);
 		}
 		
 		if (isset($package->configs) == true) {
 			$configs = new stdClass();
+			$templetFields = array();
 			$installed = $this->isInstalled($module) == true ? json_decode($this->getInstalled($module)->configs) : new stdClass();
 			foreach ($package->configs as $config=>$type) {
 				if (isset($configDatas->$config) == true) $value = $configDatas->$config;
 				elseif (isset($installed->$config) == true) $value = $installed->$config;
-				else $value = $type->value;
+				else $value = isset($type->default) == true ? $type->default : '';
 				
 				if ($type->type == 'boolean') $value = $value === true || $value === 'on' ? true : false;
 				elseif ($type->type == 'array' && is_array($value) == false) $value = json_decode($value);
 				elseif ($type->type == 'number' && is_numeric($value) == false) $value = floatVal($value);
 				
+				if ($type->type == 'templet') $templetFields[] = $config;
+				
 				$configs->$config = $value;
+			}
+			
+			for ($i=0, $loop=count($templetFields);$i<$loop;$i++) {
+				if (isset($configs->{$templetFields[$i].'_configs'}) == false) $configs->{$templetFields[$i].'_configs'} = new stdClass();
+				
+				foreach ($configDatas as $key=>$value) {
+					if (preg_match('/^'.$templetFields[$i].'_configs_(.*?)$/',$key,$match) == true) {
+						$configs->{$templetFields[$i].'_configs'}->{$match[1]} = $value;
+					}
+				}
 			}
 		} else {
 			$configs = new stdClass();
