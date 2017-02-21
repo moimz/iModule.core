@@ -5,7 +5,8 @@
 		"keyword":"검색어",
 		"email":"이메일",
 		"password":"패스워드",
-		"nickname":"닉네임"
+		"nickname":"닉네임",
+		"error":"에러"
 	},
 	"button":{
 		"prev":"이전",
@@ -49,6 +50,7 @@
 		"REQUIRED_WIDGET_TEMPLET":"위젯 템플릿명이 입력되지 않았습니다.",
 		"REQUIRED_WIDGET_VALUE":"위젯에서 필요한 설정값이 입력되지 않았습니다.",
 		"DUPLICATED":"기존에 등록되어 있는 데이터와 중복됩니다.",
+		"INVALID_VALUE":"입력된 값이 유효하지 않습니다.",
 		"INVALID_LANGUAGE_CODE":"언어코드가 잘못 입력되었습니다. (영어소문자 2글자)",
 		"INVALID_FORM_DATA":"입력한 데이터에 오류가 있습니다.",
 		"INVALID_EMAIL":"이메일이 잘못 입력되었습니다.",
@@ -67,6 +69,7 @@
 		"NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING":"권한구문에는 쌍따옴표(\")를 입력할 수 없습니다.",
 		"PERMISSION_STRING_PARSING_FAILED":"권한구문을 해석할 수 없습니다.",
 		"NOT_BOOLEAN_PERMISSION_STRING_RESULT":"권한구문의 해석값이 TRUE or FALSE 가 아닙니다.",
-		"UNSELECTED":"항목이 선택되지 않았습니다."
+		"UNSELECTED":"항목이 선택되지 않았습니다.",
+		"DB_CREATE_TABLE_ERROR":"데이터베이스 테이블 생성에 실패하였습니다."
 	}
 }
