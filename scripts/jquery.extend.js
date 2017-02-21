@@ -42,6 +42,15 @@
 		}
 	};
 	
+	$.valHooks.select = {
+		set:function(el,value) {
+			if (typeof value == "string" && $(el).val() != value) {
+				el.value = value;
+				$(el).trigger("change");
+			}
+		}
+	};
+	
 	/**
 	 * 특정 객체나 오브젝트를 초기화한다.
 	 */
@@ -109,11 +118,13 @@
 				var $container = this;
 				
 				if (is_reset == true) {
-					var $select = $("select",this).clone();
-					$container.empty().append($select);
+					$("button",$container).remove();
+					$("ul",$container).remove();
+					var $select = $("select",$container);
+				} else {
+					var $select = this.children();
 				}
 				
-				var $select = this.children();
 				$container.attr("data-type","select");
 				if ($select.attr("name")) $container.attr("data-name",$select.attr("name"));
 				
@@ -134,44 +145,48 @@
 				
 				$select.data("submitValue",null);
 				
-				$select.on("disable",function() {
-					var $parent = $(this).parent();
-					var $button = $("button",$parent).disable();
-				});
+				if (is_reset == false) {
+					$select.on("disable",function() {
+						var $parent = $(this).parent();
+						var $button = $("button",$parent).disable();
+					});
+					
+					$select.on("enable",function() {
+						var $parent = $(this).parent();
+						var $button = $("button",$parent).enable();
+					});
 				
-				$select.on("enable",function() {
-					var $parent = $(this).parent();
-					var $button = $("button",$parent).enable();
-				});
-			
-				$select.on("change",function() {
-					if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
-						$(this).status("default");
-					}
-					
-					var $parent = $(this).parent();
-					var $button = $("button",$parent);
-					var $item = $("option[value='"+$(this).val()+"']",$(this));
-					if ($item.length == 0) {
-					
-					} else {
-						$("span",$button).html($item.html());
-					}
-				});
+					$select.on("change",function() {
+						if ($(this).isValid() !== null && $(this).data("submitValue") != $(this).val()) {
+							$(this).status("default");
+						}
+						
+						var $parent = $(this).parent();
+						var $button = $("button",$parent);
+						var $item = $("option[value='"+$(this).val()+"']",$(this));
+						if ($item.length == 0) {
+						
+						} else {
+							$("span",$button).html($item.html());
+						}
+					});
+				}
 				
 				/**
 				 * 모바일 브라우져에서는 Native UI 를 사용하도록 한다.
 				 */
 				if (iModule.isMobile == true) {
-					$select.on("focus",function() {
-						var $parent = $(this).parent();
-						var $button = $("button",$parent).addClass("focus");
-					});
-					
-					$select.on("blur",function() {
-						var $parent = $(this).parent();
-						var $button = $("button",$parent).removeClass("focus");
-					});
+					if (is_reset == false) {
+						$select.on("focus",function() {
+							var $parent = $(this).parent();
+							var $button = $("button",$parent).addClass("focus");
+						});
+						
+						$select.on("blur",function() {
+							var $parent = $(this).parent();
+							var $button = $("button",$parent).removeClass("focus");
+						});
+					}
 				} else {
 					var $lists = $("<ul>");
 					$("option",$select).each(function() {
@@ -317,7 +332,6 @@
 						var $select = $("select",$parent);
 						
 						$select.val($(this).attr("data-value"));
-						$select.triggerHandler("change");
 						
 						$button.click();
 						$button.focus();
@@ -1041,7 +1055,10 @@
 			dataType:"json",
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
-				if (result.success == false && result.message) iModule.alert.show("error",result.message,5);
+				if (result.success == false) {
+					if (result.message) iModule.alert.show("error",result.message,5);
+					if (result.error) iModule.modal.error(result.error,result.url ? result.url : null);
+				}
 			},
 			error:function() {
 				if (count == 3) {
@@ -1092,6 +1109,11 @@
 					iModule.alert.show("error",result.message);
 					$form.status("default");
 				}
+				
+				if (result.error) {
+					iModule.modal.error(result.error,result.url ? result.url : null);
+					$form.status("default");
+				}
 			},
 			error:function() {
 				/**
@@ -1134,7 +1156,7 @@
 	 */
 	$.fn.status = function(status,message) {
 		if (typeof this != "object") return;
-		var message = message ? message : null;
+		var message = message !== undefined ? message : null;
 		
 		this.each(function() {
 			/**
@@ -1173,24 +1195,58 @@
 					 */
 					$("input,textarea,select",$(this)).status(status,message);
 					$("button[type=submit]",$(this)).status(status);
+					$("button[type=button]",$(this)).status(status,false);
 				}
 			}
 			
 			/**
 			 * 객체가 submit 버튼일 경우
 			 */
-			if ($(this).is("button") == true || $(this).is("input[type=submit]") == true) {
+			if ($(this).is("button[type=submit]") == true || $(this).is("input[type=submit]") == true) {
 				if (status == "loading") {
 					if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
-					$(this).attr("data-loading","TRUE");
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
 					$(this).html('<i class="mi mi-loading"></i>');
 					$(this).disable();
-				} else {
+				} else if (status == "default" || status == "success" || status == "error") {
 					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
 					if ($(this).attr("data-loading") == "TRUE") {
 						$(this).enable();
 						$(this).attr("data-loading",null);
 					}
+				} else {
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
+					$(this).disable();
+				}
+			}
+			
+			/**
+			 * 객체가 버튼일 경우
+			 */
+			if ($(this).is("button[type=button]") == true) {
+				console.log("message",message);
+				var is_indicator = message !== false;
+				
+				if (status == "loading") {
+					if (is_indicator == true) {
+						if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
+						$(this).html('<i class="mi mi-loading"></i>');
+					}
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
+					$(this).disable();
+				} else if (status == "default" || status == "success" || status == "error") {
+					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
+					if ($(this).attr("data-loading") == "TRUE") {
+						$(this).enable();
+						$(this).attr("data-loading",null);
+					}
+				} else {
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
+					if (status == $(this).attr("data-action")) {
+						if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
+						$(this).html('<i class="mi mi-loading"></i>');
+					}
+					$(this).disable();
 				}
 			}
 			
@@ -1199,13 +1255,16 @@
 			 */
 			if ($(this).is("input,textarea,select") == true) {
 				if (status == "loading") {
-					$(this).attr("data-loading","TRUE");
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
 					$(this).disable();
-				} else {
+				} else if (status == "default" || status == "success" || status == "error") {
 					if ($(this).attr("data-loading") == "TRUE") {
 						$(this).enable();
 						$(this).attr("data-loading",null);
 					}
+				} else {
+					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
+					$(this).disable();
 				}
 				
 				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
@@ -1249,7 +1308,7 @@
 					if ($parent.data("isInit") !== true) $parent.inits();
 				}
 				
-				if ($inputbox.is("[data-role=inputset]") == true && $inputbox.hasClass("flex") == true) {
+				if ($inputbox.is("[data-role=inputset]") == true && ($inputbox.hasClass("flex") == true || $inputbox.hasClass("grow") == true)) {
 					$inputbox.next("div[data-role=help]").remove();
 					if (help !== null) $inputbox.after($help);
 				} else {
@@ -1504,7 +1563,7 @@
 		 */
 		$(document).on("keydown",function(e) {
 			if (e.keyCode == 27) {
-				iModule.modal.close();
+				iModule.modal.close(true);
 			}
 		});
 	});

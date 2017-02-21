@@ -182,6 +182,16 @@ var iModule = {
 		return depthSize > fileSize ? fileSize+"B" : depthSize * depthSize > fileSize ? (fileSize/depthSize).toFixed(2)+(isKiB == true ? "KiB" : "KB") : depthSize * depthSize * depthSize > fileSize ? (fileSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "MiB" : "MB") : (fileSize/depthSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "GiB" : "GB");
 	},
 	/**
+	 * 브라우져의 앞/뒤로 가기 버튼 클릭시 캐시사용을 막는다.
+	 */
+	preventCache:function() {
+		window.onpageshow = function(event) {
+			if (event.persisted) {
+				location.reload();
+			}
+		};
+	},
+	/**
 	 * 알림메세지 관련
 	 */
 	alert:{
@@ -424,6 +434,103 @@ var iModule = {
 				}
 			});
 		},
+		show:function(title,content,options,buttons,callback) {
+			var options = options ? options : {};
+			options.width = options.width ? options.width : 0;
+			options.height = options.height ? options.height : 0;
+			options.maxWidth = options.maxWidth ? options.maxWidth : 0;
+			options.maxHeight = options.maxHeight ? options.maxHeight : 0;
+			options.fullsize =  options.fullsize === true;
+			options.closable =  options.closable !== false;
+			
+			var $modal = $("<div>").attr("data-role","modal");
+			$modal.attr("data-closable",options.closable == true ? "true" : "false");
+			$modal.attr("data-fullsize",options.fullsize == true ? "true" : "false");
+			$modal.attr("data-width",options.width);
+			$modal.attr("data-height",options.height);
+			$modal.attr("data-max-width",options.maxWidth);
+			$modal.attr("data-max-height",options.maxHeight);
+			
+			var $form = $("<form>").attr("id","iModuleModalForm");
+			var $header = $("<header>");
+			var $title = $("<h1>").html(title);
+			$header.append($title);
+			
+			var $close = $("<button>").attr("type","button").attr("data-action","close").html('<i class="mi mi-close"></i>');
+			$header.append($close);
+			
+			$form.append($header);
+			
+			var $main = $("<main>").html(content);
+			$form.append($main);
+			
+			var $footer = $("<footer>");
+			
+			if (typeof buttons == "function") {
+				var $button = $("<button>").attr("type","button").attr("data-action","close").html(iModule.getText("button/close"));
+				$footer.append($("<div>").append($button));
+				var $submit = $("<button>").attr("type","submit").html(iModule.getText("button/confirm"));
+				$footer.append($("<div>").append($submit));
+				
+				var callback = buttons;
+			} else if (typeof buttons == "object") {
+				
+				for (var i=0, loop=buttons.length;i<loop;i++) {
+					var $button = $("<button>").attr("type","button").html(buttons[i].text);
+					
+					if (typeof buttons[i].click == "function") {
+						$button.on("click",buttons[i].click);
+					} else if (typeof buttons[i].click == "string") {
+						if (buttons[i].click == "submit") $button.attr("type","submit");
+						else $button.attr("data-action",buttons[i].click);
+					}
+					$footer.append($("<div>").append($button));
+				}
+			}
+			
+			$form.append($footer);
+			
+			$modal.append($form);
+			
+			iModule.modal.showHtml($modal,callback);
+		},
+		error:function(message,callback) {
+			var $modal = $("<div>").attr("data-role","modal");
+			$modal.attr("data-closable","true");
+			$modal.attr("data-fullsize","false");
+			$modal.attr("data-width",400);
+			$modal.attr("data-height",0);
+			$modal.attr("data-max-width",400);
+			$modal.attr("data-max-height",0);
+			
+			var $form = $("<form>").attr("id","iModuleModalForm");
+			var $header = $("<header>");
+			var $title = $("<h1>").html(iModule.getText("text/error"));
+			$header.append($title);
+			
+			var $close = $("<button>").attr("type","button").attr("data-action","close").html('<i class="mi mi-close"></i>');
+			$header.append($close);
+			
+			$form.append($header);
+			
+			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			$form.append($main);
+			
+			var $footer = $("<footer>");
+			
+			var $button = $("<button>").attr("type","submit").html(iModule.getText("button/confirm"));
+			$footer.append($("<div>").append($button));
+			
+			$form.append($footer);
+			
+			$modal.append($form);
+			
+			if (typeof callback == "string") {
+				callback = function(url) { location.href = url; }(callback);
+			}
+			
+			iModule.modal.showHtml($modal,callback);
+		},
 		showHtml:function(html,callback) {
 			iModule.disable();
 			
@@ -458,10 +565,14 @@ var iModule = {
 				iModule.modal.close();
 			});
 		},
-		close:function() {
+		close:function(check_closable) {
+			var check_closable = check_closable === true;
 			var $disabled = $("body > div[data-role=disabled]");
 			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
 			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
+			
+			if (check_closable === true && $modal.attr("data-closable") == "FALSE") return;
+			
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
 			
 			if ($("body").attr("data-scroll") !== undefined) {
