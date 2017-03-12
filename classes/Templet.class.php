@@ -408,11 +408,11 @@ class Templet {
 	 * @return Templet $this
 	 */
 	function setConfigs($values) {
-		if ($values === null) return $this;
+		if ($values === null || is_object($values) == false) return $this;
 		
 		$configs = $this->getConfigs();
 		foreach ($values as $key=>$value) {
-			$configs->{$key}->value = $value;
+			if (isset($configs->{$key}) == true) $configs->{$key}->value = $value;
 		}
 		
 		$this->templetConfigs = $configs;
