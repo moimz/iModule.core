@@ -23,6 +23,11 @@ var iModule = {
 		$("div[data-role=input]",$container).inits();
 		
 		/**
+		 * form 상태 초기화
+		 */
+		$("form").status("default");
+		
+		/**
 		 * tab 객체 초기화
 		 */
 		$("*[data-role=tab]",$container).inits();
@@ -474,7 +479,6 @@ var iModule = {
 				
 				var callback = buttons;
 			} else if (typeof buttons == "object") {
-				
 				for (var i=0, loop=buttons.length;i<loop;i++) {
 					var $button = $("<button>").attr("type","button").html(buttons[i].text);
 					
@@ -484,14 +488,14 @@ var iModule = {
 						if (buttons[i].click == "submit") $button.attr("type","submit");
 						else $button.attr("data-action",buttons[i].click);
 					}
+					
+					if (buttons[i].class) $button.addClass(buttons[i].class);
 					$footer.append($("<div>").append($button));
 				}
 			}
 			
 			$form.append($footer);
-			
 			$modal.append($form);
-			
 			iModule.modal.showHtml($modal,callback);
 		},
 		error:function(message,callback) {
@@ -540,23 +544,10 @@ var iModule = {
 			
 			var $modal = $(html);
 			$box.append($modal);
-/*
-			
-			if (iModule.isMobile == true) {
-				var position = $("body").scrollTop();
-				$("body").data("position",position);
-				$("body").addClass("mobile");
-				$("body > div[data-role=wrapper]").height(Math.max($(window).height(),$box.outerHeight(true))).scrollTop(position);
-				$("body").scrollTop(0);
-				$disabled.height(Math.max($(window).height(),$box.outerHeight(true)));
-				
-				$box.css("marginTop",-$box.outerHeight(true));
-				$box.animate({marginTop:0});
-			}
-*/
 			
 			iModule.modal.init();
 			var $form = $("#iModuleModalForm");
+			$form.status("default");
 			
 			if (typeof callback == "function" && callback($modal,$form) === false) return;
 			
@@ -564,6 +555,8 @@ var iModule = {
 				e.preventDefault();
 				iModule.modal.close();
 			});
+			
+			$modal.triggerHandler("show",[$modal]);
 		},
 		close:function(check_closable) {
 			var check_closable = check_closable === true;
@@ -580,6 +573,8 @@ var iModule = {
 				$("body").attr("data-scroll",null);
 				$("body").scrollTop(scroll);
 			}
+			
+			$modal.triggerHandler("close",[$modal]);
 			
 			if (iModule.isMobile == true) {
 				$box.animate({marginTop:-$box.outerHeight(true)},"",function() {
