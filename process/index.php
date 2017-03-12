@@ -15,17 +15,18 @@ REQUIRE_ONCE str_replace('/process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/c
  * iModule 코어클래스를 선언한다.
  */
 $IM = new iModule();
+$IM->setLanguage(Request('_language'));
 
 /**
  * 요청작업을 수행할 모듈 및 요청작업코드
  */
-$module = Request('module');
-$action = Request('action');
+$_module = Request('_module');
+$_action = Request('_action');
 
 /**
  * 관리자모듈과 첨부파일열기에서는 사이트 데이터를 초기화하지 않는다.
  */
-if ($module == 'admin' || ($module == 'attachment' && in_array($action,array('original','view','thumbnail','download')) == true)) {
+if ($_module == 'admin' || ($_module == 'attachment' && in_array($_action,array('original','view','thumbnail','download')) == true)) {
 	
 } else {
 	$site = $IM->getSite();
@@ -34,15 +35,15 @@ if ($module == 'admin' || ($module == 'attachment' && in_array($action,array('or
 /**
  * 작업코드가 @ 로 시작할 경우 관리자권한으로 동작하는 작업으로 관리자권한을 확인한다.
  */
-if (preg_match('/^@/',$action) == true && $IM->getModule('member')->isAdmin() == false) {
+if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() == false) {
 	header('Content-type:text/json; charset=utf-8',true);
 	header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 	header('Cache-Control:post-check=0, pre-check=0', false);
 	header('Pragma:no-cache');
 	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
 } else {
-	if (Request('module') != null) {
-		$results = $IM->getModule(Request('module'),true)->doProcess(Request('action'));
+	if ($_module != null) {
+		$results = $IM->getModule($_module,true)->doProcess($_action);
 		
 		if ($results !== null) {
 			header('Content-type:text/json; charset=utf-8',true);
