@@ -54,6 +54,14 @@ class mysql {
 		}
 	}
 	
+	public function db() {
+		return $this->db;
+	}
+	
+	public function mysqli() {
+		return $this->_mysqli;
+	}
+	
 	public function check($db) {
 		if (isset($db->port) == false) $db->port = 3306;
 		$mysqli = @new mysqli($db->host,$db->username,$db->password,$db->database,$db->port);
@@ -71,7 +79,8 @@ class mysql {
 	}
 	
 	function error($msg,$query='') {
-		die($msg.'<br>'.$query);
+		$IM = new iModule('SAFETY');
+		echo $IM->printError('DATABASE_ERROR',$msg.'<br>'.$query);
 	}
 	
 	private function reset() {
@@ -259,7 +268,11 @@ class mysql {
 			} elseif ($index == 'index') {
 				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD INDEX('.$column.')');
 			} elseif ($index == 'fulltext') {
-				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.')');
+				if (version_compare($this->version,'5.7.6','>=') == true) {
+					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.') WITH PARSER ngram');
+				} else {
+					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.')');
+				}
 			} elseif ($index == 'unique') {
 				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD UNIQUE('.$column.')');
 			}
