@@ -97,6 +97,10 @@
 		 * 객체가 div 이고 data-role 이 input 일 경우
 		 */
 		if (this.is("div[data-role=input]") == true) {
+			if (is_reset == true) {
+				this.children("input, select, textarea").status("default");
+			}
+			
 			/**
 			 * div[data-role=input] 하위에는 자식이 1개 있어야 한다.
 			 */
@@ -596,6 +600,12 @@
 				$radio.hide();
 				$radio.after($icon);
 				
+				$icon.on("click",function(e) {
+					$radio.trigger("click");
+					e.preventDefault();
+					e.stopPropagation();
+				});
+				
 				if ($radio.is(":disabled") == true) {
 					$container.addClass("disabled");
 				}
@@ -1056,14 +1066,24 @@
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false) {
-					if (result.message) iModule.alert.show("error",result.message,5);
-					if (result.error) iModule.modal.error(result.error,result.url ? result.url : null);
+					if (result.message || result.error) {
+						if (typeof Ext == "object") {
+							Ext.Msg.show({title:iModule.getText("text/error"),msg:result.message ? result.message : result.error,buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+						} else {
+							if (result.message) iModule.alert.show("error",result.message,5);
+							if (result.error) iModule.modal.error(result.error,result.url ? result.url : null);
+						}
+					}
 				}
 			},
 			error:function() {
 				if (count == 3) {
-					iModule.alert.show("error","Server Connect Error!",5);
-					if (typeof callback == "function") callback({success:false});
+					if (typeof Ext == "object") {
+						Ext.Msg.show({title:iModule.getText("text/error"),msg:iModule.getErrorText("DISCONNECT_ERROR"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+					} else {
+						iModule.alert.show("error",iModule.getErrorText("DISCONNECT_ERROR"),5);
+						if (typeof callback == "function") callback({success:false});
+					}
 				} else {
 					setTimeout(function(url,data,callback,count) { $.send(url,data,callback,count); },1000,url,data,callback,++count);
 				}
@@ -1082,6 +1102,8 @@
 		 * 전송대상이 form 이 아닐경우 아무런 행동을 하지 않는다.
 		 */
 		if (this.is("form") == false) return;
+		
+		if (this.triggerHandler("beforesubmit",[this]) === false) return;
 		
 		var count = count ? count : 0;
 		var $form = this;
@@ -1224,7 +1246,6 @@
 			 * 객체가 버튼일 경우
 			 */
 			if ($(this).is("button[type=button]") == true) {
-				console.log("message",message);
 				var is_indicator = message !== false;
 				
 				if (status == "loading") {
@@ -1585,6 +1606,8 @@
 				$iframe = $iframe.length == 0 ? $("iframe[src^='"+decodeURIComponent(parser.href)+"']") : $iframe;
 				$iframe = $iframe.length == 0 ? $("iframe[src^='"+parser.pathname+"']") : $iframe;
 				$iframe = $iframe.length == 0 ? $("iframe[src^='"+decodeURIComponent(parser.pathname)+"']") : $iframe;
+				$iframe = $iframe.length == 0 ? $("iframe[src^='/"+parser.pathname+"']") : $iframe;
+				$iframe = $iframe.length == 0 ? $("iframe[src^='/"+decodeURIComponent(parser.pathname)+"']") : $iframe;
 				
 				if ($iframe.length > 0) {
 					$iframe.triggerHandler("init");
