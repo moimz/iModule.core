@@ -29,6 +29,77 @@ Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",getPanel:
 		parent = parent.ownerCt;
 	}
 }});
+Ext.define("Ext.ux.ColorField",{
+	extend:"Ext.form.field.Trigger",
+	lengthText:"색상코드가 잘못입력되었습니다. (#333 or #333333)",
+	blankText:"색상코드가 잘못입력되었습니다. (#333 or #333333)",
+	preview:true,
+	regex:/^#[0-9a-f]{3,6}$/i,
+	validateValue :function(value){
+		if (!this.getEl()) {
+			return true;
+		}
+		if (value.length!=4 && value.length!=7) {
+			this.markInvalid(Ext.String.format(this.lengthText,value));
+			return false;
+		}
+		if ((value.length < 1 && !this.allowBlank) || !this.regex.test(value)) {
+			this.markInvalid(Ext.String.format(this.blankText,value));
+			return false;
+		}
+		
+		this.markInvalid();
+		this.setColor(value);
+		return true;
+	},
+	markInvalid :function( msg ) {
+		Ext.ux.ColorField.superclass.markInvalid.call(this,msg);
+	},
+	setValue :function(hex){
+		Ext.ux.ColorField.superclass.setValue.call(this,hex);
+		this.setColor(hex);
+	},
+	setColor :function(hex) {
+		if (this.preview == true) {
+			Ext.ux.ColorField.superclass.setFieldStyle.call(this,{
+				"background-color":hex,
+				"background-image":"none"
+			});
+		}
+	},
+	menuListeners :{
+		select:function(m,d){
+			this.setValue("#"+d);
+		},
+		show :function(){
+			this.onFocus();
+		},
+		hide :function(){
+			this.focus();
+			var ml = this.menuListeners;
+			this.menu.un("select",ml.select,this);
+			this.menu.un("show",ml.show,this);
+			this.menu.un("hide",ml.hide,this);
+		}
+	},
+	onTriggerClick :function(e){
+		if (this.disabled){
+			return;
+		}
+		
+		this.menu = new Ext.menu.ColorPicker({
+			shadow:true,
+			autoShow :true
+		});
+		this.menu.alignTo(this.inputEl,"tl-bl?");
+		
+		this.menu.on(Ext.apply({},this.menuListeners,{
+			scope:this
+		}));
+		
+		this.menu.show(this.inputEl);
+	}
+});
 Ext.define("Ext.moimz.form.field.ComboBox",{override:"Ext.form.field.ComboBox",queryMode:"local",editable:false,autoLoadOnValue:true});
 Ext.define("Ext.moimz.form.field.Date",{override:"Ext.form.field.Date",submitFormat:"Y-m-d",format:"Y-m-d"});
 Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",fieldStyle:{textAlign:"right"},
@@ -532,15 +603,3 @@ Ext.define("Ext.locale.ko.window.MessageBox",{
 Ext.define("Ext.locale.ko.Component",{	
 	override:"Ext.Component"
 });
-/*
-$(window).on("resize",function() {
-	Ext.WindowManager.each(function(w) {
-		if (w.getHeight() > $(window).height() - 50) {
-			w.setMaxHeight($(window).height() - 50);
-			w.setY(25);
-		} else {
-			w.setMaxHeight($(window).height() - 50);
-		}
-	});
-});
-*/
