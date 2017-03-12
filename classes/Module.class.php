@@ -152,6 +152,11 @@ class Module {
 	 * @see /classes/iModule.class.php -> doLayout()
 	 */
 	function loadGlobals() {
+		/**
+		 * 관리자일 경우 처리하지 않는다.
+		 */
+		if ($_SERVER['SCRIPT_NAME'] == '/admin/index.php') return;
+		
 		$globals = $this->IM->db()->select($this->table->module)->where('is_global','TRUE')->get();
 		for ($i=0, $loop=sizeof($globals);$i<$loop;$i++) {
 			$this->IM->getModule($globals[$i]->module);
@@ -446,14 +451,24 @@ class Module {
 	 *
 	 * @param string $domain 설정대상 사이트도메인, 없을경우 현재사이트
 	 * @param string $langauge 설정대상 사이트언어셋, 없을경우 현재사이트
+	 * @param string $menu 설정대상 사이트메뉴
+	 * @param string $page 설정대상 사이트페이지
 	 * @param string $module 설정대상 모듈명
 	 * @param string $context 설정대상 컨텍스트명
 	 * @return object[] $configs 컨텍스트 환경설정
 	 */
-	function getContextConfigs($domain,$language,$module,$context) {
+	function getContextConfigs($domain,$language,$menu,$page,$module,$context) {
 		$site = $this->IM->getSites($domain,$language);
+		$page = $menu && $page ? $this->IM->getPages($menu,$page,$domain,$language) : null;
+		
+		if ($page != null && $page->type == 'MODULE' && $page->context->module == $module && $page->context->context == $context) {
+			$values = $page->context->configs;
+		} else {
+			$values = null;
+		}
+		
 		$mModule = $this->IM->getModule($module);
-		if (method_exists($mModule,'getContextConfigs') == true) return $mModule->getContextConfigs($site,$context);
+		if (method_exists($mModule,'getContextConfigs') == true) return $mModule->getContextConfigs($site,$values,$context);
 		return array();
 	}
 	
