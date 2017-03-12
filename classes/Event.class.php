@@ -158,8 +158,6 @@ class Event {
 		
 			$action = $caller;
 			unset($caller,$html);
-			
-			if (strpos($event,'before') === 0) unset($results);
 		}
 		
 		/**
