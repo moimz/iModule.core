@@ -100,7 +100,7 @@ class iModule {
 	/**
 	 * class 선언
 	 */
-	function __construct() {
+	function __construct($mode=null) {
 		global $_CONFIGS;
 		
 		/**
@@ -108,29 +108,31 @@ class iModule {
 		 */
 		$this->initTime = $this->getMicroTime();
 		
-		/**
-		 * cache처리를 위한 클래스를 정의한다.
-		 */
-		$this->Cache = new Cache($this);
-		
-		/**
-		 * iModule 이 설치되어 있다면 각 기능별 core class 를 호출한다.
-		 * 이 클래스는 인스톨러에서도 사용되기 인스톨러에서 호출되면 에러가 발생하는 기능 class 를 비활성화 한다.
-		 */
-		if ($_CONFIGS->installed === true) {
-			$this->Event = new Event($this);
-			$this->Addon = new Addon($this);
-			$this->Module = new Module($this);
+		if ($mode !== 'SAFETY') {
+			/**
+			 * cache처리를 위한 클래스를 정의한다.
+			 */
+			$this->Cache = new Cache($this);
+			
+			/**
+			 * iModule 이 설치되어 있다면 각 기능별 core class 를 호출한다.
+			 * 이 클래스는 인스톨러에서도 사용되기 인스톨러에서 호출되면 에러가 발생하는 기능 class 를 비활성화 한다.
+			 */
+			if ($_CONFIGS->installed === true) {
+				$this->Event = new Event($this);
+				$this->Addon = new Addon($this);
+				$this->Module = new Module($this);
+			}
+			
+			/**
+			 * iModule core 에서 사용하는 DB 테이블 별칭 정의
+			 * @see package.json 의 databases 참고
+			 */
+			$this->table = new stdClass();
+			$this->table->site = 'site_table';
+			$this->table->sitemap = 'sitemap_table';
+			$this->table->article = 'article_table';
 		}
-		
-		/**
-		 * iModule core 에서 사용하는 DB 테이블 별칭 정의
-		 * @see package.json 의 databases 참고
-		 */
-		$this->table = new stdClass();
-		$this->table->site = 'site_table';
-		$this->table->sitemap = 'sitemap_table';
-		$this->table->article = 'article_table';
 		
 		/**
 		 * 타임존 설정
@@ -1426,6 +1428,24 @@ class iModule {
 	}
 	
 	/**
+	 * 현재 설정된 언어셋을 반환한다.
+	 *
+	 * @return $langcode
+	 */
+	function getLanguage() {
+		return $this->language;
+	}
+	
+	/**
+	 * 코어의 언어셋을 지정한다.
+	 *
+	 * @param $langcode
+	 */
+	function setLanguage($language) {
+		$this->language = $language;
+	}
+	
+	/**
 	 * 이 함수가 호출된 이후부터 강제로 $view 를 변경하여 출력한다.
 	 * 한 페이지 내에서 2가지 view 를 사용할 경우 호출한다.
 	 *
@@ -1673,6 +1693,8 @@ class iModule {
 	 * @return null
 	 */
 	function printError($code=null,$value=null,$message=null) {
+		if (isset($_SERVER['SCRIPT_NAME']) == true && in_array($_SERVER['SCRIPT_NAME'],array('/scripts/php2js.js.php')) == true) exit;
+		
 		if (is_string($code) == true) {
 			if (preg_match('/^NOT_FOUND/',$code) == true) {
 				header('HTTP/1.1 404 Not Found');
