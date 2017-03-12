@@ -23,17 +23,17 @@ header('Access-Control-Allow-Credentials:true');
 header('Access-Control-Allow-Headers:Authorization');
 header('Access-Control-Allow-Methods:*');
 
-if (isset($headers['Authorization']) == true) {
-	$IM->getModule('member')->authorizationToken($headers['Authorization']);
+if (isset($headers['Authorization']) == true || isset($headers['authorization']) == true) {
+	$IM->getModule('member')->authorizationToken(isset($headers['Authorization']) == true ? $headers['Authorization'] : $headers['authorization']);
 }
 
 $results = new stdClass();
-$module = Request('module');
-if ($module != null && $IM->Module->isInstalled($module) == true) {
-	$mModule = $IM->getModule($module);
+$_module = Request('_module');
+if ($_module != null && $IM->Module->isInstalled($_module) == true) {
+	$mModule = $IM->getModule($_module);
 	$method = $_SERVER['REQUEST_METHOD'];
 	
-	$api = Request('api');
+	$_api = Request('_api');
 	$idx = Request('idx');
 	if ($method == 'POST' && method_exists($mModule,'postApi') == true) {
 		$params = $_POST;
@@ -41,7 +41,7 @@ if ($module != null && $IM->Module->isInstalled($module) == true) {
 	} elseif ($method == 'GET' && method_exists($mModule,'getApi') == true) {
 		$params = $_GET;
 		unset($params['module'],$params['api'],$params['idx']);
-		$data = $mModule->getApi($api,$idx,$params);
+		$data = $mModule->getApi($_api,$idx,$params);
 	} else {
 		$data = null;
 	}
