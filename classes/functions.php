@@ -106,6 +106,17 @@ function CheckNickname($nickname) {
 	return true;
 }
 
+/**
+ * 전화번호 형식이 맞는지 확인한다.
+ *
+ * @param string $phone
+ * @return boolean $isValid
+ */
+function CheckPhoneNumber($phone) {
+	$phone = str_replace('-','',$phone);
+	return preg_match('/^0[0-9]{9,11}$/',$phone);
+}
+
 function GetAntiSpamEmail($email,$isLink=true) {
 	$email = str_replace('@','<i class="fa fa-at"></i>',$email);
 	return $isLink == true ? '<span class="iModuleEmail">'.$email.'</span>' : $email;
