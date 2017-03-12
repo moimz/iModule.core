@@ -12,13 +12,6 @@
  */
 
 /**
- * 베타버전에 한하여 에러메세지를 모두 출력하도록 설정합니다.
- * @todo 정식배포시 아래 2개 라인을 삭제
- */
-error_reporting(E_ALL);
-ini_set('display_errors',true);
-
-/**
  * 사이트 헤더 설정
  * 기본적인 HTTP보안설정 및 언어셋을 선언한다.
  */
@@ -107,4 +100,11 @@ if (isset($_CONFIGS->sessionDomain) == true) {
 	session_set_cookie_params(0,'/',$_CONFIGS->sessionDomain);
 }
 session_start();
+
+if (defined('__DEBUG_MODE__') == true) {
+	error_reporting(E_ALL);
+	ini_set('display_errors',true);
+} else {
+	ini_set('display_errors',false);
+}
 ?>
