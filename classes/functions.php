@@ -114,7 +114,7 @@ function CheckNickname($nickname) {
  */
 function CheckPhoneNumber($phone) {
 	$phone = str_replace('-','',$phone);
-	return preg_match('/^0[0-9]{9,11}$/',$phone);
+	return preg_match('/^0[0-9]{8,11}$/',$phone);
 }
 
 function GetAntiSpamEmail($email,$isLink=true) {
@@ -350,6 +350,20 @@ function GetCutString($str,$limit,$is_html=false) {
 
 function GetRandomString($length=10) {
 	return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),0,$length);
+}
+
+/**
+ * 특정년도의 특정주차의 시작날짜를 가져온다.
+ *
+ * @param int $year 년도
+ * @param int $week 주차
+ * @return date $date
+ */
+function GetDateOfWeek($year,$week) {
+	$start = strtotime($year.'-01-01');
+	
+	$time = $start + ($week - 1) * 7 * 60 * 60 * 24 - date('w',$start) * 60 * 60 * 24;
+	return date('Y-m-d',$time);
 }
 
 /**
