@@ -12,8 +12,16 @@ Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootPro
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false});
 Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,enableColumnMove:false});
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
+Ext.define("Ext.moimz.form.Panel",{override:"Ext.form.Panel",trackResetOnLoad:true});
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
 Ext.define("Ext.moimz.chart.CartesianChart",{override:"Ext.chart.CartesianChart",bodyBorder:false});
+Ext.define("Ext.moimz.Component",{override:"Ext.Component",getRoot:function() {
+	var parent = this;
+	while (true) {
+		if (parent.ownerCt == null) return parent;
+		parent = parent.ownerCt;
+	}
+}});
 Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",getPanel:function() {
 	var parent = this.ownerCt;
 	while (true) {
@@ -332,7 +340,7 @@ Ext.define("Ext.moimz.container.Container",{override:"Ext.container.Container",a
 	if (me.storedScrollY) me.setScrollY(me.storedScrollY);
 }});
 
-Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField",accept:null,reset:function() {
+Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField",accept:null,clearOnSubmit:false,reset:function() {
 	var me = this, clear = me.clearOnSubmit;
 	if (me.rendered) {
 		me.button.reset(clear);
