@@ -20,6 +20,7 @@
 
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
 .x-form-display-field-default {margin-top:0px; padding-top:8px;}
+.x-form-checkboxgroup-body {padding:0px !important;}
 /*
 .x-form-fieldset-grid {padding:5px 0px 0px 0px;}
 .x-form-fieldset-grid > legend {margin:0px 15px 0px 15px;}
