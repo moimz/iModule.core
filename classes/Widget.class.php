@@ -331,12 +331,6 @@ class Widget {
 	 */
 	function getContext() {
 		/**
-		 * 위젯 템플릿의 기본 자바스크립트 및 스타일시트가 있을 경우 불러온다.
-		 */
-		if (is_file($this->getTemplet()->getPath().'/styles/style.css') == true) $this->IM->addHeadResource('style',$this->getTemplet()->getDir().'/styles/style.css');
-		if (is_file($this->getTemplet()->getPath().'/scripts/script.js') == true) $this->IM->addHeadResource('script',$this->getTemplet()->getDir().'/scripts/script.js');
-		
-		/**
 		 * 위젯파일에서 iModule 코어클래스 및 모듈클래스, 템플릿 클래스에 접근하기 위한 변수 선언
 		 */
 		$IM = $this->IM;
@@ -348,6 +342,25 @@ class Widget {
 		
 		$Widget = $this;
 		$Templet = $this->getTemplet();
+		
+		/**
+		 * 위젯 템플릿의 기본 자바스크립트 및 스타일시트가 있을 경우 불러온다.
+		 */
+		$package = $Templet->getPackage();
+		
+		if (isset($package->styles) == true && is_array($package->styles) == true) {
+			foreach ($package->styles as $style) {
+				$style = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$style) == true ? $style : $Templet->getDir().$style;
+				$this->IM->addHeadResource('style',$style);
+			}
+		}
+		
+		if (isset($package->scripts) == true && is_array($package->scripts) == true) {
+			foreach ($package->scripts as $script) {
+				$script = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$script) == true ? $script : $Templet->getDir().$script;
+				$this->IM->addHeadResource('script',$script);
+			}
+		}
 		
 		return INCLUDE $this->getPath().'/index.php';
 	}
