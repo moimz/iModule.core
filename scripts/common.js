@@ -530,7 +530,52 @@ var iModule = {
 			$modal.append($form);
 			
 			if (typeof callback == "string") {
-				callback = function(url) { location.href = url; }(callback);
+				var url = callback;
+				callback = function($modal,$form) { $form.on("submit",function() { location.href = url; return false; }); return false; };
+			} else if (typeof callback == "function") {
+				var submitter = callback;
+				callback = function($modal,$form) { $form.on("submit",function() { submitter(); return false; }); return false; };
+			}
+			
+			iModule.modal.showHtml($modal,callback);
+		},
+		alert:function(title,message,callback) {
+			var $modal = $("<div>").attr("data-role","modal");
+			$modal.attr("data-closable","true");
+			$modal.attr("data-fullsize","false");
+			$modal.attr("data-width",400);
+			$modal.attr("data-height",0);
+			$modal.attr("data-max-width",400);
+			$modal.attr("data-max-height",0);
+			
+			var $form = $("<form>").attr("id","iModuleModalForm");
+			var $header = $("<header>");
+			var $title = $("<h1>").html(title);
+			$header.append($title);
+			
+			var $close = $("<button>").attr("type","button").attr("data-action","close").html('<i class="mi mi-close"></i>');
+			$header.append($close);
+			
+			$form.append($header);
+			
+			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			$form.append($main);
+			
+			var $footer = $("<footer>");
+			
+			var $button = $("<button>").attr("type","submit").html(iModule.getText("button/confirm"));
+			$footer.append($("<div>").append($button));
+			
+			$form.append($footer);
+			
+			$modal.append($form);
+			
+			if (typeof callback == "string") {
+				var url = callback;
+				callback = function($modal,$form) { $form.on("submit",function() { location.href = url; return false; }); return false; };
+			} else if (typeof callback == "function") {
+				var submitter = callback;
+				callback = function($modal,$form) { $form.on("submit",function() { submitter(); return false; }); return false; };
 			}
 			
 			iModule.modal.showHtml($modal,callback);
