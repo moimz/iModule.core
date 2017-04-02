@@ -581,13 +581,23 @@ function CheckDirectoryPermission($dir,$permission) {
  * @return boolean $success
  */
 function CreateDatabase($dbConnect,$schema) {
+	$dbConnect->startTransaction();
+	
 	foreach ($schema as $table=>$structure) {
 		if ($dbConnect->exists($table) == false) {
-			if ($dbConnect->create($table,$structure) == false) return $table;
+			if ($dbConnect->create($table,$structure) == false) {
+				$dbConnect->rollback();
+				return $table;
+			}
 		} elseif ($dbConnect->compare($table,$structure) == false) {
 			$rename = $table.'_BK'.date('YmdHis');
-			if ($dbConnect->rename($table,$rename) == false) return $table;
+			if ($dbConnect->rename($table,$rename) == false) {
+				$dbConnect->rollback();
+				return $table;
+			}
+			
 			if ($dbConnect->create($table,$structure) == false) {
+				$dbConnect->rollback();
 				$dbConnect->rename($rename,$table);
 				return $table;
 			}
@@ -607,6 +617,11 @@ function CreateDatabase($dbConnect,$schema) {
 				
 				$dbConnect->insert($table,$insert)->execute();
 			}
+			
+			if ($dbConnect->getLastError()) {
+				$dbConnect->rollback();
+				return $table;
+			}
 		}
 		
 		if (isset($structure->datas) == true && is_array($structure->datas) == true && count($structure->datas) > 0 && $dbConnect->select($table)->count() == 0) {
@@ -614,7 +629,14 @@ function CreateDatabase($dbConnect,$schema) {
 				$dbConnect->insert($table,(array)$structure->datas[$i])->execute();
 			}
 		}
+		
+		if ($dbConnect->getLastError()) {
+			$dbConnect->rollback();
+			return $table;
+		}
 	}
+	
+	$dbConnect->commit();
 	
 	return true;
 }
