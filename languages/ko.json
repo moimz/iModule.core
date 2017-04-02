@@ -6,7 +6,9 @@
 		"email":"이메일",
 		"password":"패스워드",
 		"nickname":"닉네임",
-		"error":"에러"
+		"error":"에러",
+		"info":"안내",
+		"confirm":"확인"
 	},
 	"button":{
 		"prev":"이전",
