@@ -831,7 +831,9 @@
 				
 				var timeout = setTimeout(function($this) {
 					var interval = setInterval(function($this) {
-						$this.data("year",$this.data("year") - 1);
+						var prev = moment().year($this.data("year")).month($this.data("month")).add(-2,"months");
+						$this.data("year",prev.year());
+						$this.data("month",prev.month() + 1);
 						$this.calendar();
 					},100,$this);
 					
@@ -882,7 +884,9 @@
 					$parent.data("moveInterval",null);
 				}
 				
-				$parent.data("year",$parent.data("year") - 1);
+				var prev = moment().year($parent.data("year")).month($parent.data("month")).add(-2,"months");
+				$parent.data("year",prev.year());
+				$parent.data("month",prev.month() + 1);
 				$parent.calendar();
 				
 				e.preventDefault();
@@ -910,7 +914,9 @@
 				
 				var timeout = setTimeout(function($this) {
 					var interval = setInterval(function($this) {
-						$this.data("year",$this.data("year") + 1);
+						var next = moment().year($this.data("year")).month($this.data("month"));
+						$this.data("year",next.year());
+						$this.data("month",next.month() + 1);
 						$this.calendar();
 					},100,$this);
 					
@@ -961,7 +967,9 @@
 					$parent.data("moveInterval",null);
 				}
 				
-				$parent.data("year",$parent.data("year") + 1);
+				var next = moment().year($parent.data("year")).month($parent.data("month"));
+				$parent.data("year",next.year());
+				$parent.data("month",next.month() + 1);
 				$parent.calendar();
 				
 				e.preventDefault();
@@ -1209,7 +1217,7 @@
 							}
 						}
 						
-						$("div[data-role=input].error, div[data-role=inputset].error").first().scroll();
+						$("div[data-role=input].error, div[data-role=inputset].error, div[data-module=wysiwyg].error").first().scroll();
 					}
 				} else {
 					/**
@@ -1288,8 +1296,12 @@
 					$(this).disable();
 				}
 				
-				var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
-				var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
+				if ($(this).is("textarea[data-wysiwyg=TRUE]") == true) {
+					var $parent = $(this).parents("div[data-module=wysiwyg]").length == 0 ? null : $(this).parents("div[data-module=wysiwyg]").eq(0);
+				} else {
+					var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
+					var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
+				}
 				
 				if ($parent == null) return;
 				
@@ -1424,7 +1436,20 @@
 	 * 대상을 회전시킨다.
 	 */
 	$.fn.rotate = function(options) {
-		var $this=$(this), prefixes, opts, wait4css=0;
+		var $this=$(this);
+		
+		if (typeof options == "number") {
+			$this.css({"transform":"rotate("+options+"deg"});/*	'-ms-filter' : 'progid:DXImageTransform.Microsoft.Matrix(M11=' + a + ', M12=' + b + ', M21=' + c + ', M22=' + d + ',sizingMethod=\'auto expand\')',
+			'filter' : 'progid:DXImageTransform.Microsoft.Matrix(M11=' + a + ', M12=' + b + ', M21=' + c + ', M22=' + d + ',sizingMethod=\'auto expand\')',
+			'-moz-transform' :  "matrix(" + a + ", " + c + ", " + b + ", " + d + ", 0, 0)",
+			'-webkit-transform' :  "matrix(" + a + ", " + c + ", " + b + ", " + d + ", 0, 0)",
+			'-o-transform' :  "matrix(" + a + ", " + c + ", " + b + ", " + d + ", 0, 0)"
+			});
+			*/
+			return;
+		}
+		
+		var prefixes, opts, wait4css=0;
 		prefixes=['-Webkit-', '-Moz-', '-O-', '-ms-', ''];
 		opts=$.extend({
 			startDeg: false,

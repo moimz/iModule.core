@@ -107,8 +107,13 @@ div[data-role=input] input, div[data-role=input] textarea, div[data-role=input] 
 div[data-role=inputset] {display:block; width:100%; position:relative; font-size:0;}
 div[data-role=inputset] > div[data-role=input] {display:block; margin-top:5px; vertical-align:middle; font-size:1rem;}
 div[data-role=inputset] > div[data-role=input]:first-child {margin-top:0px;}
-div[data-role=inputset].inline > div[data-role=input] {display:inline-block; width:auto; margin-top:0px; margin-left:5px;}
-div[data-role=inputset].inline > div[data-role=input]:first-child {margin-left:0px;}
+div[data-role=inputset] > div[data-role=text] {font-size:1rem; height:40px; line-height:40px;}
+div[data-role=inputset].inline > div[data-role=input] {display:inline-block; width:auto; margin-top:0px; margin-right:5px;}
+div[data-role=inputset].inline > div[data-role=input]:last-child {margin-right:0px;}
+div[data-role=inputset].inline > div[data-role=input] > label {padding-right:20px;}
+div[data-role=inputset].inline > div[data-role=input]:last-child > label {padding-right:0px;}
+div[data-role=inputset].inline > div[data-role=text] {display:inline-block; width:auto; margin-top:0px; margin-right:5px;}
+div[data-role=inputset].inline > div[data-role=text]:last-child {margin-right:0px;}
 div[data-role=inputset].flex {width:100%; min-height:40px; display:table; table-layout:fixed;}
 div[data-role=inputset].flex > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
 div[data-role=inputset].flex > div[data-role=input] > label {white-space:nowrap;}
@@ -277,6 +282,7 @@ ul[data-role=table] > li.tbody {border-bottom:1px solid #e3e4e5; background:#fff
 ul[data-role=table] > li.tbody > span {vertical-align:middle; padding:0px 10px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 ul[data-role=table] > li.tbody > span.multiline {line-height:20px; padding:10px; height:auto; white-space:normal;}
 ul[data-role=table] > li.tbody > span.center {text-align:center;}
+ul[data-role=table] > li.tbody > span.right {text-align:right;}
 
 ul[data-role=table].inner > li > span, ul[data-role=table].inner > li > a {border-right:1px solid #e3e4e5;}
 ul[data-role=table].inner > li > span:last-child {border-right:0px;}
@@ -328,8 +334,9 @@ ul[data-role=form] > li {display:table; width:100%; min-height:60px; table-layou
 ul[data-role=form].inner > li {border-bottom:1px solid #e3e4e5;}
 ul[data-role=form].outer > li {border-left:1px solid #e3e4e5; border-right:1px solid #e3e4e5;}
 
-ul[data-role=form] > li > label {display:table-cell; width:160px; vertical-align:top; line-height:20px; background:#f4f4f4; padding:20px 0px 20px 20px; font-weight:bold; font-size:13px;}
-ul[data-role=form] > li > div {display:table-cell; width:100%; padding:10px 0px;}
+ul[data-role=form] > li > label {display:table-cell; width:150px; vertical-align:top; line-height:20px; background:#f4f4f4; padding:20px 0px 20px 20px; font-weight:bold; font-size:13px;}
+ul[data-role=form] > li > div {display:table-cell; width:100%; padding:10px 10px 10px 0px;}
+ul[data-role=form] > li > div:last-child {padding-right:0px;}
 ul[data-role=form] > li > label + div {padding-left:10px;}
 ul[data-role=form] > li > div > div[data-role=text] {display:table; padding:5px 0px; min-height:30px; line-height:30px; font-size:13px;}
 ul[data-role=form] > li > div > div[data-role=text] > div {display:table-cell; vertical-align:middle; line-height:1.6;}
@@ -394,11 +401,12 @@ div[data-role=wysiwyg-content] img {max-width:100%;}
 	ul[data-role=form] > li > label:after {content:" :";}
 	ul[data-role=form] > li > div {display:block; padding:5px 0px 10px 0px; min-height:40px; line-height:40px;}
 	ul[data-role=form] > li > label + div {padding-left:0px;}
+	ul[data-role=form] > li > div + label {border-left:0px;}
 	
 	/**
 	 * 테이블
 	 */
-	ul[data-role=table] > li > span, ul[data-role=table] > li.thead > a {height:50px; font-size:12px;}
+	ul[data-role=table] > li > span, ul[data-role=table] > li.thead > a {height:50px;}
 	
 	/**
 	 * 탭
