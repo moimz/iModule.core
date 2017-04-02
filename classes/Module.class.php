@@ -638,7 +638,7 @@ class Module {
 			$templetFields = array();
 			$installed = $this->isInstalled($module) == true ? json_decode($this->getInstalled($module)->configs) : new stdClass();
 			foreach ($package->configs as $config=>$type) {
-				if (isset($configDatas->$config) == true) $value = $configDatas->$config;
+				if ($configDatas != null && isset($configDatas->$config) == true) $value = $configDatas->$config;
 				elseif (isset($installed->$config) == true) $value = $installed->$config;
 				else $value = isset($type->default) == true ? $type->default : '';
 				
@@ -654,9 +654,11 @@ class Module {
 			for ($i=0, $loop=count($templetFields);$i<$loop;$i++) {
 				if (isset($configs->{$templetFields[$i].'_configs'}) == false) $configs->{$templetFields[$i].'_configs'} = new stdClass();
 				
-				foreach ($configDatas as $key=>$value) {
-					if (preg_match('/^'.$templetFields[$i].'_configs_(.*?)$/',$key,$match) == true) {
-						$configs->{$templetFields[$i].'_configs'}->{$match[1]} = $value;
+				if ($configDatas != null) {
+					foreach ($configDatas as $key=>$value) {
+						if (preg_match('/^'.$templetFields[$i].'_configs_(.*?)$/',$key,$match) == true) {
+							$configs->{$templetFields[$i].'_configs'}->{$match[1]} = $value;
+						}
 					}
 				}
 			}
@@ -709,7 +711,7 @@ class Module {
 		/**
 		 * 이벤트리스너를 업데이트하고 이벤트를 발생시킨다.
 		 */
-		$this->addEventListener();
+		$this->addEventListener(true);
 		$this->IM->fireEvent('afterInstall','core',$mode);
 		
 		return true;
