@@ -37,11 +37,13 @@ class iModule {
 	 * DB접근을 줄이기 위해 DB에서 불러온 데이터를 저장할 변수를 정의한다.
 	 *
 	 * @public object[] $sites : 사이트 설정값
+	 * @public object[] $siteLinks : 사이트 링크값
 	 * @public object[] $menus : 사이트별 모든 메뉴설정값
 	 * @public object[] $pages : 사이트별 특정 메뉴에 해당하는 모든 페이지설정값
 	 * @public object[] $modules : 불러온 모듈 클래스
 	 */
 	public $sites = array();
+	public $siteLinks = array();
 	public $menus = array();
 	public $pages = array();
 	public $sitemap = array();
@@ -880,6 +882,39 @@ class iModule {
 		}
 		
 		return count($sites) > 0 ? $sites : null;
+	}
+	
+	/**
+	 * 사이트관리자에 의해 설정된 멀티사이트링크를 가져온다.
+	 * 가급적 현재 사이트와 동일한 언어의 사이트링크를 가져오고 없을경우 기본언어 사이트를 가져온다.
+	 */
+	function getSiteLinks() {
+		if ($this->siteLinks != null) return $this->siteLinks;
+		if ($this->sites == null) $this->initSites();
+		
+		$check = array();
+		$links = array();
+		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+			if ($this->sites[$i]->language == $this->language) {
+				$check[$this->sites[$i]->domain] = true;
+			}
+		}
+		
+		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+			if (isset($check[$this->sites[$i]->domain]) == false && $this->sites[$i]->is_default == 'TRUE') {
+				$links[] = $this->sites[$i];
+			} elseif ($this->sites[$i]->language == $this->language) {
+				$links[] = $this->sites[$i];
+			}
+		}
+		
+		for ($i=0, $loop=count($links);$i<$loop;$i++) {
+			$links[$i]->url = ($links[$i]->is_ssl == 'TRUE' ? 'https://' : 'http://').$links[$i]->domain.__IM_DIR__.'/'.$links[$i]->language;
+		}
+		
+		$this->siteLinks = $links;
+		
+		return $this->siteLinks;
 	}
 	
 	/**
