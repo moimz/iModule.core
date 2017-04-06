@@ -22,125 +22,18 @@
 		}
 	},
 	"configs":{
-		"intro":{
+		"thema_color":{
 			"title":{
-				"ko":"한줄소개"
+				"ko":"테마색"
 			},
 			"help":{
-				"ko":"메인페이지 메뉴하단에 이미지와 함께 나타날 문구를 설정하여 주십시오."
+				"ko":"네비게이션바 색상 등 홈페이지 전반적으로 사용되는 테마색을 설정하여 주십시오."
 			},
-			"type":"text",
-			"default":""
-		},
-		"facebook":{
-			"title":{
-				"ko":"페이스북"
-			},
-			"help":{
-				"ko":"페이스북 URL을 입력하면 사이트 하단에 페이스북으로 연결되는 아이콘이 표시됩니다."
-			},
-			"type":"text",
-			"default":""
-		},
-		"twitter":{
-			"title":{
-				"ko":"트위터"
-			},
-			"help":{
-				"ko":"트위터 URL을 입력하면 사이트 하단에 트위터로 연결되는 아이콘이 표시됩니다."
-			},
-			"type":"text",
-			"default":""
-		},
-		"company":{
-			"title":{
-				"ko":"회사명"
-			},
-			"help":{
-				"ko":"사이트 하단 카피라이트부분에 나타날 회사명을 입력하여 주십시오."
-			},
-			"type":"text",
-			"default":""
-		},
-		"address":{
-			"title":{
-				"ko":"회사주소"
-			},
-			"help":{
-				"ko":"사이트 하단 카피라이트부분에 나타날 회사주소를 입력하여 주십시오."
-			},
-			"type":"text",
-			"default":""
-		},
-		"contact":{
-			"title":{
-				"ko":"연락처"
-			},
-			"help":{
-				"ko":"사이트 하단 카피라이트부분에 나타날 연락처정보(이메일/전화번호 등)를 입력하여 주십시오."
-			},
-			"type":"text",
-			"default":""
-		},
-		"copyright":{
-			"title":{
-				"ko":"카피라이트"
-			},
-			"help":{
-				"ko":"사이트 하단 카피라이트부분에 카피라이트정보를 입력하여 주십시오. ({year}입력시 올해년도로 치환됩니다.)"
-			},
-			"type":"text",
-			"default":""
-		},
-		"head":{
-			"title":{
-				"ko":"head 태그"
-			},
-			"help":{
-				"ko":"&lt;head&gt;&lt;/head&gt; 태그안에 추가적으로 넣을 태그( 사이트인증코드 등)를 입력하여 주십시오."
-			},
-			"type":"textarea",
-			"default":""
-		},
-		"body":{
-			"title":{
-				"ko":"body 태그"
-			},
-			"help":{
-				"ko":"&lt;/body&gt; 태그 직전에 추가적으로 넣을 태그(구글통계 등)를 입력하여 주십시오."
-			},
-			"type":"textarea",
-			"default":""
-		},
-		"ad_top":{
-			"title":{
-				"ko":"상단배너"
-			},
-			"help":{
-				"ko":"사이트 상단에 표시될 애드센스코드 또는 배너태그(HTML)을 입력하여 주십시오. (468px * 60px)"
-			},
-			"type":"textarea",
-			"default":""
-		},
-		"ad_sidebar":{
-			"title":{
-				"ko":"우측배너"
-			},
-			"help":{
-				"ko":"사이트 우측 사이드바에 표시될 애드센스코드 또는 배너태그(HTML)을 입력하여 주십시오. (반응형)"
-			},
-			"type":"textarea",
-			"default":""
-		},
-		"ad_slide":{
-			"title":{
-				"ko":"슬라이드 배너"
-			},
-			"help":{
-				"ko":"모바일용 우측 슬라이드 메뉴에 표시될 애드센스코드 또는 배너태그(HTML)을 입력하여 주십시오. (250px * 250px)"
-			},
-			"type":"textarea",
-			"default":""
+			"type":"color",
+			"default":"#1479bb"
 		}
-	}
+	},
+	"styles":[
+		"/styles/style.css"
+	]
 }

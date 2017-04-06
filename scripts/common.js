@@ -23,6 +23,11 @@ var iModule = {
 		$("div[data-role=input]",$container).inits();
 		
 		/**
+		 * 태그입력기 객체 초기화
+		 */
+		$("div[data-role=tags]").inits();
+		 
+		/**
 		 * form 상태 초기화
 		 */
 		$("form").status("default");

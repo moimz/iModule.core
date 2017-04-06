@@ -373,6 +373,25 @@
 				});
 				
 				/**
+				 * 숫자필드인 경우
+				 */
+				if ($input.is("[type=number]") == true) {
+					$input.on("keydown",function(e) {
+						if (e.keyCode == 8 || e.keyCode == 9 || e.keyCode == 13 || e.ctrlKey == true || e.metaKey == true) return;
+						if (e.keyCode >= 38 && e.keyCode <= 40) return;
+						if (e.keyCode >= 48 && e.keyCode <= 57 && e.shiftKey == false) return;
+						if (e.keyCode == 190 && e.shiftKey == false) return;
+						
+						e.preventDefault();
+					});
+					
+					$input.on("blur",function(e) {
+						var value = $(this).val().replace("[^0-9\.]*","");
+						$input.val(value);
+					});
+				}
+				
+				/**
 				 * input type이 date 일 경우
 				 */
 				if ($input.is("[type=date]") == true) {
@@ -643,6 +662,186 @@
 		}
 		
 		/**
+		 * 객체가 태그입력기일 경우
+		 */
+		if (this.is("div[data-role=tags]") == true && this.children().length == 1) {
+			var $container = this;
+			var $input = $container.children().eq(0);
+			var tags = $input.val().length > 0 ? $input.val().split(",") : [];
+			$input.hide();
+			
+			for (var i=0, loop=tags.length;i<loop;i++) {
+				var $tag = $("<div>").attr("data-role","tag").attr("data-tag",tags[0]);
+				$tag.append($("<span>").text(tags[i]));
+				$tag.append($("<button>").attr("type","button").append($("<i>").addClass("mi mi-close")));
+				$container.append($tag);
+				$tag.inits();
+			}
+			
+			var $insert = $("<div>").attr("data-role","tag");
+			$insert.append($("<input>").attr("type","text"));
+			$container.append($insert);
+			$insert.inits();
+		}
+		
+		/**
+		 * 객체가 태그입력기 내 태그일 경우
+		 */
+		if (this.is("div[data-role=tag]") == true) {
+			var $container = this;
+			if ($("input",$container).length == 0) {
+				$container.attr("data-tag",$("span",$container).text());
+				$("span",$container).on("click",function() {
+					var tag = $(this).text();
+					
+					$(this).parents("div[data-role=tags]").children().has("input").remove();
+					
+					var $insert = $("<div>").attr("data-role","tag");
+					$insert.append($("<input>").attr("type","text").data("last",tag).val(tag));
+					$container.replaceWith($insert);
+					$insert.inits();
+					$("input",$insert).select();
+				});
+				
+				$("button",$container).on("click",function() {
+					$container.remove();
+				});
+			} else {
+				var $input = $("input",$container);
+				$input.on("keydown",function(e) {
+					if (e.keyCode == 32 || e.keyCode == 222) {
+						e.preventDefault();
+						return;
+					}
+					
+					if ((e.keyCode == 188 || e.keyCode == 190) && e.shiftKey == true) {
+						e.preventDefault();
+						return;
+					}
+					
+					if (e.keyCode == 188) {
+						$(this).blur();
+						e.preventDefault();
+						return;
+					}
+					
+					if (e.keyCode == 51 && e.shiftKey == true) {
+						e.preventDefault();
+						return;
+					}
+					
+					if (e.keyCode == 8) {
+						if ($(this).val().length == 0 && $container.prev("div[data-role=tag]").length > 0) {
+							var $prev = $container.prev("div[data-role=tag]");
+							var tag = $("span",$prev).text();
+							
+							$container.remove();
+							
+							var $insert = $("<div>").attr("data-role","tag");
+							$insert.append($("<input>").attr("type","text").data("last",tag).val(tag));
+							$prev.replaceWith($insert);
+							$insert.inits();
+							e.preventDefault();
+							$("input",$insert).focus();
+						}
+					}
+					
+					if (e.keyCode == 13) {
+						e.preventDefault();
+					}
+					
+					if (e.keyCode == 9) {
+						var tag = $input.val().replace(/(#| )/,"");
+						
+						if (tag.length > 0) {
+							var $tag = $("<div>").attr("data-role","tag");
+							$tag.append($("<span>").html(tag));
+							$tag.append($("<button>").attr("type","button").append($("<i>").addClass("mi mi-close")));
+							$tag.inits();
+							$container.replaceWith($tag);
+							
+							var $insert = $("<div>").attr("data-role","tag");
+							$insert.append($("<input>").attr("type","text"));
+							$tag.parents("div[data-role=tags]").append($insert);
+							$insert.inits();
+							$("input",$insert).focus();
+						
+							var $parent = $tag.parents("div[data-role=tags]");
+						} else {
+							var $parent = $container.parents("div[data-role=tags]");
+							
+							if ($container.next().length > 0) {
+								$container.remove();
+								
+								var $insert = $("<div>").attr("data-role","tag");
+								$insert.append($("<input>").attr("type","text").data("last",tag).val(tag));
+								$parent.append($insert);
+								$insert.inits();
+								e.preventDefault();
+								$("input",$insert).focus();
+							}
+						}
+						
+						var tags = [];
+						var $tags = $("div[data-role=tag][data-tag]",$parent);
+						$tags.each(function() {
+							tags.push($(this).attr("data-tag"));
+						});
+						
+						$("> input",$parent).val(tags.join(","));
+						
+						e.preventDefault();
+					}
+				});
+				
+				$input.on("blur",function(e) {
+					setTimeout(function($input) {
+						var tag = $input.val().replace(/(#| )/,"");
+						
+						if (tag.length > 0) {
+							var $tag = $("<div>").attr("data-role","tag");
+							$tag.append($("<span>").html(tag));
+							$tag.append($("<button>").attr("type","button").append($("<i>").addClass("mi mi-close")));
+							$tag.inits();
+							$container.replaceWith($tag);
+							
+							var $insert = $("<div>").attr("data-role","tag");
+							$insert.append($("<input>").attr("type","text"));
+							$tag.parents("div[data-role=tags]").append($insert);
+							$insert.inits();
+							$("input",$insert).focus();
+						
+							var $parent = $tag.parents("div[data-role=tags]");
+						} else {
+							var $parent = $container.parents("div[data-role=tags]");
+							
+							if ($container.next().length > 0) {
+								$container.remove();
+								
+								var $insert = $("<div>").attr("data-role","tag");
+								$insert.append($("<input>").attr("type","text").data("last",tag).val(tag));
+								$parent.append($insert);
+								$insert.inits();
+								e.preventDefault();
+								$("input",$insert).focus();
+							}
+						}
+						
+						var tags = [];
+						var $tags = $("div[data-role=tag][data-tag]",$parent);
+						$tags.each(function() {
+							tags.push($(this).attr("data-tag"));
+						});
+						
+						$("> input",$parent).val(tags.join(","));
+					},100,$input);
+				});
+				
+				$input.keyword($input.parents("div[data-role=tags]").attr("data-search"));
+			}
+		}
+		
+		/**
 		 * 객체가 tab 일 경우
 		 */
 		if (this.is("ul[data-role=tab]") == true) {
@@ -680,6 +879,113 @@
 		}
 		
 		this.data("isInit",true);
+	};
+	
+	$.keyword = function($input,url) {
+		var $parent = $input.parents("div[data-role]").eq(0);
+		if ($input.is(":focus") == false) return;
+		
+		if ($input.val().length > 0) {
+			if ($input.data("last") != $input.val()) {
+				var keyword = $input.val();
+				
+				$.send(url,{keyword:keyword},function(result) {
+					if (result.success == true) {
+						if (result.keywords.length == 0) {
+							$("ul",$parent).remove();
+						} else {
+							var $list = $("<ul>");
+							
+							for (var i=0, loop=result.keywords.length;i<loop;i++) {
+								var $item = $("<li>").data("keyword",result.keywords[i]).html(result.keywords[i]);
+								$item.on("click",function() {
+									$input.data("last",$(this).data("keyword"));
+									$input.val($(this).data("keyword"));
+									$input.focus();
+								});
+								$list.append($item);
+							}
+							
+							if ($("ul",$parent).length == 0) $parent.append($list);
+							else $("ul",$parent).replaceWith($list);
+						}
+						
+						$input.data("last",keyword);
+						setTimeout($.keyword,100,$input,url);
+					}
+				});
+			} else {
+				setTimeout($.keyword,100,$input,url);
+			}
+		} else {
+			$("ul",$parent).remove();
+			setTimeout($.keyword,100,$input,url);
+		}
+	};
+	
+	/**
+	 * 키워드 자동완성을 불러온다.
+	 */
+	$.fn.keyword = function(url) {
+		if (this.is("input") == false) return;
+		
+		var $input = this;
+		var $parent = $input.parents("div[data-role]").eq(0);
+		if ($parent.is("div[data-role]") == false) return;
+		
+		$parent.attr("data-keyword","TRUE");
+		
+		var url = url ? url : "";
+		
+		$input.data("timeout",null);
+		$input.data("last",$input.val());
+		
+		$input.on("focus",function() {
+			setTimeout($.keyword,100,$(this),url);
+		});
+		
+		$input.on("blur",function() {
+			setTimeout(function($input) {
+				$("ul",$parent).remove();
+				$input.data("last","");
+			},100,$input);
+		});
+		
+		$input.on("keydown",function(e) {
+			if (e.keyCode == 38 || e.keyCode == 40) {
+				e.preventDefault();
+				
+				var $lists = $("ul",$parent);
+				if ($lists.lenght == 0) return;
+				
+				var $items = $("li",$lists);
+				if ($items.length == 0) return;
+				
+				var index = $items.index($items.filter(".selected"));
+	
+				if (e.keyCode == 38 && index > 0) index--;
+				if (e.keyCode == 40 && index < $items.length - 1) index++;
+				if (!~index) index = 0;
+				
+				$items.removeClass("selected");
+				$items.eq(index).addClass("selected");
+				$input.data("last",$items.eq(index).data("keyword"));
+				$input.val($items.eq(index).data("keyword"));
+			}
+			
+			if (e.keyCode == 13) {
+				if ($("ul > li.selected",$parent).length > 0) {
+					$input.data("last",$input.val());
+					$("ul",$parent).remove();
+				
+					e.preventDefault();
+				}
+			}
+			
+			if (e.keyCode == 33 || e.keyCode == 34) {
+				e.preventDefault();
+			}
+		});
 	};
 	
 	/**
