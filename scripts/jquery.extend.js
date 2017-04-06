@@ -720,7 +720,45 @@
 					}
 					
 					if (e.keyCode == 188) {
-						$(this).blur();
+						var tag = $input.val().replace(/(#| )/,"");
+						
+						if (tag.length > 0) {
+							var $tag = $("<div>").attr("data-role","tag");
+							$tag.append($("<span>").html(tag));
+							$tag.append($("<button>").attr("type","button").append($("<i>").addClass("mi mi-close")));
+							$tag.inits();
+							$container.replaceWith($tag);
+							
+							var $insert = $("<div>").attr("data-role","tag");
+							$insert.append($("<input>").attr("type","text"));
+							$tag.parents("div[data-role=tags]").append($insert);
+							$insert.inits();
+							$("input",$insert).focus();
+						
+							var $parent = $tag.parents("div[data-role=tags]");
+						} else {
+							var $parent = $container.parents("div[data-role=tags]");
+							
+							if ($container.next().length > 0) {
+								$container.remove();
+								
+								var $insert = $("<div>").attr("data-role","tag");
+								$insert.append($("<input>").attr("type","text").data("last",tag).val(tag));
+								$parent.append($insert);
+								$insert.inits();
+								e.preventDefault();
+								$("input",$insert).focus();
+							}
+						}
+						
+						var tags = [];
+						var $tags = $("div[data-role=tag][data-tag]",$parent);
+						$tags.each(function() {
+							tags.push($(this).attr("data-tag"));
+						});
+						
+						$("> input",$parent).val(tags.join(","));
+						
 						e.preventDefault();
 						return;
 					}
