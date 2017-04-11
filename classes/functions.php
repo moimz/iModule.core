@@ -619,7 +619,8 @@ function CreateDatabase($dbConnect,$schema) {
 			}
 			
 			if ($dbConnect->getLastError()) {
-				$dbConnect->rollback();
+				$dbConnect->drop($table);
+				$dbConnect->rename($rename,$table);
 				return $table;
 			}
 		}
