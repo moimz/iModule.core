@@ -444,6 +444,7 @@ class iModule {
 		if (is_object($code) == true) {
 			$message = $code->message;
 			$description = $code->description;
+			$type = $code->type;
 		} else {
 			$message = '';
 			if ($message == null) {
@@ -453,20 +454,28 @@ class iModule {
 			if ($message == $code) {
 				$message = $this->getText('error/UNKNOWN');
 				$description = $code;
+				$type = 'MAIN';
 			} else {
 				$description = null;
 				switch ($code) {
 					case 'PHP_ERROR' :
 						$description = 'File : '.$value['file'].'<br>Line : '.$value['line'].'<br><br>';
 						$description.= nl2br(str_replace(array('<','>'),array('&lt;','&gt;'),$value['message']));
+						$type = 'MAIN';
 						break;
 						
 					case 'NOT_FOUND_PAGE' :
 						$description = $value ? $value : $this->getUrl();
+						$type = 'BACK';
+						break;
+						
+					case 'REQUIRED_LOGIN' :
+						$type = 'LOGIN';
 						break;
 						
 					default :
 						if ($value != null && is_string($value) == true) $description = $value;
+						$type = 'BACK';
 				}
 				$description = strlen($description) == 0 ? null : $description;
 			}
@@ -476,6 +485,7 @@ class iModule {
 			$data = new stdClass();
 			$data->message = $message;
 			$data->description = $description;
+			$data->type = $type;
 			
 			return $data;
 		}
@@ -1696,11 +1706,17 @@ class iModule {
 		if (is_object($code) == true) {
 			$message = $code->message;
 			$description = $code->description;
+			$type = $code->type;
 		} else {
 			$error = $this->getErrorText($code,$value,$message,true);
 			$message = $error->message;
 			$description = $error->description;
+			$type = $error->type;
 		}
+
+		$link = new stdClass();
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getUrl(false) : $_SERVER['HTTP_REFERER'];
+		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
 		 * 사이트템플릿에 에러메세지 템플릿이 있을 경우, 사이트템플릿을 불러온다.
@@ -1715,6 +1731,23 @@ class iModule {
 		}
 		$html = ob_get_contents();
 		ob_end_clean();
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$values = new stdClass();
+		$values->message = $message;
+		$values->description = $description;
+		$values->type = $type;
+		$values->link = $link;
+		$this->fireEvent('afterGetContext','core','error',$values,null,$html);
+		
+		if ($type == 'LOGIN') {
+			$header = PHP_EOL.'<form id="ErrotForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#ErrotForm").inits(Member.login);</script>'.PHP_EOL;
+			
+			$html = $header.$html.$footer;
+		}
 		
 		return $html;
 	}
@@ -1750,11 +1783,15 @@ class iModule {
 		if (is_object($code) == true) {
 			$message = $code->message;
 			$description = $code->description;
+			$type = $code->type;
 		} else {
 			$error = $this->getErrorText($code,$value,$message,true);
 			$message = $error->message;
 			$description = $error->description;
+			$type = $error->type;
 		}
+		
+		echo $type;
 		
 		/**
 		 * 에러메세지 컨테이너를 설정한다.

@@ -43,6 +43,8 @@ var iModule = {
 		$("time[data-time][data-moment]",$container).each(function() {
 			if ($(this).attr("data-moment") == "fromNow") {
 				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).fromNow());
+			} else if ($(this).attr("data-moment") == "toNow") {
+				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).toNow());
 			} else {
 				$(this).html(moment.unix($(this).attr("data-time")).locale($("html").attr("lang")).format($(this).attr("data-moment")));
 			}

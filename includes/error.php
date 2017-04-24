@@ -13,18 +13,30 @@
  */
 
 if (defined('__IM__') == false) exit;
-
-$IM->loadWebFont('OpenSans');
 ?>
 <section class="errorbox">
 	<div>
 		<div>
-			<h1><i class="mi mi-attention-o"></i> ERROR!</h1>
+			<?php if ($type == 'LOGIN') { ?>
+			<h1><i class="mi mi-key"></i> <?php echo $message; ?></h1>
+			
+			<div data-role="input">
+				<input type="email" name="email" placeholder="<?php echo $this->getText('text/email'); ?>">
+			</div>
+			
+			<div data-role="input">
+				<input type="password" name="password" placeholder="<?php echo $this->getText('text/password'); ?>">
+			</div>
+			
+			<button type="submit"><?php echo $this->getText('button/login'); ?></button>
+			<?php } else { ?>
+			<h1><i class="mi mi-attention-o"></i> ERROR</h1>
 			
 			<h2><?php echo $message; ?></h2>
 			<?php if ($description) { ?><p><?php echo $description; ?></p><?php } ?>
 			
-			<a href="<?php echo $IM->getIndexUrl(); ?>"><?php echo $IM->getText('button/back_to_main'); ?></a>
+			<a href="<?php echo $link->url; ?>"><?php echo $link->text; ?></a>
+			<?php } ?>
 		</div>
 	</div>
 </section>

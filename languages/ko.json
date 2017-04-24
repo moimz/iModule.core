@@ -19,7 +19,8 @@
 		"login":"로그인",
 		"logout":"로그아웃",
 		"delete":"삭제",
-		"back_to_main":"메인페이지로 돌아가기"
+		"back_to_main":"메인페이지로 돌아가기",
+		"go_back":"이전페이지로 돌아가기"
 	},
 	"action":{
 		"wait":"잠시만 기다려주십시오.",

@@ -11,7 +11,7 @@
  * @version 3.0.0.160905
  */
 if (defined('__IM__') == false) exit;
-
+if ($_SERVER['REMOTE_ADDR'] != '121.140.251.84') header("location:http://www.minitalk.kr");
 /**
  * 헤더가 출력되었는지 확인하기 위한 상수 정의
  */

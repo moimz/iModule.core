@@ -545,7 +545,7 @@ class Module {
 	 */
 	function isSitemap($module=null) {
 		$installed = $this->getInstalled($module);
-		return $installed->is_sitemap == 'TRUE';
+		return $installed != null && $installed->is_sitemap == 'TRUE';
 	}
 	
 	/**

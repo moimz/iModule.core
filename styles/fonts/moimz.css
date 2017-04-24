@@ -65,7 +65,7 @@
 .mi-group:before {content:"\ec01"}
 .mi-home:before {content:"\ec02"}
 .mi-profile:before {content:"\ec03"}
-.mi-lock:before {content:"\ec04"}
+.mi-key:before {content:"\ec04"}
 .mi-star:before {content:"\ec05"}
 .mi-star-half:before {content:"\ec06"}
 .mi-star-empty:before {content:"\ec07"}
@@ -75,7 +75,12 @@
 .mi-download:before {content:"\ec11"}
 .mi-calendar:before {content:"\ec12"}
 .mi-time:before {content:"\ec13"}
-.mi-folder:before { content: '\ec14'; } /* '' */
-.mi-folder_share:before { content: '\ec15'; } /* '' */
-.mi-trash:before { content: '\ec16'; } /* '' */
+.mi-folder:before {content:"\ec14"}
+.mi-folder_share:before {content:"\ec15"}
+.mi-trash:before {content:"\ec16"}
+.mi-lock:before {content:"\ec17"}
+.mi-unlock:before {content:"\ec18"}
+.mi-push:before {content:"\ec19"}
+.mi-message:before {content:"\ec20"}
+.mi-mail:before {content:"\ec21"}
 .mi-loading:before {content:"\ed00"}

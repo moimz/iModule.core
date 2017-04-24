@@ -124,6 +124,7 @@
 				if (is_reset == true) {
 					$("button",$container).remove();
 					$("ul",$container).remove();
+					$("div[data-role=help]",$container).remove();
 					var $select = $("select",$container);
 				} else {
 					var $select = this.children();
@@ -341,6 +342,8 @@
 						$button.focus();
 					});
 				}
+				
+				$select.status("default");
 			}
 			
 			/**
@@ -380,6 +383,8 @@
 						if (e.keyCode == 8 || e.keyCode == 9 || e.keyCode == 13 || e.ctrlKey == true || e.metaKey == true) return;
 						if (e.keyCode >= 38 && e.keyCode <= 40) return;
 						if (e.keyCode >= 48 && e.keyCode <= 57 && e.shiftKey == false) return;
+						if (e.keyCode >= 96 && e.keyCode <= 105 && e.shiftKey == false) return;
+						if (e.keyCode == 110 && e.shiftKey == false) return;
 						if (e.keyCode == 190 && e.shiftKey == false) return;
 						
 						e.preventDefault();
@@ -569,7 +574,7 @@
 				$checkbox.after($icon);
 				
 				$icon.on("click",function(e) {
-					$checkbox.trigger("click");
+					$("input[type=checkbox]",$(this).parents("div[data-role=input]")).trigger("click");
 					e.preventDefault();
 					e.stopPropagation();
 				});
