@@ -578,7 +578,7 @@ class Templet {
 		
 		if (isset($package->scripts) == true && is_array($package->scripts) == true) {
 			foreach ($package->scripts as $script) {
-				$script = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$style) == true ? $script : $this->getDir().$script;
+				$script = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$script) == true ? $script : $this->getDir().$script;
 				$this->IM->addHeadResource('script',$script);
 			}
 		}
