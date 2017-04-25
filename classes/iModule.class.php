@@ -1771,6 +1771,13 @@ class iModule {
 			}
 		}
 		
+		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['PHP_SELF']) == true) {
+			$results = new stdClass();
+			$results->success = false;
+			$results->message = $this->getErrorText($code,$value,$message);
+			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
+		}
+		
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
@@ -1791,7 +1798,9 @@ class iModule {
 			$type = $error->type;
 		}
 		
-		echo $type;
+		$link = new stdClass();
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getUrl(false) : $_SERVER['HTTP_REFERER'];
+		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
 		 * 에러메세지 컨테이너를 설정한다.
@@ -1807,6 +1816,13 @@ class iModule {
 		 * 에러메세지 컨테이너를 설정한다.
 		 */
 		$context.= PHP_EOL.'</div>'.PHP_EOL;
+		
+		if ($type == 'LOGIN') {
+			$header = PHP_EOL.'<form id="ErrotForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#ErrotForm").inits(Member.login);</script>'.PHP_EOL;
+			
+			$context = $header.$context.$footer;
+		}
 		
 		/**
 		 * 기본 헤더파일을 불러온다.
