@@ -380,6 +380,11 @@ class PHPExcel
         $this->addCellXf(new PHPExcel_Style);
         $this->addCellStyleXf(new PHPExcel_Style);
     }
+    
+    public function read($file) {
+	    $reader = new PHPExcelReader($file);
+	    return $reader;
+    }
 
     /**
      * Code to execute when this worksheet is unset()
