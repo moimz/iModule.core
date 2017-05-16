@@ -38,6 +38,11 @@ var iModule = {
 		$("*[data-role=tab]",$container).inits();
 		
 		/**
+		 * 테이블 객체 초기화
+		 */
+		$("ul[data-role=table]",$container).inits();
+		
+		/**
 		 * 시간출력
 		 */
 		$("time[data-time][data-moment]",$container).each(function() {
@@ -364,6 +369,8 @@ var iModule = {
 			});
 			
 			$modal.on("click",function(e) {
+				$("div[data-role=input]").removeClass("extend");
+				$("div[data-role=picker]").remove();
 				e.stopPropagation();
 			});
 			
@@ -383,6 +390,7 @@ var iModule = {
 			var $disabled = $("body > div[data-role=disabled]");
 			var $box = $("body > div[data-role=disabled] > div[data-role=box]");
 			var $modal = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal]");
+			var $form = $("body > div[data-role=disabled] > div[data-role=box] > div[data-role=modal] > form");
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
 			
 			var width = parseInt($modal.attr("data-width"));
@@ -401,25 +409,35 @@ var iModule = {
 			if ($modal.width() < maxWidth) {
 				if (maxWidth < $(window).width()) {
 					$modal.css("minWidth",maxWidth+"px").css("width",maxWidth+"px");
+					$form.css("minWidth",maxWidth+"px").css("width",maxWidth+"px");
 				} else {
 					$modal.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
+					$form.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
 				}
 			}
 			
 			if ($modal.height() < maxHeight) {
 				if (maxHeight < $(window).height()) {
 					$modal.css("minHeight",maxHeight+"px").css("height",maxHeight+"px");
+					$form.css("minHeight",maxHeight+"px").css("height",maxHeight+"px");
 				} else {
 					$modal.css("minHeight",($(window).height() - 20)+"px").css("height",($(window).height() - 20)+"px");
+					$form.css("minHeight",($(window).height() - 20)+"px").css("height",($(window).height() - 20)+"px");
 				}
 			}
 			
-			if (is_fullsize == true) {
-				if (iModule.isMobile == true || ($modal.width() < width || $modal.height() < height)) {
-					$modal.css("minWidth","100%").css("width","100%").css("minHeight","100%").css("height","100%");
-					$("body").attr("data-scroll",$("body").scrollTop());
+			if (is_fullsize == true && (iModule.isMobile == true || ($modal.width() < width && $modal.height() < height))) {
+				$modal.css("minWidth","100%").css("width","100%").css("minHeight","100%").css("height","100%");
+				$("body").attr("data-scroll",$("body").scrollTop());
+			} else {
+				if ($(window).height() > $modal.height()) {
+					$modal.css("margin",(($(window).height() - $modal.height()) / 2)+"px auto");
+				} else {
+					$modal.css("margin","10px auto");
 				}
 			}
+			
+//			$form.css("minWidth","100%").css("width","100%").css("minHeight","100%").css("height","100%");
 		},
 		/**
 		 * 모달창을 서버로 부터 가져온다.
@@ -456,8 +474,8 @@ var iModule = {
 			options.closable =  options.closable !== false;
 			
 			var $modal = $("<div>").attr("data-role","modal");
-			$modal.attr("data-closable",options.closable == true ? "true" : "false");
-			$modal.attr("data-fullsize",options.fullsize == true ? "true" : "false");
+			$modal.attr("data-closable",options.closable == true ? "TRUE" : "FALSE");
+			$modal.attr("data-fullsize",options.fullsize == true ? "TRUE" : "FALSE");
 			$modal.attr("data-width",options.width);
 			$modal.attr("data-height",options.height);
 			$modal.attr("data-max-width",options.maxWidth);

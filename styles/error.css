@@ -19,5 +19,5 @@ section.errorbox > div > div > h1 > i {float:left; width:30px; height:34px; line
 section.errorbox > div > div > h2 {font-weight:400; font-size:14px; color:#666; line-height:1.6; display:block; text-align:justify;}
 section.errorbox > div > div > p {margin-top:10px; margin-bottom:10px; font-weight:200; font-size:13px; color:#666; line-height:1.6; display:block; text-align:left;}
 section.errorbox > div > div > a, section.errorbox > div > div > button {display:block; width:100%; height:40px; line-height:40px; margin-top:10px; background:#f44336; color:#fff; font-size:14px; text-align:center; text-decoration:none; border:0; cursor:pointer;}
-section.errorbox > div > div > h2 + a, button {margin-top:20px;}
+section.errorbox > div > div > h2 + a, section.errorbox > div > div > h2 + button {margin-top:20px;}
 section.errorbox > div > div > a:hover, section.errorbox > div > div > button:hover {background:#e53935;}

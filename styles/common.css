@@ -56,8 +56,11 @@ body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; l
 body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch;}
 body.disabled > div[data-role=disabled].loading {display:table;}
 body.disabled > div[data-role=disabled].loading > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:20px;}
+/*
+
 body.disabled > div[data-role=disabled].modal {display:table;}
 body.disabled > div[data-role=disabled].modal > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:0;}
+*/
 
 body.disabled.mobile {}
 body.disabled.mobile > div[data-role=wrapper] {overflow:hidden;}
@@ -68,15 +71,15 @@ body.disabled.mobile > div[data-role=disabled] > div[data-role=box] {padding:5px
 /**
  * 모달창
  */
-div[data-role=modal] {display:inline-block; width:95%; max-width:500px; background:#fff; box-shadow:0px 1px 70px rgba(0,0,0,0.5);}
-div[data-role=modal] > form {width:100%; height:100%; margin:0; padding:0;}
-div[data-role=modal] > form > header {height:80px; padding:0; margin:0; position:relative; text-align:left; background:transparent; display:block;}
+div[data-role=modal] {display:block; width:95%; max-width:500px; background:#fff; box-shadow:0px 1px 70px rgba(0,0,0,0.5); margin:0px auto;}
+div[data-role=modal] > form {margin:0; padding:0;}
+div[data-role=modal] > form > header {height:80px; padding:0; margin:0; position:relative; text-align:left; background:transparent; display:block; box-shadow:none;}
 div[data-role=modal] > form > header > h1 {font-size:18px; display:block; height:80px; line-height:80px; padding:0px 20px; color:#333;}
 div[data-role=modal] > form > header > button {position:absolute; top:20px; right:10px; width:40px; height:40px; font-size:20px; background:transparent; border:0px; cursor:pointer; color:#666;}
 div[data-role=modal] > form > header > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
 div[data-role=modal] > form > header > button:hover {color:#333;}
 div[data-role=modal][data-closable=FALSE] > form > header > button {display:none;}
-div[data-role=modal] > form > main {min-height:50px; width:100%; height:calc(100% - 142px); padding:0px 20px; box-sizing:border-box; font-size:13px; color:#333; text-align:left; display:block;}
+div[data-role=modal] > form > main {min-height:50px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:13px; color:#333; text-align:left; display:block;}
 div[data-role=modal] > form > main[data-fullsize=TRUE] {height:calc(100% - 122px);}
 div[data-role=modal] > form > main > label {display:block; height:30px; line-height:30px; font-weight:bold;}
 div[data-role=modal] > form > main > div[data-role=message] {font-size:13px; line-height:1.6;}
@@ -131,8 +134,11 @@ div[data-role=inputset].grow > div[data-role=input].grow5 {width:20%;}
 div[data-role=inputset].grow > div[data-role=input]:first-child {border-left:0px;}
 div[data-role=inputset].grow > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:13px; line-height:40px;}
 
-div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px; line-height:38px; padding:0px 15px; box-sizing:border-box; cursor:pointer; border:1px solid rgba(0,0,0,0.1); color:#666; background:#fff;}
-div[data-role=input][data-type=button] > button:hover {background:#f4f4f4; color:#333;}
+div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px; line-height:40px; padding:0px 15px; box-sizing:border-box; cursor:pointer; color:#fff; background:#b5b7c0; border:0;}
+div[data-role=input][data-type=button] > button.icon {padding:0px;}
+div[data-role=input][data-type=button] > button.icon > i {display:inline-block; width:40px; height:40px; line-height:38px; vertical-align:top; text-align:center; font-size:16px; margin-top:0px;}
+div[data-role=input][data-type=button] > button.icon > span {display:inline-block; padding-right:15px; height:38px; line-height:38px;}
+div[data-role=input][data-type=button] > button:hover {background:#828595; color:#fff;}
 div[data-role=input][data-type=button] > button.submit {background:#2196f3; color:#fff;}
 div[data-role=input][data-type=button] > button.submit:hover {background:#1e88e5;}
 div[data-role=input][data-type=button] > button.danger {background:#f44336; color:#fff;}
@@ -151,6 +157,7 @@ div[data-role=input][data-type=select] > ul > li:focus {color:#fff; background-c
 div[data-role=input][data-type=select].extend > button {border-color:#66afe9;}
 div[data-role=input][data-type=select].extend > button > i:before {content:"\e905";}
 div[data-role=input][data-type=select].extend > ul {display:block; max-height:240px; overflow-y:auto;}
+div[data-role=input][data-type=select].extend.up > ul {top:auto; bottom:39px;}
 div[data-role=input][data-type=select] > select {width:100%; height:40px; opacity:0; -webkit-appearance:none; position:absolute; z-index:1; top:0; left:0;}
 div[data-role=input][data-type=select].error > button {border-color:#f44336;}
 div[data-role=input][data-type=select].error > button > i {color:#f44336;}
@@ -313,6 +320,15 @@ ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-heigh
 ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
 
 ul[data-role=table] > li.empty {display:block; height:100px; line-height:100px; font-size:13px; color:#666; text-align:center;}
+
+ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
+
+
+div[data-role=table-fixer] {position:relative; z-index:0; overflow:hidden;}
+ul[data-role=table].fixed {position:absolute; min-width:0; top:0; left:0; z-index:1; box-shadow:1px 0px 5px 0px rgba(0,0,0,0.1);}
+ul[data-role=table].fixed > li {width:181px;}
+ul[data-role=table].fixed > li > span {display:none;}
+ul[data-role=table].fixed > li > span.fixed {display:table-cell;}
 
 /**
  * 캘린더 테이블

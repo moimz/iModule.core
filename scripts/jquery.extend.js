@@ -168,7 +168,7 @@
 						
 						var $parent = $(this).parent();
 						var $button = $("button",$parent);
-						var $item = $("option[value='"+$(this).val()+"']",$(this));
+						var $item = $(this).val().length > 0 ? $("option[value='"+$(this).val()+"']",$(this)) : [];
 						if ($item.length == 0) {
 						
 						} else {
@@ -211,11 +211,15 @@
 						$("div[data-role=input].extend").not($parent).removeClass("extend");
 						
 						if ($parent.hasClass("extend") == true) {
-							$parent.removeClass("extend");
+							$parent.removeClass("extend").removeClass("up");
 							$("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",null);
 						} else {
 							$parent.addClass("extend");
 							$("li:not(.divider):visible:not([data-disabled=true])",$lists).attr("tabindex",1);
+							
+							if ($(this).offset().top - $(document).scrollTop() + 250 > $(window).height()) {
+								$parent.addClass("up");
+							}
 						}
 						
 						if ($("li[data-value='"+$value.attr("value")+"']",$lists).length == 0) {
@@ -223,6 +227,7 @@
 						} else {
 							$("li[data-value='"+$value.attr("value")+"']",$lists).focus();
 						}
+						
 						e.preventDefault();
 						e.stopPropagation();
 					});
@@ -667,13 +672,57 @@
 		}
 		
 		/**
+		 * 객체가 테이블일 경우
+		 */
+		if (this.is("ul[data-role=table]") == true) {
+			var $container = this;
+			
+			if (this.hasClass("fixed") == false && $("li > span.fixed",$container).length > 0) {
+				var width = 0;
+				$("li:first-child > span.fixed",$container).each(function() {
+					width+= $(this).outerWidth();
+				});
+				
+				var $fixed = $container.clone(true);
+				var $origin = $container.clone(true);
+				
+				if ($container.parents("div[data-role=table-fixer]").length == 0) {
+					var $fixer = $("<div>").attr("data-role","table-fixer");
+					$container.replaceWith($fixer);
+					
+					$origin.addClass("origin");
+					$fixer.append($origin);
+					
+					$fixed.addClass("fixed");
+					$("li",$fixed).width(width);
+					$("li",$fixed).css("minWidth",width+"px");
+					$fixer.append($fixed);
+				}
+			}
+		}
+		
+		/**
 		 * 객체가 태그입력기일 경우
 		 */
 		if (this.is("div[data-role=tags]") == true && this.children().length == 1) {
 			var $container = this;
+			
+			var $container = this;
 			var $input = $container.children().eq(0);
 			var tags = $input.val().length > 0 ? $input.val().split(",") : [];
 			$input.hide();
+			
+			$input.on("change",function() {
+				$("div[data-role=tag][data-tag]",$container).remove();
+				var tags = $(this).val().length > 0 ? $(this).val().split(",") : [];
+				for (var i=0, loop=tags.length;i<loop;i++) {
+					var $tag = $("<div>").attr("data-role","tag").attr("data-tag",tags[0]);
+					$tag.append($("<span>").text(tags[i]));
+					$tag.append($("<button>").attr("type","button").append($("<i>").addClass("mi mi-close")));
+					$(this).after($tag);
+					$tag.inits();
+				}
+			});
 			
 			for (var i=0, loop=tags.length;i<loop;i++) {
 				var $tag = $("<div>").attr("data-role","tag").attr("data-tag",tags[0]);
@@ -833,7 +882,7 @@
 						
 						$("> input",$parent).val(tags.join(","));
 						
-						e.preventDefault();
+						if (tag.length > 0) e.preventDefault();
 					}
 				});
 				
@@ -852,7 +901,6 @@
 							$insert.append($("<input>").attr("type","text"));
 							$tag.parents("div[data-role=tags]").append($insert);
 							$insert.inits();
-							$("input",$insert).focus();
 						
 							var $parent = $tag.parents("div[data-role=tags]");
 						} else {
@@ -866,7 +914,6 @@
 								$parent.append($insert);
 								$insert.inits();
 								e.preventDefault();
-								$("input",$insert).focus();
 							}
 						}
 						
@@ -880,7 +927,7 @@
 					},100,$input);
 				});
 				
-				$input.keyword($input.parents("div[data-role=tags]").attr("data-search"));
+				if ($input.parents("div[data-role=tags]").attr("data-search")) $input.keyword($input.parents("div[data-role=tags]").attr("data-search"));
 			}
 		}
 		
@@ -1029,6 +1076,79 @@
 				e.preventDefault();
 			}
 		});
+	};
+	
+	/**
+	 * 데이터를 불러온다.
+	 */
+	$.fn.set = function(url,params,callback) {
+		if (typeof params == "function") {
+			callback = params;
+			params = {};
+		}
+		
+		if (this.is("form") == true) {
+			var $form = this;
+			
+			$.send(url,params,function(result) {
+				if (result.success == true && result.data) {
+					for (var field in result.data) {
+						var value = result.data[field];
+						
+						var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"]",$form);
+						if ($field.length > 0) {
+							if ($field.is("select") == true) {
+								if (value) {
+									if ($("option[value="+value+"]",$field).length == 0) {
+										$field.attr("data-value",value);
+									} else {
+										$field.val(value);
+									}
+								}
+							} else if ($field.is("input[type=radio]") == true) {
+								$field.each(function() {
+									if ($(this).attr("value") == value) {
+										$(this).prop("checked",true);
+									}
+								});
+							} else if ($field.is("input[type=checkbox]") == true) {
+								if (typeof value == "string") value = value.split(",");
+								$field.each(function() {
+									if ($.inArray($(this).attr("value"),value) > -1) {
+										$(this).prop("checked",true);
+									} else {
+										$(this).prop("checked",false);
+									}
+								});
+							} else if ($field.is("textarea[data-wysiwyg=TRUE]") == true) {
+								$field.froalaEditor("html.set",value);
+								$field.val(value);
+							} else {
+								$field.val(value);
+							}
+							
+							$field.trigger("change");
+						} else {
+							var $field = $("input[name='"+field+"[]'], select[name='"+field+"[]'], textarea[name='"+field+"[]']",$form);
+							if ($field.length > 0) {
+								if (typeof value == "string") value = value.split(",");
+								if ($field.is("input[type=checkbox]") == true) {
+									$field.each(function() {
+										if ($.inArray($(this).attr("value"),value) > -1) {
+											$(this).prop("checked",true);
+										} else {
+											$(this).prop("checked",false);
+										}
+									});
+								}
+							}
+						}
+					}
+				}
+				
+				if (typeof callback == "function") callback(result);
+			});
+		}
 	};
 	
 	/**
@@ -1464,7 +1584,7 @@
 		
 		var count = count ? count : 0;
 		var $form = this;
-		var data = $form.serialize();
+		var data = $("input[type=file]",$form).length == 0 ? $form.serialize() : new FormData($form[0]);
 		
 		$("input, select, textarea",$form).each(function() {
 			if ($(this).attr("type") == "checkbox") {
@@ -1480,7 +1600,9 @@
 			type:"POST",
 			url:url,
 			data:data,
+			processData:$("input[type=file]",$form).length == 0 ? true : false,
 			dataType:"json",
+			contentType:$("input[type=file]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) $form.status("error",result.errors);
@@ -1499,6 +1621,7 @@
 				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
 				 */
 				if (count == 3) {
+					$form.status("error");
 					iModule.alert.show("error","Server Connect Error!",5);
 				} else {
 					setTimeout(function($form,url,callback,count) { $form.status("default"); $form.send(url,callback,count); },1000,$form,url,callback,++count);
