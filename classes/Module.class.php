@@ -682,6 +682,7 @@ class Module {
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
 				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
+				'is_cron'=>isset($package->cron) == true && $package->cron === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
 				'targets'=>$targets
 			))->execute();
@@ -699,6 +700,7 @@ class Module {
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
 				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
+				'is_cron'=>isset($package->cron) == true && $package->cron === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
 				'targets'=>$targets
 			))->where('module',$module)->execute();
