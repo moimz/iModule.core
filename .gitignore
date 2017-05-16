@@ -1,5 +1,6 @@
 .DS_Store
-/iModule.config.php
+/iModule.preset.php
+/classes/PHPWord*
 /addons/*
 !/addons/index.php
 /attachments/*
