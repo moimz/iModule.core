@@ -35,7 +35,9 @@ function Encoder($value,$key='') {
 	$key = $key ? md5($key) : md5($_CONFIGS->key);
 	$padSize = 16 - (strlen($value) % 16);
 	$value = $value.str_repeat(chr($padSize),$padSize);
-	$output = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
+	
+	$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	
 	return base64_encode($output);
 }
 
@@ -45,7 +47,7 @@ function Decoder($value,$key='') {
 	$key = $key ? md5($key) : md5($_CONFIGS->key);
 	$value = base64_decode(str_replace(' ','+',$value));
 	
-	$output = mcrypt_decrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
+	$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
 	$valueLen = strlen($output);
 	if ($valueLen % 16 > 0) return false;
 
