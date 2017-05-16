@@ -37,7 +37,7 @@ if ($_module != null && $IM->Module->isInstalled($_module) == true) {
 	$idx = Request('idx');
 	if ($method == 'POST' && method_exists($mModule,'postApi') == true) {
 		$params = $_POST;
-		$data = $mModule->postApi($api,$idx,$params);
+		$data = $mModule->postApi($_api,$idx,$params);
 	} elseif ($method == 'GET' && method_exists($mModule,'getApi') == true) {
 		$params = $_GET;
 		unset($params['module'],$params['api'],$params['idx']);
