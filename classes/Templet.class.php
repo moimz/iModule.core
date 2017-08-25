@@ -88,8 +88,15 @@ class Templet {
 			 * 사이트모듈일 경우
 			 */
 			if (strpos($templet,'#') === 0) {
-				$this->templetPath = __IM_PATH__.'/modules/'.substr($templet,1).'/templets';
-				$this->templetDir = __IM_DIR__.'/modules/'.substr($templet,1).'/templets';
+				$temp = explode('.',preg_replace('/^#/','',$templet));
+				
+				if (count($temp) == 1) {
+					$this->templetPath = __IM_PATH__.'/modules/'.$temp[0].'/templets';
+					$this->templetDir = __IM_DIR__.'/modules/'.$temp[0].'/templets';
+				} else {
+					$this->templetPath = __IM_PATH__.'/modules/'.$temp[0].'/templets/'.$temp[1];
+					$this->templetDir = __IM_DIR__.'/modules/'.$temp[0].'/templets/'.$temp[1];
+				}
 			} else {
 				$this->templetPath = __IM_PATH__.'/templets/'.$templet;
 				$this->templetDir = __IM_DIR__.'/templets/'.$templet;
@@ -301,8 +308,20 @@ class Templet {
 			 */
 			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->where('is_templet','TRUE')->get();
 			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-				$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module);
-				$templets[] = $templet;
+				if (is_file(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/package.json') == true) {
+					$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module);
+					if ($templet->isLoaded() === true) $templets[] = $templet;
+				} else {
+					$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets');
+					
+					while ($templetName = @readdir($templetsPath)) {
+						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName) == true) {
+							$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName);
+							if ($templet->isLoaded() === true) $templets[] = $templet;
+						}
+					}
+					@closedir($templetsPath);
+				}
 			}
 		}
 		
@@ -619,7 +638,7 @@ class Templet {
 		/**
 		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getHeader 메소드가 있는 경우 iModule 코어에서는 템플릿 header 파일을 불러오지 않는다.
 		 */
-		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(substr($this->getName(),1)),'getHeader') == false) {
+		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == false) {
 			if (is_file($this->getPath().'/header.php') == true) {
 				ob_start();
 				INCLUDE $this->getPath().'/header.php';
@@ -700,7 +719,7 @@ class Templet {
 		/**
 		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getFooter 메소드가 있는 경우 iModule 코어에서는 템플릿 footer 파일을 불러오지 않는다.
 		 */
-		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(substr($this->getName(),1)),'getFooter') == false) {
+		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getFooter') == false) {
 			if (is_file($this->getPath().'/footer.php') == true) {
 				ob_start();
 				INCLUDE $this->getPath().'/footer.php';
@@ -745,7 +764,7 @@ class Templet {
 		/**
 		 * 템플릿폴더에 레이아웃 파일이 없다면 에러메세지를 출력한다.
 		 */
-		if (is_file($this->getPath().'/layouts/'.$layout.'.php') == false) return $this->getError('NOT_FOUND_LAYOUT',$this->getDir().'/layouts/'.$layout.'.php');
+		if (is_file($this->getPath().'/layouts/'.$layout.'.php') == false) return $this->IM->printError('NOT_FOUND_LAYOUT',$this->getDir().'/layouts/'.$layout.'.php');
 		
 		/**
 		 * 레이아웃파일에서 사용할 변수선언
