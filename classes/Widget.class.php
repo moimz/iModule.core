@@ -34,12 +34,14 @@ class Widget {
 	 * @private string $widgetPackage 위젯 package.json 정보
 	 * @private object $templet 위젯 템플릿 정보 (false 일 경우 템플릿이 존재하지 않음)
 	 * @private object $values 위젯에서 사용되는 변수정보
+	 * @private string[] $attributes 위젯 컨테이터에 사용되는 변수정보
 	 */
 	private $widgetPath;
 	private $widgetDir;
 	private $widgetPackage = null;
 	private $templet = null;
 	private $values = null;
+	private $attributes = array();
 	
 	/**
 	 * 호출된 위젯이 있을 경우 해당 위젯명
@@ -298,6 +300,18 @@ class Widget {
 	}
 	
 	/**
+	 * 위젯 컨테이너에 attribute 를 추가한다.
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @return Widget $this
+	 */
+	function setAttribute($name,$value) {
+		$this->attributes[$name] = $value;
+		return $this;
+	}
+	
+	/**
 	 * 위젯의 캐시 생성시간을 확인한다.
 	 *
 	 * @return int $unixtime 위젯 캐시가 생성된 시간
@@ -412,17 +426,22 @@ class Widget {
 			}
 		}
 		
-		$html = PHP_EOL.'<!-- WIDGET : '.$this->loaded.' -->'.PHP_EOL;
-		$html.= '<div data-role="widget" data-widget="'.str_replace('.','-',$this->loaded).'" data-templet="'.$this->getTemplet()->getName(true).'"'.$this->getTemplet()->getContainerName().'>'.PHP_EOL;
-		
 		/**
 		 * 위젯파일이 없을 경우 에러메세지를 출력한다.
 		 */
 		if (is_file($this->getPath().'/index.php') == false) {
-			$html.= $this->getError('NOT_FOUND_WIDGET_FILE',$this->getPath().'/index.php');
+			$widget = $this->getError('NOT_FOUND_WIDGET_FILE',$this->getPath().'/index.php');
 		} else {
-			$html.= $this->getContext();
+			$widget = $this->getContext();
 		}
+		
+		
+		$html = PHP_EOL.'<!-- WIDGET : '.$this->loaded.' -->'.PHP_EOL;
+		$html.= '<div data-role="widget" data-widget="'.str_replace('.','-',$this->loaded).'" data-templet="'.$this->getTemplet()->getName(true).'"'.$this->getTemplet()->getContainerName();
+		foreach ($this->attributes as $key=>$value) $html.= ' '.$key.'='.$value;
+		$html.= '>'.PHP_EOL;
+		
+		$html.= $widget;
 		
 		$html.= PHP_EOL.'</div>'.PHP_EOL;
 		$html.= '<!--// WIDGET : '.$this->loaded.' -->'.PHP_EOL;
