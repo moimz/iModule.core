@@ -18,7 +18,7 @@ class Cache {
 	}
 	
 	function check($controller,$component,$code) {
-		if ($this->enabled === false) return 0;
+		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return 0;
 		
 		if (file_exists($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
 			return filemtime($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
@@ -28,6 +28,8 @@ class Cache {
 	}
 	
 	function get($controller,$component,$code) {
+		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return null;
+		
 		if (file_exists($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
 			return file_get_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
 		} else {
@@ -36,7 +38,8 @@ class Cache {
 	}
 	
 	function store($controller,$component,$code,$data) {
-		if ($this->enabled === false) return false;
+		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return false;
+		
 		return file_put_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache',$data);
 	}
 }
