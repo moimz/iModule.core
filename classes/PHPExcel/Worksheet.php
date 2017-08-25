@@ -837,9 +837,12 @@ class PHPExcel_Worksheet implements PHPExcel_IComparable
             return $this;
         }
 
+		$pValue = str_replace(array('*',':','/','\\','?','[',']'),array('﹡','∶','⁄﹖','₩','﹖','❲','❳'),$pValue);
+		$pValue = mb_substr($pValue,0,31,'UTF-8');
+
         // Syntax check
         self::_checkSheetTitle($pValue);
-
+        
         // Old title
         $oldTitle = $this->getTitle();
 
