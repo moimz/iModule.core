@@ -707,7 +707,6 @@
 		if (this.is("div[data-role=tags]") == true && this.children().length == 1) {
 			var $container = this;
 			
-			var $container = this;
 			var $input = $container.children().eq(0);
 			var tags = $input.val().length > 0 ? $input.val().split(",") : [];
 			$input.hide();
@@ -758,12 +757,20 @@
 				});
 				
 				$("button",$container).on("click",function() {
+					var $parent = $container.parents("div[data-role=tags]");
 					$container.remove();
+					
+					var tags = [];
+					var $tags = $("div[data-role=tag][data-tag]",$parent);
+					$tags.each(function() {
+						tags.push($(this).attr("data-tag"));
+					});
+					$("> input",$parent).val(tags.join(","));
 				});
 			} else {
 				var $input = $("input",$container);
 				$input.on("keydown",function(e) {
-					if (e.keyCode == 32 || e.keyCode == 222) {
+					if (e.keyCode == 32 || e.keyCode == 222 || e.keyCode == 191 || e.keyCode == 220 || e.keyCode == 186 || e.keyCode == 187) {
 						e.preventDefault();
 						return;
 					}
@@ -1059,6 +1066,15 @@
 				
 				$items.removeClass("selected");
 				$items.eq(index).addClass("selected");
+				
+				if (e.keyCode == 40 && $items.eq(index).position().top + $items.eq(index).height() > $lists.height()) {
+					$lists.scrollTop($lists.scrollTop() + $items.eq(index).position().top + $items.eq(index).height() - $lists.height());
+				}
+				
+				if (e.keyCode == 38 && $items.eq(index).position().top < 0) {
+					$lists.scrollTop($lists.scrollTop() + $items.eq(index).position().top);
+				}
+				
 				$input.data("last",$items.eq(index).data("keyword"));
 				$input.val($items.eq(index).data("keyword"));
 			}
@@ -1112,14 +1128,7 @@
 									}
 								});
 							} else if ($field.is("input[type=checkbox]") == true) {
-								if (typeof value == "string") value = value.split(",");
-								$field.each(function() {
-									if ($.inArray($(this).attr("value"),value) > -1) {
-										$(this).prop("checked",true);
-									} else {
-										$(this).prop("checked",false);
-									}
-								});
+								$field.prop("checked",value === true || value == $field.attr("value"));
 							} else if ($field.is("textarea[data-wysiwyg=TRUE]") == true) {
 								$field.froalaEditor("html.set",value);
 								$field.val(value);
@@ -1127,11 +1136,18 @@
 								$field.val(value);
 							}
 							
+							if ($field.parents("div[data-role=tags]").length == 1) {
+								$field.parents("div[data-role=tags]").inits();
+							}
+							
 							$field.trigger("change");
 						} else {
 							var $field = $("input[name='"+field+"[]'], select[name='"+field+"[]'], textarea[name='"+field+"[]']",$form);
 							if ($field.length > 0) {
 								if (typeof value == "string") value = value.split(",");
+								for (var i=0, loop=value.length;i<loop;i++) {
+									value[i] = value[i].toString();
+								}
 								if ($field.is("input[type=checkbox]") == true) {
 									$field.each(function() {
 										if ($.inArray($(this).attr("value"),value) > -1) {
