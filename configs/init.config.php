@@ -16,6 +16,7 @@
  * 기본적인 HTTP보안설정 및 언어셋을 선언한다.
  */
 header("X-UA-Compatible: IE=Edge");
+header("X-XSS-Protection: 1");
 header("Content-type: text/html; charset=utf-8",true);
 header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Cache-Control: post-check=0, pre-check=0", false);
@@ -105,6 +106,7 @@ if (defined('__DEBUG_MODE__') == true) {
 	error_reporting(E_ALL);
 	ini_set('display_errors',true);
 } else {
+	error_reporting(0);
 	ini_set('display_errors',false);
 }
 ?>
