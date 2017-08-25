@@ -9,11 +9,102 @@
  * @version 3.0.0.160831
  */
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
+Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x"});
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false});
 Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,enableColumnMove:false});
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
 Ext.define("Ext.moimz.form.Panel",{override:"Ext.form.Panel",trackResetOnLoad:true});
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
+Ext.define("Ext.moimz.form.action.Submit",{
+	override:"Ext.form.action.Submit",
+	run :function(){
+		var me = this,
+			form = me.form;
+			
+		if (me.clientValidation === false || form.isValid()) {
+			me.doSubmit();
+		} else {
+			me.failureType = Ext.form.action.Action.CLIENT_INVALID;
+			form.afterAction(me, false);
+			
+			var invalid = form.getFields().filterBy(function(field) {
+				return !field.validate();
+			});
+			
+			if (invalid.items.length > 0) {
+				var topField = invalid.items.shift();
+				if (form.owner.getScrollable() != null) {
+					var position = topField.getPosition()[1];
+					
+					if (position - 10 < form.owner.getScrollable().getPosition().y) {
+						form.owner.scrollBy(0,position - 10,true);
+					}
+					
+					if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
+						form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
+					}
+				} else if (form.owner.ownerCt.scrollable != null) {
+					var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+					
+					if (position - 10 < form.owner.ownerCt.getScrollable().getPosition().y) {
+						form.owner.ownerCt.scrollTo(0,position - 10,true);
+					}
+					
+					if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
+						form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
+					}
+				}
+			}
+		}
+	},
+	onSuccess: function(response) {
+		var form = this.form,
+			formActive = form && !form.destroying && !form.destroyed,
+			success = true,
+			result = this.processResponse(response);
+		
+		if (result !== true && !result.success) {
+			if (result.errors && formActive) {
+				form.markInvalid(result.errors);
+				
+				var invalid = form.getFields().filterBy(function(field) {
+					return !field.validate();
+				});
+				
+				if (invalid.items.length > 0) {
+					var topField = invalid.items.shift();
+					if (form.owner.getScrollable() != null) {
+						var position = topField.getPosition()[1];
+						
+						if (position - 10 < form.owner.getScrollable().getPosition().y) {
+							form.owner.scrollBy(0,position - 10,true);
+						}
+						
+						if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
+							form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
+						}
+					} else if (form.owner.ownerCt.scrollable != null) {
+						var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+						
+						if (position - 10 < form.owner.ownerCt.getScrollable().getPosition().y) {
+							form.owner.ownerCt.scrollTo(0,position - 10,true);
+						}
+						
+						if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
+							form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
+						}
+					}
+				}
+			}
+			this.failureType = Ext.form.action.Action.SERVER_INVALID;
+			success = false;
+		}
+		
+		if (formActive) {
+			form.afterAction(this, success);
+		}
+	}
+});
 Ext.define("Ext.moimz.chart.CartesianChart",{override:"Ext.chart.CartesianChart",bodyBorder:false});
 Ext.define("Ext.moimz.Component",{override:"Ext.Component",getRoot:function() {
 	var parent = this;
@@ -108,8 +199,8 @@ Ext.define("Ext.ux.ColorField",{
 		this.menu.show(this.inputEl);
 	}
 });
-Ext.define("Ext.moimz.form.field.ComboBox",{override:"Ext.form.field.ComboBox",queryMode:"local",editable:false,autoLoadOnValue:true});
-Ext.define("Ext.moimz.form.field.Date",{override:"Ext.form.field.Date",submitFormat:"Y-m-d",format:"Y-m-d"});
+Ext.define("Ext.moimz.form.field.ComboBox",{override:"Ext.form.field.ComboBox",cls:"x-form-no-padding",queryMode:"local",editable:false,autoLoadOnValue:true});
+Ext.define("Ext.moimz.form.field.Date",{override:"Ext.form.field.Date",cls:"x-form-no-padding",submitFormat:"Y-m-d",format:"Y-m-d"});
 Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",fieldStyle:{textAlign:"right"},
 	allowThousandSeparator:true,
 	submitLocaleSeparator:false,

@@ -18,13 +18,17 @@
 .x-grid-button .x-grid-cell-inner button.red:hover {background:#c32a31;}
 .x-grid-button .x-grid-cell-inner button.red[disabled] {background:#e08485 !important;}
 
+.x-fieldset.x-form-wysiwyg {overflow:visible !important;}
+.x-fieldset.x-form-wysiwyg .x-fieldset-body {overflow:visible !important;}
+
+.x-field.x-form-wysiwyg .x-form-text-wrap {overflow:visible !important;}
+
+.x-form-no-padding .x-form-text-default {padding-right:0px;}
+
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
 .x-form-display-field-default {margin-top:0px; padding-top:8px;}
 .x-form-checkboxgroup-body {padding:0px !important;}
-/*
-.x-form-fieldset-grid {padding:5px 0px 0px 0px;}
-.x-form-fieldset-grid > legend {margin:0px 15px 0px 15px;}
-*/
+
 .x-legend-panel .x-panel-body-default {border-color:#fff !important;}
 .x-small-header .x-panel-header {padding:6px 8px !important;}
 .x-small-header .x-panel-header .x-panel-header-title-default {font-size:13px !important;}
