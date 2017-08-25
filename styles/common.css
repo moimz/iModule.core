@@ -96,7 +96,7 @@ div[data-role=modal] > form > footer > div > button:focus {border:1px dotted rgb
 div[data-role=modal] > form > footer > div > button[disabled] {background:#bdbdbd !important; opacity:0.7; cursor:not-allowed;}
 div[data-role=modal] > form > footer > div > button[type=submit], div[data-role=modal] > form > footer > div > button.submit {background:#2196fe; color:#fff;}
 div[data-role=modal] > form > footer > div > button[type=submit]:hover, div[data-role=modal] > form > footer > div > button.submit:hover {background:#1e88e5;}
-div[data-role=modal] > form > footer > div > button[type=submit][disabled] {background:#2196fe !important;}
+div[data-role=modal] > form > footer > div > button[type=submit][disabled], div[data-role=modal] > form > footer > div > button.submit {background:#2196fe !important;}
 div[data-role=modal] > form > footer > div > button.danger {background:#f44336; color:#fff;}
 div[data-role=modal] > form > footer > div > button.danger:hover {background:#e53935;}
 div[data-role=modal] > form > footer > div > button[disabled].danger {background:#e53935 !important;}
@@ -111,9 +111,10 @@ div[data-role=inputset] {display:block; width:100%; position:relative; font-size
 div[data-role=inputset] > div[data-role=input] {display:block; margin-top:5px; vertical-align:middle; font-size:1rem;}
 div[data-role=inputset] > div[data-role=input]:first-child {margin-top:0px;}
 div[data-role=inputset] > div[data-role=text] {font-size:1rem; height:40px; line-height:40px;}
+div[data-role=inputset].inline > div[data-role] {vertical-align:middle;}
 div[data-role=inputset].inline > div[data-role=input] {display:inline-block; width:auto; margin-top:0px; margin-right:5px;}
 div[data-role=inputset].inline > div[data-role=input]:last-child {margin-right:0px;}
-div[data-role=inputset].inline > div[data-role=input] > label {padding-right:20px;}
+div[data-role=inputset].inline > div[data-role=input] > label {padding-right:15px;}
 div[data-role=inputset].inline > div[data-role=input]:last-child > label {padding-right:0px;}
 div[data-role=inputset].inline > div[data-role=text] {display:inline-block; width:auto; margin-top:0px; margin-right:5px;}
 div[data-role=inputset].inline > div[data-role=text]:last-child {margin-right:0px;}
@@ -151,7 +152,7 @@ div[data-role=input][data-type=select] > button:focus, div[data-role=input][data
 div[data-role=input][data-type=select] > button:focus > i, div[data-role=input][data-type=select] > button:active > i, div[data-role=input][data-type=select] > button.focus > i {color:#428bca;}
 div[data-role=input][data-type=select] > button:disabled {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
 div[data-role=input][data-type=select] > ul {list-style:none; border:1px solid #66afe9; box-sizing:border-box; width:100%; position:absolute; top:39px; left:0; z-index:10; background:#fff; display:none; text-align:left;}
-div[data-role=input][data-type=select] > ul > li {height:38px; line-height:38px; padding:0px 10px; border-bottom:1px solid #e1e1e1; cursor:pointer; outline:none; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none;}
+div[data-role=input][data-type=select] > ul > li {height:38px; line-height:38px; padding:0px 10px; border-bottom:1px solid #e1e1e1; cursor:pointer; outline:none; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none; text-overflow:ellipsis; white-space:nowrap; overflow:hidden;}
 div[data-role=input][data-type=select] > ul > li:last-child {border-bottom:0px;}
 div[data-role=input][data-type=select] > ul > li:focus {color:#fff; background-color:#428bca;}
 div[data-role=input][data-type=select].extend > button {border-color:#66afe9;}
@@ -231,7 +232,7 @@ div[data-role=tags] > div[data-role=tag] > input:focus {border-color:#66afe9;}
  * 자동검색
  */
 div[data-keyword=TRUE] {position:relative; z-index:1;}
-div[data-keyword=TRUE] > ul {list-style:none; width:100%; max-height:200px; border:1px solid #66afe9; position:absolute; top:39px; left:0px; z-index:2; box-sizing:border-box; background:#fff;}
+div[data-keyword=TRUE] > ul {list-style:none; width:100%; max-height:200px; border:1px solid #66afe9; position:absolute; top:39px; left:0px; z-index:2; box-sizing:border-box; background:#fff; overflow-y:scroll;}
 div[data-keyword=TRUE] > ul > li {height:38px; line-height:38px; padding:0px 10px; border-bottom:1px solid #e1e1e1; cursor:pointer; outline:none; -webkit-user-select:none; -ms-user-select:none; -moz-user-select:none; -o-user-select:none; font-size:1rem; background:#fff;}
 div[data-keyword=TRUE] > ul > li:last-child {border-bottom:0px;}
 div[data-keyword=TRUE] > ul > li:hover {color:#fff; background-color:#428bca;}
@@ -242,6 +243,7 @@ div[data-keyword=TRUE] > ul > li.selected {color:#fff; background-color:#428bca;
  */
 div[data-role=wysiwyg] {position:relative; overflow:visible;}
 div[data-role=wysiwyg] .fr-view {font-family:inherit; font-size:13px;}
+div[data-role=wysiwyg] .fr-view table {border-color:#000;}
 
 /**
  * 버튼정의
@@ -419,6 +421,10 @@ div[data-role=pagination] > div > ul > li.disabled > a:hover {border-color:trans
 div[data-role=wysiwyg-content] .fr-file {display:inline-block; border:1px solid #ddd; border-radius:5px; color:#000; text-decoration:none; vertial-align:middle; padding:5px 10px 5px 30px; background:url(../modules/wysiwyg/images/download.png) no-repeat 10px 50%; background-size:14px 14px;}
 div[data-role=wysiwyg-content] .fr-file:hover {background-color:rgba(0,0,0,0.1);}
 div[data-role=wysiwyg-content] .fr-file > i.size {display:inline-block; padding-left:5px; color:#666; font-style:normal;}
+
+div[data-role=wysiwyg-content] table {border-collapse:collapse; margin:10px 0px;}
+div[data-role=wysiwyg-content] table td {border:1px solid #ddd; padding:5px;}
+
 div[data-role=wysiwyg-content] img {max-width:100%;}
 
 @media (max-width:767px) {
@@ -454,4 +460,9 @@ div[data-role=wysiwyg-content] img {max-width:100%;}
 	div[data-role=tabbar] > div > ul > li {height:60px;}
 	div[data-role=tabbar] > div > ul > li > button, div[data-role=tabbar] > div > ul > li > a {height:57px; line-height:57px; font-size:13px;}
 	div[data-role=tabbar] > div > ul > li.selected > button, div[data-role=tabbar] > div > ul > li.selected > a {height:58px;}
+}
+
+@media (min-width:768px) and (max-width:991px) {
+	ul[data-role=form] > li > label {width:130px; padding-left:15px;}
+	ul[data-role=form] > li > label.small {width:90px;}
 }
