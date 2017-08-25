@@ -123,9 +123,6 @@ if ($action == 'install') {
 			
 			$check = $dbConnect->exists('member_table') == true && $dbConnect->select('member_table')->where('email',$admin_email)->where('idx',1,'>')->has();
 			if ($check == true) $errors['admin_email'] = 'admin_email_exists';
-			
-			$check = $dbConnect->exists('member_table') == true && $dbConnect->select('member_table')->where('nickname',$admin_nickname)->where('idx',1,'>')->has();
-			if ($check == true) $errors['admin_nickname'] = 'admin_nickname_exists';
 		}
 	}
 	
