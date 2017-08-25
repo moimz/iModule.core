@@ -63,6 +63,23 @@ var iModule = {
 		});
 		
 		/**
+		 * 링크타켓처리
+		 */
+		$("a",$container).on("click",function(e) {
+			if ($(this).attr("href").indexOf("#IM_") == -1) return;
+			var temp = $(this).attr("href").split("#IM_")
+			var link = temp[0];
+			var target = temp[1];
+			
+			if (target == "blank") {
+				window.open(link);
+			} else {
+				location.href = link;
+			}
+			e.preventDefault();
+		});
+		
+		/**
 		 * 페이지이동 네비게이션 처리
 		 */
 		$("div[data-role=pagination] > ul > li.disabled > a",$container).on("click",function(e) {
@@ -470,7 +487,7 @@ var iModule = {
 			options.height = options.height ? options.height : 0;
 			options.maxWidth = options.maxWidth ? options.maxWidth : 0;
 			options.maxHeight = options.maxHeight ? options.maxHeight : 0;
-			options.fullsize =  options.fullsize === true;
+			options.is_fullsize =  options.is_fullsize === true;
 			options.closable =  options.closable !== false;
 			
 			var $modal = $("<div>").attr("data-role","modal");
@@ -604,6 +621,43 @@ var iModule = {
 			}
 			
 			iModule.modal.showHtml($modal,callback);
+		},
+		confirm:function(title,message,callback) {
+			var $modal = $("<div>").attr("data-role","modal");
+			$modal.attr("data-closable","true");
+			$modal.attr("data-fullsize","false");
+			$modal.attr("data-width",400);
+			$modal.attr("data-height",0);
+			$modal.attr("data-max-width",400);
+			$modal.attr("data-max-height",0);
+			
+			var $form = $("<form>").attr("id","iModuleModalForm");
+			var $header = $("<header>");
+			var $title = $("<h1>").html(title);
+			$header.append($title);
+			
+			$form.append($header);
+			
+			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			$form.append($main);
+			
+			var $footer = $("<footer>");
+			
+			var $button = $("<button>").attr("type","button").attr("data-action","ok").addClass("submit").html(iModule.getText("button/confirm"));
+			$footer.append($("<div>").append($button));
+			
+			var $cancel = $("<button>").attr("type","button").attr("data-action","cancel").html(iModule.getText("button/cancel"));
+			$footer.append($("<div>").append($cancel));
+			
+			$form.append($footer);
+			
+			$modal.append($form);
+			
+			$("button",$footer).on("click",function() {
+				callback($(this));
+			});
+			
+			iModule.modal.showHtml($modal);
 		},
 		showHtml:function(html,callback) {
 			iModule.disable();
