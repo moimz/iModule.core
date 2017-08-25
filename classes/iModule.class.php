@@ -110,6 +110,17 @@ class iModule {
 		 */
 		$this->initTime = $this->getMicroTime();
 		
+		/**
+		 * 접속한 사이트주소 및 사이트변수 정의
+		 */
+		$this->site = null;
+		$this->domain = isset($_SERVER['HTTP_HOST']) == true ? strtolower($_SERVER['HTTP_HOST']) : '';
+		$this->language = Request('language');
+		$this->menu = Request('menu') == null ? 'index' : preg_replace('/[^a-zA-Z_0-9]/','',Request('menu'));
+		$this->page = Request('page') == null ? null : preg_replace('/[^a-zA-Z_0-9]/','',Request('page'));
+		$this->view = Request('view') == null ? null : Request('view');
+		$this->idx = Request('idx') == null ? null : Request('idx');
+		
 		if ($mode !== 'SAFETY') {
 			/**
 			 * cache처리를 위한 클래스를 정의한다.
@@ -142,17 +153,6 @@ class iModule {
 		 */
 		$this->timezone = 'Asia/Seoul';
 		date_default_timezone_set($this->timezone);
-		
-		/**
-		 * 접속한 사이트주소 및 사이트변수 정의
-		 */
-		$this->site = null;
-		$this->domain = isset($_SERVER['HTTP_HOST']) == true ? strtolower($_SERVER['HTTP_HOST']) : '';
-		$this->language = Request('language');
-		$this->menu = Request('menu') == null ? 'index' : Request('menu');
-		$this->page = Request('page') == null ? null : Request('page');
-		$this->view = Request('view') == null ? null : Request('view');
-		$this->idx = Request('idx') == null ? null : Request('idx');
 		
 		/**
 		 * 기본 사이트 자바스크립트 호출
@@ -296,7 +296,10 @@ class iModule {
 				$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
 				
 				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
-					$sitemap[$j]->context = $sitemap[$j]->context == '' ? null : json_decode($sitemap[$j]->context);
+					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
+					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
+					
+					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
 					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
 					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
 					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
@@ -311,29 +314,6 @@ class iModule {
 				}
 			}
 		}
-		/*
-		$pages = $this->db()->select($this->table->sitemap)->orderBy('sort','asc')->get();
-		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
-			if ($pages[$i]->page == '') {
-				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
-				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
-				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
-				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
-				$this->menus[$pages[$i]->domain.'@'.$pages[$i]->language][] = $pages[$i];
-				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu] = array();
-			}
-		}
-		
-		for ($i=0, $loop=count($pages);$i<$loop;$i++) {
-			if ($pages[$i]->page != '') {
-				$pages[$i]->context = $pages[$i]->context == '' ? null : json_decode($pages[$i]->context);
-				$pages[$i]->description = isset($pages[$i]->description) == true && $pages[$i]->description ? $pages[$i]->description : null;
-				$pages[$i]->image = isset($pages[$i]->image) == true && $pages[$i]->image ? __IM_DIR__.'/attachment/view/'.$pages[$i]->image.'/preview.png' : null;
-				if ($pages[$i]->type == 'MODULE') $pages[$i]->context->config = isset($pages[$i]->context->config) == true ? $pages[$i]->context->config : null;
-				$this->pages[$pages[$i]->domain.'@'.$pages[$i]->language][$pages[$i]->menu][] = $pages[$i];
-			}
-		}
-		*/
 	}
 	
 	/**
@@ -649,6 +629,9 @@ class iModule {
 		 * $domain 의 값이 * 일 경우 현재 사이트의 도메인으로 설정한다.
 		 */
 		$domain = $domain == '*' ? $this->site->domain : $domain;
+		
+		$context = $menu === null || $menu === false ? null : ($page === null || $page === false ? $this->getMenus($menu,$domain,$language) : $this->getPages($menu,$page,$domain,$language));
+		if ($context != null && isset($context->type) == true && $context->type == 'LINK') return $context->context->link.'#IM'.$context->context->target;
 		
 		/**
 		 * $isFullUrl 값이 true 이거나, 설정된 도메인이 현재 사이트의 도메인과 다를 경우 전체 URL 을 생성한다.
@@ -999,7 +982,7 @@ class iModule {
 		
 		if ($this->page == null) {
 			$menu = $this->getMenus($this->menu);
-			if ($menu->type == 'PAGE') return $this->getPages($this->menu,$menu->context->page);
+			if (isset($menu->type) == true && $menu->type == 'PAGE') return $this->getPages($this->menu,$menu->context->page);
 			else return $menu;
 		} else {
 			return $this->getPages($this->menu,$this->page);
@@ -1771,13 +1754,32 @@ class iModule {
 			}
 		}
 		
+		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true) {
+			$results = new stdClass();
+			$results->success = false;
+			
+			if ($match[1] == 'api') {
+				$results->error = $code;
+				$results->message = $value;
+			} elseif ($match[1] == 'process') {
+				$this->language = Request('_language');
+				$results->message = $this->getErrorText($code,$value,$message);
+			}
+			
+			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+		}
+		
+		if ($this->language == null) {
+			$this->language = 'ko';
+		}
+		/*
 		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['PHP_SELF']) == true) {
 			$results = new stdClass();
 			$results->success = false;
 			$results->message = $this->getErrorText($code,$value,$message);
 			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
 		}
-		
+		*/
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
@@ -2232,6 +2234,18 @@ class iModule {
 		} else {
 			$this->printError('PHP_ERROR',$error);
 		}
+	}
+	
+	/**
+	 * 특정 이벤트리스너를 가지고 온다.
+	 *
+	 * @param string $event 이벤트 타입 (afterInitContext or afterDoProcess ... etc.)
+	 * @param string $target 이벤트 대상 (core 또는 모듈명)
+	 * @param string $caller 이벤트 지점 (보통 이벤트를 발생시킨 함수명)
+	 * @param object[] $listeners
+	 */
+	function getEventListeners($event,$target,$caller) {
+		return $this->Event->getEventListeners($event,$target,$caller);
 	}
 	
 	/**
