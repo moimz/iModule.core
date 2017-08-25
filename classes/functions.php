@@ -544,8 +544,14 @@ function CheckDependency($dependency,$version) {
 	} elseif ($dependency == 'curl') {
 		$check->installed = function_exists('curl_init');
 		$check->installedVersion = null;
-	} elseif ($dependency == 'mcrypt_encrypt') {
-		$check->installed = function_exists('mcrypt_encrypt');
+	} elseif ($dependency == 'zip') {
+		$check->installed = class_exists('ZipArchive');
+		$check->installedVersion = null;
+	} elseif ($dependency == 'mbstring') {
+		$check->installed = function_exists('mb_strlen');
+		$check->installedVersion = null;
+	} elseif ($dependency == 'gd') {
+		$check->installed = function_exists('ImageCreateFromJPEG');
 		$check->installedVersion = null;
 	} else {
 		$check->installed = false;
