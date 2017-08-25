@@ -79,6 +79,8 @@ class mysql {
 	}
 	
 	function error($msg,$query='') {
+		$this->reset();
+		
 		$IM = new iModule('SAFETY');
 		echo $IM->printError('DATABASE_ERROR',$msg.'<br>'.$query);
 	}
