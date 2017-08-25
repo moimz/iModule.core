@@ -18,6 +18,8 @@
  */
 REQUIRE_ONCE str_replace('/admin','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
+define('__IM_ADMIN__',true);
+
 $IM = new iModule();
 $IM->getModule('admin')->doLayout();
 ?>
