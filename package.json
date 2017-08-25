@@ -7,7 +7,9 @@
 		"php":"5.3.3",
 		"mysql":"5.0.0",
 		"curl":"*",
-		"mcrypt_encrypt":"*"
+		"zip":"*",
+		"mbstring":"*",
+		"gd":"*"
 	},
 	"requirements":{
 		"modules/admin":"3.0.0",
@@ -16,8 +18,7 @@
 		"modules/keyword":"3.0.0",
 		"modules/member":"3.0.0",
 		"modules/push":"3.0.0",
-		"modules/wysiwyg":"3.0.0",
-		"widgets/article":"3.0.0"
+		"modules/wysiwyg":"3.0.0"
 	},
 	"directories":{
 		"attachments":"0707",
@@ -89,6 +90,43 @@
 				"module,type,idx":"primary_key"
 			}
 		},
+		"cron_table":{
+			"columns":{
+				"host":{
+					"type":"varchar",
+					"length":100
+				},
+				"module":{
+					"type":"varchar",
+					"length":20
+				},
+				"type":{
+					"type":"enum",
+					"length":"'DAILY','WEEKLY','MONTHLY'",
+					"default":"DAILY"
+				},
+				"date":{
+					"type":"date"
+				},
+				"result":{
+					"type":"longtext"
+				},
+				"start_date":{
+					"type":"int",
+					"length":11
+				},
+				"end_date":{
+					"type":"int",
+					"length":11
+				},
+				"runtime":{
+					"type":"double"
+				}
+			},
+			"indexes":{
+				"host,module,type,date":"primary_key"
+			}
+		},
 		"module_table":{
 			"columns":{
 				"module":{
@@ -144,6 +182,11 @@
 					"default":"FALSE"
 				},
 				"is_templet":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				},
+				"is_external":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
 					"default":"FALSE"
