@@ -46,6 +46,32 @@ class Event {
 	}
 	
 	/**
+	 * 특정 이벤트리스너를 가지고 온다.
+	 *
+	 * @param string $event 이벤트 타입 (afterInitContext or afterDoProcess ... etc.)
+	 * @param string $target 이벤트 대상 (core 또는 모듈명)
+	 * @param string $caller 이벤트 지점 (보통 이벤트를 발생시킨 함수명)
+	 * @param object[] $listeners
+	 */
+	function getEventListeners($event,$target,$caller) {
+		$listeners = array();
+		
+		if (isset($this->listeners[$target][$event]['*']) == true) {
+			for ($i=0, $loop=count($this->listeners[$target][$event]['*']);$i<$loop;$i++) {
+				$listeners[] = $this->listeners[$target][$event]['*'][$i];
+			}
+		}
+		
+		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return $listeners;
+		
+		for ($i=0, $loop=count($this->listeners[$target][$event][$caller]);$i<$loop;$i++) {
+			$listeners[] = $this->listeners[$target][$event][$caller][$i];
+		}
+		
+		return $listeners;
+	}
+	
+	/**
 	 * 이벤트를 발생시킨다.
 	 *
 	 * @param string $event 이벤트명
@@ -61,7 +87,6 @@ class Event {
 			for ($i=0, $loop=count($this->listeners[$target][$event]['*']);$i<$loop;$i++) {
 				if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event]['*'][$i],$values,$results,$html) === false) return false;
 			}
-			return true;
 		}
 		
 		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return null;
