@@ -61,6 +61,8 @@
 .mi-bars:before {content:"\eb13"}
 .mi-view-card:before {content:"\eb14"}
 .mi-view-grid:before {content:"\eb15"}
+.mi-plus-thin:before {content:"\eb16"}
+.mi-minus-thin:before {content:"\eb17"}
 .mi-user:before {content:"\ec00"}
 .mi-group:before {content:"\ec01"}
 .mi-home:before {content:"\ec02"}
