@@ -598,6 +598,17 @@ class Module {
 	}
 	
 	/**
+	 * 크론작업을 사용한다고 설정된 모듈목록을 가져온다.
+	 *
+	 * @return object[] $modules
+	 */
+	function getCronModules() {
+		$modules = $this->IM->db()->select($this->table->module)->where('is_cron','TRUE')->get();
+		
+		return $modules;
+	}
+	
+	/**
 	 * [코어/사이트관리자] 모듈을 설치한다.
 	 *
 	 * @param string $module 설치할 모듈명
@@ -681,6 +692,7 @@ class Module {
 				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
+				'is_external'=>isset($package->external) == true && $package->external === true ? 'TRUE' : 'FALSE',
 				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
 				'is_cron'=>isset($package->cron) == true && $package->cron === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
@@ -699,6 +711,7 @@ class Module {
 				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
+				'is_external'=>isset($package->external) == true && $package->external === true ? 'TRUE' : 'FALSE',
 				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
 				'is_cron'=>isset($package->cron) == true && $package->cron === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
