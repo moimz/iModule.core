@@ -1012,7 +1012,8 @@ class Templet {
 	 * @return string $html
 	 */
 	function getPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
-		$link = $link.$this->IM->getQueryString();
+		$link = $link;
+		if (strpos($link,'#') != 0) $link.= $this->IM->getQueryString();
 		
 		$total = $total == 0 ? 1 : $total;
 		
@@ -1052,6 +1053,8 @@ class Templet {
 				return $this->getError('NOT_FOUND_TEMPLET_FILE',$this->getDir().'/'.$file.'.php',false);
 			}
 		}
+		
+		$html = PHP_EOL.'<div data-role="pagination" data-page="'.$p.'" data-total="'.$total.'">'.$html.'</div>'.PHP_EOL;
 		
 		return $html;
 	}
