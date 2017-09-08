@@ -1623,10 +1623,9 @@
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) $form.status("error",result.errors);
 				if (result.message) {
-					iModule.alert.show("error",result.message);
+					iModule.alert.show(result.success == true ? "success" : "error",result.message);
 					$form.status("default");
 				}
-				
 				if (result.error) {
 					iModule.modal.error(result.error,result.url ? result.url : null);
 					$form.status("default");
@@ -1851,11 +1850,9 @@
 		var offsetTop = 50;
 		var offsetBottom = 50;
 		
-		if (this.offset().top - offsetTop < $("body").scrollTop()) {
+		if (this.outerHeight() > $(window).height() || this.offset().top - offsetTop < $("body").scrollTop()) {
 			$("html,body").animate({scrollTop:this.offset().top - offsetTop});
-		}
-		
-		if (this.offset().top + this.outerHeight(true) + offsetBottom > $(window).height() + $("body").scrollTop()) {
+		} else if (this.offset().top + this.outerHeight(true) + offsetBottom > $(window).height() + $("body").scrollTop()) {
 			$("html,body").animate({scrollTop:this.offset().top + this.outerHeight(true) + offsetBottom - $(window).height()});
 		}
 	};
