@@ -426,6 +426,9 @@ div[data-role=wysiwyg-content] table {border-collapse:collapse; margin:10px 0px;
 div[data-role=wysiwyg-content] table td {border:1px solid #ddd; padding:5px;}
 
 div[data-role=wysiwyg-content] img {max-width:100%;}
+div[data-role=wysiwyg-content] ul {list-style-position:outside; list-style-type:disc; margin-left:25px;}
+div[data-role=wysiwyg-content] ol {list-style-position:outside; margin-left:25px;}
+
 
 @media (max-width:767px) {
 	div[data-role=pagination] > div {width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
