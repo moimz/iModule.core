@@ -390,6 +390,12 @@ class Module {
 		 * 모듈에 설정패널 메소드가 없으면 NULL 을 반환한다.
 		 */
 		if (method_exists($mModule,'getAdminPanel') == false) return null;
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$this->IM->fireEvent('afterGetAdminPanel',$module,'admin');
+		
 		return $mModule->getAdminPanel();
 	}
 	
