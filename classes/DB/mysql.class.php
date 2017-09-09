@@ -361,14 +361,14 @@ class mysql {
 		}
 	}
 	
-	public function get() {
+	public function get($field=null) {
 		$stmt = $this->_buildQuery();
 		if ($this->isSubQuery == true) return $this;
 		
 		$stmt->execute();
 		$this->_stmtError = $stmt->error;
 		$this->reset();
-		return $this->_dynamicBindResults($stmt);
+		return $this->_dynamicBindResults($stmt,$field);
 	}
 	
 	public function getOne() {
@@ -550,7 +550,7 @@ class mysql {
 		return $stmt;
 	}
 	
-	private function _dynamicBindResults(mysqli_stmt $stmt) {
+	private function _dynamicBindResults(mysqli_stmt $stmt,$selector=null) {
 		$parameters = array();
 		$results = array();
 		$meta = $stmt->result_metadata();
@@ -571,7 +571,7 @@ class mysql {
 			foreach ($row as $key=>$val) {
 				$result[$key] = isset($val) == false || $val === null ? '' : $val;
 			}
-			array_push($results,(object)$result);
+			array_push($results,$selector == null ? (object)$result : (isset($result[$selector]) == true ? $result[$selector] : ''));
 			$this->count++;
 		}
 		$stmt->free_result();
