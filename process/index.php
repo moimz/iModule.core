@@ -35,7 +35,7 @@ if ($_module == 'admin' || ($_module == 'attachment' && in_array($_action,array(
 /**
  * 작업코드가 @ 로 시작할 경우 관리자권한으로 동작하는 작업으로 관리자권한을 확인한다.
  */
-if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() == false) {
+if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() == false && (method_exists($IM->getModule($_module),'isAdmin') === false || $IM->getModule($_module)->isAdmin() === false) && $IM->getModule('admin')->checkProcessPermission($_module,$_action) == false) {
 	header('Content-type:text/json; charset=utf-8',true);
 	header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 	header('Cache-Control:post-check=0, pre-check=0', false);
@@ -44,6 +44,7 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 } else {
 	if ($_module != null) {
 		$results = $IM->getModule($_module,true)->doProcess($_action);
+		$results->_loadtime = $IM->getLoadTime();
 		
 		if ($results !== null) {
 			header('Content-type:text/json; charset=utf-8',true);
