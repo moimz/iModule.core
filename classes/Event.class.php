@@ -250,6 +250,11 @@ class Event {
 			$panel = &$context;
 		}
 		
+		if ($event == 'checkPermission' || $event == 'checkProcessPermission') {
+			$action = $values->action;
+			$permission = &$values->permission;
+		}
+		
 		$listenerPath = '';
 		if ($listenerType == 'addon') {
 			$listenerPath = __IM_PATH__.'/addons/'.$listenerName.'/'.$event.'.php';
