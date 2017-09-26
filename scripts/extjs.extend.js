@@ -17,7 +17,7 @@ Ext.define("Ext.moimz.form.Panel",{override:"Ext.form.Panel",trackResetOnLoad:tr
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
 Ext.define("Ext.moimz.form.action.Submit",{
 	override:"Ext.form.action.Submit",
-	run :function(){
+	run:function(){
 		var me = this,
 			form = me.form;
 			
@@ -57,7 +57,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 			}
 		}
 	},
-	onSuccess: function(response) {
+	onSuccess:function(response) {
 		var form = this.form,
 			formActive = form && !form.destroying && !form.destroyed,
 			success = true,
@@ -65,10 +65,12 @@ Ext.define("Ext.moimz.form.action.Submit",{
 		
 		if (result !== true && !result.success) {
 			if (result.errors && formActive) {
+				console.log(result.errors);
+				
 				form.markInvalid(result.errors);
 				
 				var invalid = form.getFields().filterBy(function(field) {
-					return !field.validate();
+					return field.isDirty();
 				});
 				
 				if (invalid.items.length > 0) {
