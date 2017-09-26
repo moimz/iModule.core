@@ -49,6 +49,12 @@
 .x-grid-group-title {font-size:13px; font-weight:bold; color:#000;}
 .x-grid-group-title > i {margin-right:8px;}
 
+.x-grid-dark .x-column-header {background-color:#48535f; border-color:#2d3844; color:#adb3b8;}
+.x-grid-dark .x-column-header-over {background:#2d3844;}
+.x-grid-dark .x-grid-header-ct {border:1px solid #2d3844;}
+.x-grid-dark .x-grid-body {border-top:1px solid #adb3b8;}
+.x-grid-dark .x-column-header.x-column-header-focus .x-column-header-inner:after {border:0px;}
+
 .x-grid-cell-button .x-grid-cell-inner button {border:1px solid transparent; border-bottom:1px solid transparent; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; width:calc(100% - 2px); height:30px; margin:1px 1px; box-sizing:border-box; font-weight:normal; text-align:center; display:block; font-size:12px; cursor:pointer; box-shadow:rgba(255, 255, 255, 0.2) 0px 1px 0px 0px inset; border-color:rgba(0, 0, 0, 0.1);}
 .x-grid-cell-button .x-grid-cell-inner button[disabled] {opacity:0.4; cursor:not-allowed; background-image:none !important;}
 .grid .bodyPanel ul.row li:last-child.button button {border-right:0px;}
@@ -68,6 +74,15 @@
 .x-menu-title {max-width:250px; height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 .x-form-help {margin-top:5px; line-height:1.6; font-size:11px; color:#666;}
 .x-box-default {padding:8px; font-size:12px; line-height:1.6; background:#ffffef; color:#666;}
+
+.x-tool-maximize {font-size:14px; line-height:16px;}
+.x-tool-maximize:before {content:"\f2d0";}
+.x-tool-restore {font-size:14px; line-height:16px;}
+.x-tool-restore:before {content:"\f2d2";}
+
+
+.x-fieldset {overflow:visible;}
+
 /*
 .x-form-wysiwyg {height:345px !important; table-layout:fixed;}
 .x-form-wysiwyg > label {height:345px !important; overflow:hidden;}
