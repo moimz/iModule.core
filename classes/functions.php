@@ -124,7 +124,8 @@ function GetAntiSpamEmail($email,$isLink=true) {
 	return $isLink == true ? '<span class="iModuleEmail">'.$email.'</span>' : $email;
 }
 
-function GetTime($format,$time=null) {
+function GetTime($format,$time=null,$is_moment=true) {
+	$language = Request('language');
 	$time = $time === null ? time() : $time;
 
 	$replacements = array(
@@ -167,7 +168,9 @@ function GetTime($format,$time=null) {
 		'U' => 'X'
 	);
 	$momentFormat = strtr($format,$replacements);
-	return '<time datetime="'.date('c',$time).'" data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
+	
+	if ($is_moment == true) return '<time datetime="'.date('c',$time).'" data-time="'.$time.'" data-format="'.$format.'" data-moment="'.$momentFormat.'">'.date($format,$time).'</time>';
+	else return date($format,$time);
 }
 
 function GetPhoneNumber($phone) {
@@ -396,6 +399,11 @@ function SaveFileFromUrl($url,$filename,$filetype=null) {
 	curl_setopt($ch,CURLOPT_REFERER,$url);
 	curl_setopt($ch,CURLOPT_TIMEOUT,30);
 	curl_setopt($ch,CURLOPT_FOLLOWLOCATION,1);
+	
+	if (isset($_SERVER['HTTP_USER_AGENT']) == true) {
+		curl_setopt($ch,CURLOPT_USERAGENT,$_SERVER['HTTP_USER_AGENT']);
+	}
+	
 	curl_setopt($ch,CURLOPT_AUTOREFERER,1);
 	curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
 	$buffer = curl_exec($ch);
