@@ -65,12 +65,10 @@ Ext.define("Ext.moimz.form.action.Submit",{
 		
 		if (result !== true && !result.success) {
 			if (result.errors && formActive) {
-				console.log(result.errors);
-				
 				form.markInvalid(result.errors);
 				
 				var invalid = form.getFields().filterBy(function(field) {
-					return field.isDirty();
+					return !field.validate();
 				});
 				
 				if (invalid.items.length > 0) {
@@ -216,7 +214,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		value = parseFloat(me.toBaseNumber(value));
 		return isNaN(value) ? null :value;
 	},
-	onChange: function(newValue) {
+	onChange:function(newValue) {
 		var ariaDom = this.ariaEl.dom;
 		
 		this.toggleSpinners();
@@ -364,6 +362,25 @@ Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",onRender:
 	}
 }});
 */
+Ext.define("Ext.moimz.grid.NavigationModelWithoutScrolling",{extend:"Ext.grid.NavigationModel",onCellMouseDown:function(view,cell,cellIndex,record,row,recordIndex,mousedownEvent) {
+	var targetComponent = Ext.Component.fromElement(mousedownEvent.target,cell),
+		ac;
+
+	if (view.actionableMode && (mousedownEvent.getTarget(null, null, true).isTabbable() || ((ac = Ext.ComponentManager.getActiveComponent()) && ac.owns(mousedownEvent)))) {
+		return;
+	}
+
+	if (mousedownEvent.pointerType !== "touch") {
+		this.setPosition(mousedownEvent.position,null,mousedownEvent);
+	}
+
+	if (targetComponent && targetComponent.isFocusable && targetComponent.isFocusable()) {
+		view.setActionableMode(true,mousedownEvent.position);
+	}
+},focusItem:function(item) {
+	item.addCls(this.focusCls);
+}});
+
 Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:function(ct,position) {
 	var me = this;
 	me.callParent(arguments);
