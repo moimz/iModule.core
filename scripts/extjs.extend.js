@@ -68,7 +68,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 				form.markInvalid(result.errors);
 				
 				var invalid = form.getFields().filterBy(function(field) {
-					return !field.validate();
+					return field.isDirty();
 				});
 				
 				if (invalid.items.length > 0) {
