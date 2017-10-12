@@ -1743,7 +1743,7 @@ class iModule {
 	 * @param string $message(옵션) 변환된 에러메세지
 	 * @return null
 	 */
-	function printError($code=null,$value=null,$message=null) {
+	function printError($code=null,$value=null,$message=null,$is_force_html=false) {
 		if (isset($_SERVER['SCRIPT_NAME']) == true && in_array($_SERVER['SCRIPT_NAME'],array('/scripts/php2js.js.php')) == true) exit;
 		
 		if (is_string($code) == true) {
@@ -1754,7 +1754,7 @@ class iModule {
 			}
 		}
 		
-		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true) {
+		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && $is_force_html == false) {
 			$results = new stdClass();
 			$results->success = false;
 			
