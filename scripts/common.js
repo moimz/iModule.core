@@ -747,5 +747,37 @@ var iModule = {
 		
 		popup.window.resizeBy(resizeWidth,resizeHeight);
 		popup.location.href = url;
+	},
+	getCookie:function(name) {
+		var cookies = document.cookie.split(";");
+		var values = "";
+	
+		for (var i=0, total=cookies.length;i<total;i++) {
+			if (cookies[i].indexOf(name+"=")!=-1) {
+				var temp = cookies[i].split("=");
+				values = temp[1];
+				break;
+			}
+		}
+	
+		return values;
+	},
+	setCookie:function(name,value,expire,path) {
+		path = !path ? "/" : path;
+		var todaydate = new Date();
+		unixtime = todaydate.getTime();
+	
+		if (value == null) {
+			extime = unixtime-3600;
+			todaydate.setTime(extime);
+			expiretime = " expires=" + todaydate.toUTCString() +";";
+		} else {
+			extime = unixtime+(expire*1000);
+			todaydate.setTime(extime);
+			if (expire) expiretime = " expires=" + todaydate.toUTCString() +";";
+			else expiretime = "";
+		}
+	
+		document.cookie = name + "=" + escape(value) + "; path="+path+";"+expiretime;
 	}
 };
