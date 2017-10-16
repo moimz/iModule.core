@@ -25,6 +25,8 @@ $module = Request('module');
 $container = Request('container');
 $view = Request('view');
 $idx = Request('idx');
+$IM->menu = '#';
+$IM->page = '#';
 $IM->setContainerMode($module,$container);
 
 define('__IS_MODULE_CONTAINER__',true);
