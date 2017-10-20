@@ -124,6 +124,9 @@ class Templet {
 				
 				$this->templetPath = $siteTemplet->getPath().'/modules/'.$caller->getName().'/'.$moduleTemplet;
 				$this->templetDir = $siteTemplet->getDir().'/modules/'.$caller->getName().'/'.$moduleTemplet;
+			} elseif ($templet == '#') {
+				$this->templetPath = $caller->getPath().'/templets';
+				$this->templetDir = $caller->getDir().'/templets';
 			} elseif (strpos($templet,'#') === 0) {
 				$temp = explode('.',preg_replace('/^#/','',$templet));
 				
@@ -133,13 +136,13 @@ class Templet {
 				if (count($temp) == 1) {
 					$this->templetPath = $caller->getPath().'/templets';
 					$this->templetDir = $caller->getDir().'/templets';
-				} else {
+				} elseif (count($temp) == 2) {
 					$this->templetPath = $this->IM->getModule()->getPath($temp[0]).'/templets/modules/'.$caller->getName().'/'.$temp[1];
 					$this->templetDir = $this->IM->getModule()->getDir($temp[0]).'/templets/modules/'.$caller->getName().'/'.$temp[1];
+				} elseif (count($temp) == 3) {
+					$this->templetPath = $this->IM->getModule()->getPath($temp[0]).'/templets/'.$temp[1].'/modules/'.$caller->getName().'/'.$temp[2];
+					$this->templetDir = $this->IM->getModule()->getDir($temp[0]).'/templets/'.$temp[1].'/modules/'.$caller->getName().'/'.$temp[2];
 				}
-			} elseif ($templet == '#') {
-				$this->templetPath = $caller->getPath().'/templets';
-				$this->templetDir = $caller->getDir().'/templets';
 			} else {
 				$this->templetPath = $caller->getPath().'/templets/'.$templet;
 				$this->templetDir = $caller->getDir().'/templets/'.$templet;
@@ -358,12 +361,32 @@ class Templet {
 			 */
 			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->where('is_templet','TRUE')->get();
 			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-				if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName()) == true) {
-					$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName());
+				if (is_file(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/package.json') == true) {
+					if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName()) == true) {
+						$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName());
+						while ($templetName = @readdir($templetsPath)) {
+							if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName().'/'.$templetName) == true) {
+								$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName);
+								if ($templet->isLoaded() === true) $templets[] = $templet;
+							}
+						}
+						@closedir($templetsPath);
+					}
+				} else {
+					$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets');
+					
 					while ($templetName = @readdir($templetsPath)) {
-						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName().'/'.$templetName) == true) {
-							$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName);
-							if ($templet->isLoaded() === true) $templets[] = $templet;
+						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName) == true) {
+							if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName.'/modules/'.$caller->getName()) == true) {
+								$templetsPath2 = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName.'/modules/'.$caller->getName());
+								while ($templetName2 = @readdir($templetsPath2)) {
+									if ($templetName2 != '.' && $templetName2 != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName.'/modules/'.$caller->getName().'/'.$templetName2) == true) {
+										$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName.'.'.$templetName2);
+										if ($templet->isLoaded() === true) $templets[] = $templet;
+									}
+								}
+								@closedir($templetsPath2);
+							}
 						}
 					}
 					@closedir($templetsPath);
