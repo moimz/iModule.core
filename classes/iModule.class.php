@@ -1630,7 +1630,7 @@ class iModule {
 		/**
 		 * PHP 설정값들 중 자바스크립트에 필수적으로 필요한 정보를 불러온다.
 		 */
-		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null ? $this->menu : '').'&page='.($this->page != null ? $this->page : '').'&view='.($this->view != null ? $this->view : '').'&container='.($this->container != null ? $this->container : ''));
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null && $this->menu != '#' ? $this->menu : '').'&page='.($this->page != null && $this->page != '#' ? $this->page : '').'&view='.($this->view != null ? $this->view : '').'&container='.($this->container != null ? $this->container : ''));
 		
 		/**
 		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.
