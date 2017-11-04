@@ -121,7 +121,6 @@ class Module {
 		$this->moduleDir = __IM_DIR__.'/modules/'.$module;
 		
 		if (is_dir($this->modulePath) == false) return false;
-		
 		$this->modulePackage = $this->getPackage($module);
 		
 		/**
@@ -137,7 +136,6 @@ class Module {
 		}
 		
 		$class = 'Module'.ucfirst($module);
-		
 		if (is_file($this->modulePath.'/'.$class.'.class.php') == false) return false;
 		
 		$this->loaded = $module;
