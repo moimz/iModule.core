@@ -2061,11 +2061,15 @@
 	};
 	
 	$.fn.checked = function(checked) {
-		if (this.is("input[type=radio]") == true || this.is("input[type=checkbox]") == true) {
-			this.prop("checked",checked);
+		if (checked === undefined) {
+			return this.prop("checked");
+		} else {
+			if (this.is("input[type=radio]") == true || this.is("input[type=checkbox]") == true) {
+				this.prop("checked",checked);
+			}
+			
+			return this;
 		}
-		
-		return this;
 	}
 	
 	$.fn.setDisabled = function(value) {
