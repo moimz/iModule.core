@@ -367,6 +367,7 @@ var iModule = {
 			}
 			
 			iModule.init($modal);
+			iModule.modal.set();
 			
 			if ($("div[data-role=input]",$modal).length > 0) {
 				var $input = $("div[data-role=input]",$modal).first();
@@ -398,7 +399,6 @@ var iModule = {
 			}
 			
 			$modal.data("isInit",true);
-			iModule.modal.set();
 		},
 		/**
 		 * 모달창의 크기와 위치를 정의한다.
