@@ -325,7 +325,7 @@ class iModule {
 	 */
 	function db($code='default',$prefix=null) {
 		$db = new DB();
-		$prefix = $prefix == null ? __IM_DB_PREFIX__ : $prefix;
+		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
 		return $db->db($code,$prefix);
 	}
 	
