@@ -116,7 +116,7 @@ function CheckNickname($nickname) {
  */
 function CheckPhoneNumber($phone) {
 	$phone = str_replace('-','',$phone);
-	return preg_match('/^0[0-9]{8,11}$/',$phone);
+	return preg_match('/^0[0-9]{9,11}$/',$phone);
 }
 
 function GetAntiSpamEmail($email,$isLink=true) {
