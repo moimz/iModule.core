@@ -186,8 +186,10 @@ class iModule {
 	
 	/**
 	 * 정상적으로 사이트에 접속시, 현재 접속한 사이트의 기본 URL을 구하고 사이트에 설정된 메뉴들을 저장한다.
+	 *
+	 * @param boolean $is_admin 관리자에서 접근하는지 여부
 	 */
-	function initSites() {
+	function initSites($is_admin=false) {
 		/**
 		 * 모든 사이트의 RAW 데이터를 저장한다.
 		 */
@@ -278,7 +280,7 @@ class iModule {
 			}
 		}
 		
-		if (defined('__IM_ADMIN__') == true) return;
+		if ($is_admin == false && defined('__IM_ADMIN__') == true) return;
 		
 		/**
 		 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
@@ -863,10 +865,11 @@ class iModule {
 	 *
 	 * @param string $domain(옵션) 사이트 도메인 주소 (해당 값이 있을 경우 해당 도메인에 대한 설정값이 반환되며 없을 경우 모든 사이트에 대한 설정값이 반환된다.)
 	 * @param string $language(옵션) 사이트 언어셋코드 (해당 값이 있을 경우 해당 언어셋을 사용하고 있는 사이트정보만 반환된다.)
+	 * @param boolean $is_admin 관리자에서 접근하는지 여부
 	 * @return object[] 파라매터 조건에 맞는 사이트정보 (조건에 맞는 사이트가 1뿐이라면 배열이 아닌 사이트정보 Object 가 반환된다.)
 	 */
-	function getSites($domain=null,$language=null) {
-		if ($this->sites == null) $this->initSites();
+	function getSites($domain=null,$language=null,$is_admin=false) {
+		if ($this->sites == null) $this->initSites($is_admin);
 		if ($domain == null && $language == null) return $this->sites;
 		
 		$sites = array();
