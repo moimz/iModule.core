@@ -187,9 +187,9 @@ class iModule {
 	/**
 	 * 정상적으로 사이트에 접속시, 현재 접속한 사이트의 기본 URL을 구하고 사이트에 설정된 메뉴들을 저장한다.
 	 *
-	 * @param boolean $is_admin 관리자에서 접근하는지 여부
+	 * @param boolean $is_force_inits 강제로 사이트메뉴를 초기화할지 여부
 	 */
-	function initSites($is_admin=false) {
+	function initSites($is_force_inits=false) {
 		/**
 		 * 모든 사이트의 RAW 데이터를 저장한다.
 		 */
@@ -251,7 +251,6 @@ class iModule {
 			 */
 			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
 			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
-			
 			$this->language = $site->language;
 		} else {
 			/**
@@ -273,50 +272,53 @@ class iModule {
 		/**
 		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
 		 */
-		if (preg_match('/\/(addons|admin|api|modules|process|templets)(\/[a-z]+)?\/index\.php/',$_SERVER['PHP_SELF']) == false) {
+		if (defined('__IM_SITE__') == true) {
 			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || Request('language') != $site->language) {
 				header("location:".($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/');
 				exit;
 			}
 		}
 		
-		if ($is_admin == false && defined('__IM_ADMIN__') == true) return;
-		
-		/**
-		 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
-		 */
-		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
-			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-			
+		if ($is_force_inits == true || defined('__IM_ADMIN__') == false) {
 			/**
-			 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
+			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
 			 */
-			if (strpos($this->sites[$i]->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->sites[$i]->templet,1)) == true) {
-				$mModule = $this->getModule(substr($this->sites[$i]->templet,1));
-				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
-				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
-			} else {
-				$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 				
-				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
-					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
-					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
+				/**
+				 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
+				 */
+				if (strpos($this->sites[$i]->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->sites[$i]->templet,1)) == true) {
+					$mModule = $this->getModule(substr($this->sites[$i]->templet,1));
+					$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
+					$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
+				} else {
+					$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
 					
-					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
-					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
-					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
-					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
-					
-					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
-					
-					if ($sitemap[$j]->page == '') {
-						$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
-					} else {
-						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
+					for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
+						$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
+						$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
+						
+						$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
+						$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
+						$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
+						if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
+						
+						if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+						
+						if ($sitemap[$j]->page == '') {
+							$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
+						} else {
+							$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
+						}
 					}
 				}
 			}
+		} else {
+			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 		}
 	}
 	
@@ -865,11 +867,11 @@ class iModule {
 	 *
 	 * @param string $domain(옵션) 사이트 도메인 주소 (해당 값이 있을 경우 해당 도메인에 대한 설정값이 반환되며 없을 경우 모든 사이트에 대한 설정값이 반환된다.)
 	 * @param string $language(옵션) 사이트 언어셋코드 (해당 값이 있을 경우 해당 언어셋을 사용하고 있는 사이트정보만 반환된다.)
-	 * @param boolean $is_admin 관리자에서 접근하는지 여부
+	 * @param boolean $is_force_inits 강제로 사이트메뉴를 초기화할지 여부
 	 * @return object[] 파라매터 조건에 맞는 사이트정보 (조건에 맞는 사이트가 1뿐이라면 배열이 아닌 사이트정보 Object 가 반환된다.)
 	 */
-	function getSites($domain=null,$language=null,$is_admin=false) {
-		if ($this->sites == null) $this->initSites($is_admin);
+	function getSites($domain=null,$language=null,$is_force_inits=false) {
+		if ($this->sites == null) $this->initSites($is_force_inits);
 		if ($domain == null && $language == null) return $this->sites;
 		
 		$sites = array();
@@ -969,7 +971,7 @@ class iModule {
 	 */
 	function getSite() {
 		if ($this->site != null) return $this->site;
-		
+		if ($this->language == null) $this->initSites();
 		$this->site = clone $this->getSites($this->domain,$this->language);
 		
 		$this->site->logo = json_decode($this->site->logo);
