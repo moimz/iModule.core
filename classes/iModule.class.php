@@ -278,6 +278,8 @@ class iModule {
 			}
 		}
 		
+		if (defined('__IM_ADMIN__') == true) return;
+		
 		/**
 		 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
 		 */
