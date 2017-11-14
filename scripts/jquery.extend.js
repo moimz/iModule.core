@@ -1229,7 +1229,7 @@
 			$month.html(now.format("MM"));
 			
 			var $years = $("<select>");
-			for (var i=year-15;i<=year+15;i++) {
+			for (var i=year-100;i<=year+15;i++) {
 				var $option = $("<option>").attr("value",i).html(i);
 				if (i == year) $option.attr("selected","selected");
 				$years.append($option);
