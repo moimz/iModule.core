@@ -22,6 +22,7 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 <meta name="viewport" content="width=800">
 <title>MoimzTools Install - <?php echo $package->title; ?></title>
 <link rel="stylesheet" href="//www.moimz.com/modules/moimz/styles/install.css" type="text/css">
+<link rel="shortcut icon" type="image/x-icon" href="//www.moimz.com/modules/moimz/images/favicon.ico">
 <?php if ($language != 'en') { ?>
 <link rel="stylesheet" href="//www.moimz.com/modules/moimz/styles/install.<?php echo $language; ?>.css" type="text/css">
 <?php } ?>
