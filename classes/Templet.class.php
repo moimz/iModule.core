@@ -631,7 +631,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetHeader',$this->caller->getName(),'header',$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetHeader',$this->caller->getName(),'header',$values);
 		
 		$html = '';
 		
@@ -690,7 +690,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetHeader',$this->caller->getName(),'header',$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetHeader',$this->caller->getName(),'header',$values,$html);
 		
 		return $html;
 	}
@@ -712,7 +712,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetFooter',$this->caller->getName(),'footer',$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetFooter',$this->caller->getName(),'footer',$values);
 		
 		$html = '';
 		
@@ -771,7 +771,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetFooter',$this->caller->getName(),'footer',$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetFooter',$this->caller->getName(),'footer',$values,$html);
 		
 		return $html;
 	}
@@ -842,7 +842,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetContext',$this->caller->getName(),$file,$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetContext',$this->caller->getName(),$file,$values);
 		
 		foreach ($values as $key=>$value) {
 			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
@@ -886,7 +886,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetContext',$this->caller->getName(),$file,$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetContext',$this->caller->getName(),$file,$values,$html);
 		
 		if ($layout !== null) return $this->getLayout($html);
 		return $html;
@@ -962,7 +962,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetExternal',$this->caller->getName(),$file,$values,null);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetExternal',$this->caller->getName(),$file,$values);
 		
 		foreach ($values as $key=>$value) {
 			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
@@ -1015,7 +1015,7 @@ class Templet {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetExternal',$this->caller->getName(),$file,$values,null,$html);
+		if ($this->callerType !== 'Widget') $this->IM->fireEvent('afterGetExternal',$this->caller->getName(),$file,$values,$html);
 		
 		$this->templetDir = $oTempletDir;
 		$this->templetPath = __IM_PATH__.$this->templetDir;

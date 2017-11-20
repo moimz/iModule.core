@@ -78,21 +78,20 @@ class Event {
 	 * @param string $target 이벤트가 발생한 모듈명
 	 * @param string $caller 이벤트가 발생한 객체명
 	 * @param &object $values 이벤트가 발생한 시점에서 정의된 모든 변수객체
-	 * @param &object $results 이벤트가 발생한 시점에서 정의된 모든 결과변수 (beforeDoProcess, afterDoProcess 이벤트에서만 사용된다.)
-	 * @param &string $html 이벤트가 발생한 시점에서 생성된 컨텍스트 HTML 소스 (afterGetContext, afterDoLayout 이벤트에서만 존재한다.)
+	 * @param &object $results 이벤트가 발생한 시점에서 정의된 모든 결과변수
 	 * @return boolean $result 이벤트 결과, 이벤트리스너에서 false 가 반환될 경우 다음 이벤트동작이 모두 중지되며, 경우에 따라 이벤트 발생대상에서 이벤트가 발생한 시점 이후 코드실행이 중단된다. (보통 before 가 붙은 이벤트)
 	 */
-	function fireEvent($event,$target,$caller,&$values=null,&$results=null,&$html=null) {
+	function fireEvent($event,$target,$caller,&$values=null,&$results=null) {
 		if (isset($this->listeners[$target][$event]['*']) == true) {
 			for ($i=0, $loop=count($this->listeners[$target][$event]['*']);$i<$loop;$i++) {
-				if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event]['*'][$i],$values,$results,$html) === false) return false;
+				if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event]['*'][$i],$values,$results) === false) return false;
 			}
 		}
 		
 		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return null;
 		
 		for ($i=0, $loop=count($this->listeners[$target][$event][$caller]);$i<$loop;$i++) {
-			if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event][$caller][$i],$values,$results,$html) === false) return false;
+			if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event][$caller][$i],$values,$results) === false) return false;
 		}
 		
 		return true;
@@ -106,11 +105,10 @@ class Event {
 	 * @param string $caller 이벤트가 발생한 객체명
 	 * @param string $listener 이벤트리스너 대상
 	 * @param &object $values 이벤트가 발생한 시점에서 정의된 모든 변수객체
-	 * @param &object $results 이벤트가 발생한 시점에서 정의된 모든 결과변수 (beforeDoProcess, afterDoProcess 이벤트에서만 사용된다.)
-	 * @param &string $html 이벤트가 발생한 시점에서 생성된 컨텍스트 HTML 소스 (afterGetContext, afterDoLayout 이벤트에서만 존재한다.)
+	 * @param &object $results 이벤트가 발생한 시점에서 정의된 모든 결과변수
 	 * @return boolean $result 이벤트 결과, 이벤트리스너에서 false 가 반환될 경우 다음 이벤트동작이 모두 중지되며, 경우에 따라 이벤트 발생대상에서 이벤트가 발생한 시점 이후 코드실행이 중단된다. (보통 before 가 붙은 이벤트)
 	 */
-	function execEvent($event,$target,$caller,$listener,&$values,&$results,&$html) {
+	function execEvent($event,$target,$caller,$listener,&$values,&$results) {
 		$IM = $this->IM;
 		
 		/**
@@ -163,6 +161,16 @@ class Event {
 		}
 		
 		/**
+		 * 언어팩처리
+		 */
+		if ($event == 'afterGetText') {
+			$code = $caller;
+			$string = &$values;
+
+			unset($caller);
+		}
+		
+		/**
 		 * 데이터처리
 		 */
 		if ($event == 'beforeGetData' || $event == 'afterGetData') {
@@ -182,7 +190,7 @@ class Event {
 			}
 		
 			$action = $caller;
-			unset($caller,$html);
+			unset($caller);
 		}
 		
 		/**
@@ -201,7 +209,8 @@ class Event {
 			$configs = $values->configs;
 			unset($values->configs);
 			
-			if (strpos($event,'before') === 0) unset($html);
+			if (strpos($event,'before') === 0) unset($results);
+			else $html = &$results;
 		}
 		
 		/**
@@ -220,7 +229,8 @@ class Event {
 			$configs = isset($values->configs) == true ? $values->configs : null;
 			unset($values->configs);
 			
-			if (strpos($event,'before') === 0) unset($html);
+			if (strpos($event,'before') === 0) unset($results);
+			else $html = &$results;
 		}
 		
 		if ($event == 'afterGetContextList') {
@@ -251,8 +261,8 @@ class Event {
 		}
 		
 		if ($event == 'checkPermission' || $event == 'checkProcessPermission') {
-			$action = $values->action;
-			$permission = &$values->permission;
+			$action = $values;
+			$permission = &$results;
 		}
 		
 		$listenerPath = '';

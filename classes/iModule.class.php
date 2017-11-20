@@ -317,8 +317,13 @@ class iModule {
 				}
 			}
 		} else {
-			$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-			$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+			/**
+			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
+			 */
+			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+			}
 		}
 	}
 	
@@ -1730,7 +1735,7 @@ class iModule {
 		$values->description = $description;
 		$values->type = $type;
 		$values->link = $link;
-		$this->fireEvent('afterGetContext','core','error',$values,null,$html);
+		$this->fireEvent('afterGetContext','core','error',$values,$html);
 		
 		if ($type == 'LOGIN') {
 			$header = PHP_EOL.'<form id="ErrotForm">'.PHP_EOL;
@@ -2187,7 +2192,7 @@ class iModule {
 		/**
 		 * 컨텍스트를 가지고 오기전 beforeGetContext 이벤트를 발생시킨다.
 		 */
-		$this->fireEvent('beforeGetContext','core','doLayout',null,null);
+		$this->fireEvent('beforeGetContext','core','doLayout');
 		
 		/**
 		 * 현재 접근한 페이지에 해당하는 사이트명을 설정하고, 컨텍스트 HTML 코드를 가져온다.
@@ -2199,7 +2204,7 @@ class iModule {
 		 * 컨텍스트를 가지고 온 뒤 afterGetContext 이벤트를 발생시킨다.
 		 * 컨텍스트 HTML 코드인 $context 변수는 pass by object 로 전달되기 때문에 이벤트리스너에서 조작할 경우 최종출력되는 HTML 코드가 변경된다.
 		 */
-		$this->fireEvent('afterGetContext','core','doLayout',null,null,$context);
+		$this->fireEvent('afterGetContext','core','doLayout',$site,$context);
 		
 		/**
 		 * 가져온 컨텍스트 HTML 코드를 페이지 레이아웃에 담아 웹사이트 body 를 만든다.
@@ -2230,7 +2235,10 @@ class iModule {
 		 * 전체 사이트 HTML 을 생성한 뒤 afterDoLayout 이벤트를 발생시킨다.
 		 * 전체 사이트 HTML 코드인 $html 변수는 pass by object 로 전달되기 때문에 이벤트리스너에서 조작할 경우 최종출력되는 HTML 코드가 변경된다.
 		 */
-		$this->fireEvent('afterDoLayout','core','*',null,null,$html);
+		$values = new stdClass();
+		$values->header = $header;
+		$values->footer = $footer;
+		$this->fireEvent('afterDoLayout','core','*',$values,$html);
 		
 		/**
 		 * PHP 에러가 발생하지 않았다면, 사이트 HTML 코드를 출력한다.
@@ -2267,8 +2275,8 @@ class iModule {
 	 * @param object $results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
 	 * @param string &$context 레이아웃에 관여하는 이벤트는 현재까지 파싱된 컨텍스트나 레이아웃 HTML 코드를 전달한다. (call by reference)
 	 */
-	function fireEvent($event,$target,$caller,$values=null,$results=null,&$context=null) {
-		$this->Event->fireEvent($event,$target,$caller,$values,$results,$context);
+	function fireEvent($event,$target,$caller,&$values=null,&$results=null) {
+		$this->Event->fireEvent($event,$target,$caller,$values,$results);
 	}
 }
 ?>
