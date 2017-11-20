@@ -8,6 +8,7 @@
  * @license GPLv3
  * @version 3.0.0.160831
  */
+Ext.Ajax.setTimeout(300000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
 Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x"});
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false});
