@@ -135,7 +135,7 @@ Ext.define("Ext.ux.ColorField",{
 	blankText:"색상코드가 잘못입력되었습니다. (#333 or #333333)",
 	preview:true,
 	regex:/^#[0-9a-f]{3,6}$/i,
-	validateValue :function(value){
+	validateValue:function(value){
 		if (!this.getEl()) {
 			return true;
 		}
@@ -152,14 +152,14 @@ Ext.define("Ext.ux.ColorField",{
 		this.setColor(value);
 		return true;
 	},
-	markInvalid :function( msg ) {
+	markInvalid:function( msg ) {
 		Ext.ux.ColorField.superclass.markInvalid.call(this,msg);
 	},
-	setValue :function(hex){
+	setValue:function(hex){
 		Ext.ux.ColorField.superclass.setValue.call(this,hex);
 		this.setColor(hex);
 	},
-	setColor :function(hex) {
+	setColor:function(hex) {
 		if (this.preview == true) {
 			Ext.ux.ColorField.superclass.setFieldStyle.call(this,{
 				"background-color":hex,
@@ -167,14 +167,14 @@ Ext.define("Ext.ux.ColorField",{
 			});
 		}
 	},
-	menuListeners :{
+	menuListeners:{
 		select:function(m,d){
 			this.setValue("#"+d);
 		},
-		show :function(){
+		show:function(){
 			this.onFocus();
 		},
-		hide :function(){
+		hide:function(){
 			this.focus();
 			var ml = this.menuListeners;
 			this.menu.un("select",ml.select,this);
@@ -182,7 +182,7 @@ Ext.define("Ext.ux.ColorField",{
 			this.menu.un("hide",ml.hide,this);
 		}
 	},
-	onTriggerClick :function(e){
+	onTriggerClick:function(e){
 		if (this.disabled){
 			return;
 		}
@@ -213,7 +213,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 	parseRawValue:function(value) {
 		var me = this;
 		value = parseFloat(me.toBaseNumber(value));
-		return isNaN(value) ? null :value;
+		return isNaN(value) ? null : value;
 	},
 	onChange:function(newValue) {
 		var ariaDom = this.ariaEl.dom;
@@ -237,7 +237,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 	getErrors:function(value) {
 		if (!this.allowThousandSeparator)
 			return this.callParent(arguments);
-		value = arguments.length > 0 ? value :this.processRawValue(this.getRawValue());
+		value = arguments.length > 0 ? value : this.processRawValue(this.getRawValue());
 	
 		var me = this,
 			errors = me.callSuper([value]),
@@ -353,35 +353,6 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		}
 	}
 });
-/*
-Ext.define("Ext.moimz.form.field.Base",{override:"Ext.form.field.Base",onRender:function() {
-	this.callParent(arguments);
-	this.mixins.labelable.self.initTip();
-	this.renderActiveError();
-	if (this.allowBlank == false && this.fieldLabel && this.xtype != "checkbox") {
-		this.setFieldLabel("<i class='required'>*</i>"+this.fieldLabel);
-	}
-}});
-*/
-Ext.define("Ext.moimz.grid.NavigationModelWithoutScrolling",{extend:"Ext.grid.NavigationModel",onCellMouseDown:function(view,cell,cellIndex,record,row,recordIndex,mousedownEvent) {
-	var targetComponent = Ext.Component.fromElement(mousedownEvent.target,cell),
-		ac;
-
-	if (view.actionableMode && (mousedownEvent.getTarget(null, null, true).isTabbable() || ((ac = Ext.ComponentManager.getActiveComponent()) && ac.owns(mousedownEvent)))) {
-		return;
-	}
-
-	if (mousedownEvent.pointerType !== "touch") {
-		this.setPosition(mousedownEvent.position,null,mousedownEvent);
-	}
-
-	if (targetComponent && targetComponent.isFocusable && targetComponent.isFocusable()) {
-		view.setActionableMode(true,mousedownEvent.position);
-	}
-},focusItem:function(item) {
-	item.addCls(this.focusCls);
-}});
-
 Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:function(ct,position) {
 	var me = this;
 	me.callParent(arguments);
