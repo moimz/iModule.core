@@ -446,6 +446,12 @@
 						$container.append($button);
 						
 						$input.on("blur",function(value) {
+							if ($(this).val().match(/^[0-9]{8}$/).length == 1) {
+								$(this).val($(this).val().substr(0,4)+"-"+$(this).val().substr(4,2)+"-"+$(this).val().substr(6,2));
+								$(this).trigger("change");
+								return;
+							}
+							
 							if (moment($(this).val()).isValid() == true) {
 								var format = $(this).attr("data-format") ? $(this).attr("data-format") : "YYYY-MM-DD";
 								$(this).val(moment($(this).val()).format(format));
