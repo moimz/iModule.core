@@ -37,8 +37,6 @@ var ENV = {
 		var view = view === undefined ? null : view;
 		var idx = idx === undefined ? null : idx;
 		
-		view = view === null && menu == ENV.MENU && page == ENV.PAGE ? ENV.VIEW : view;
-		
 		var url = ENV.DIR;
 		url+= "/" + ENV.LANGUAGE + "/module/" + module + "/" + container;
 		if (view === null || view === false) return url
