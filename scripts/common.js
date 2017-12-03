@@ -7,7 +7,8 @@
  * @file /scripts/common.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160904
+ * @version 3.0.0
+ * @modified 2017. 11. 30.
  */
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
@@ -214,6 +215,27 @@ var iModule = {
 		
 		fileSize = parseInt(fileSize);
 		return depthSize > fileSize ? fileSize+"B" : depthSize * depthSize > fileSize ? (fileSize/depthSize).toFixed(2)+(isKiB == true ? "KiB" : "KB") : depthSize * depthSize * depthSize > fileSize ? (fileSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "MiB" : "MB") : (fileSize/depthSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "GiB" : "GB");
+	},
+	getNumberFormat:function(number,decimals,dec_point,thousands_sep) {
+		number = (number + '').replace(/[^0-9+\-Ee.]/g, '');
+		var n = !isFinite(+number) ? 0 : +number,
+			prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+			sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+			dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+			s = '',
+			toFixedFix = function (n, prec) {
+				var k = Math.pow(10, prec);
+				return '' + Math.round(n * k) / k;
+			};
+		s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+		if (s[0].length > 3) {
+			s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+		}
+		if ((s[1] || '').length < prec) {
+			s[1] = s[1] || '';
+			s[1] += new Array(prec - s[1].length + 1).join('0');
+		}
+		return s.join(dec);
 	},
 	/**
 	 * 브라우져의 앞/뒤로 가기 버튼 클릭시 캐시사용을 막는다.
@@ -431,6 +453,8 @@ var iModule = {
 					$modal.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
 					$form.css("minWidth",($(window).width() - 20)+"px").css("width",($(window).width() - 20)+"px");
 				}
+			} else {
+				if (width > 0) $modal.css("minWidth",maxWidth+"px").css("width",maxWidth+"px");
 			}
 			
 			if ($modal.height() < maxHeight) {
@@ -441,6 +465,8 @@ var iModule = {
 					$modal.css("minHeight",($(window).height() - 20)+"px").css("height",($(window).height() - 20)+"px");
 					$form.css("minHeight",($(window).height() - 20)+"px").css("height",($(window).height() - 20)+"px");
 				}
+			} else {
+				if (height > 0) $modal.css("minHeight",maxHeight+"px").css("height",maxHeight+"px");
 			}
 			
 			if (is_fullsize == true && (iModule.isMobile == true || ($modal.width() < width && $modal.height() < height))) {
@@ -462,7 +488,7 @@ var iModule = {
 		 * @param string url 모달창을 가져올 주소
 		 * @param object data 전달할 데이터
 		 */
-		get:function(url,data,callback) {
+		get:function(url,data,callback,error) {
 			iModule.disable(true);
 			var data = data && typeof data == "object" ? data : {};
 			
@@ -478,6 +504,9 @@ var iModule = {
 					}
 				} else {
 					iModule.enable();
+					if (typeof error == "function") {
+						return error(result);
+					}
 				}
 			});
 		},
@@ -542,8 +571,8 @@ var iModule = {
 		},
 		error:function(message,callback) {
 			var $modal = $("<div>").attr("data-role","modal");
-			$modal.attr("data-closable","true");
-			$modal.attr("data-fullsize","false");
+			$modal.attr("data-closable","TRUE");
+			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
 			$modal.attr("data-height",0);
 			$modal.attr("data-max-width",400);
@@ -581,10 +610,10 @@ var iModule = {
 			
 			iModule.modal.showHtml($modal,callback);
 		},
-		alert:function(title,message,callback) {
+		alert:function(title,message,callback,closable) {
 			var $modal = $("<div>").attr("data-role","modal");
-			$modal.attr("data-closable","true");
-			$modal.attr("data-fullsize","false");
+			$modal.attr("data-closable",closable === false ? "FALSE" : "TRUE");
+			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
 			$modal.attr("data-height",0);
 			$modal.attr("data-max-width",400);
@@ -624,8 +653,8 @@ var iModule = {
 		},
 		confirm:function(title,message,callback) {
 			var $modal = $("<div>").attr("data-role","modal");
-			$modal.attr("data-closable","true");
-			$modal.attr("data-fullsize","false");
+			$modal.attr("data-closable","TRUE");
+			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
 			$modal.attr("data-height",0);
 			$modal.attr("data-max-width",400);
@@ -742,11 +771,34 @@ var iModule = {
 	 * @param string name 창이름
 	 */
 	resizePopup:function(popup,url,width,height) {
+		if (width > screen.width) width = screen.width;
+		if (height > screen.height) height = screen.height;
+		
 		var resizeWidth = width - $(popup.window).width();
 		var resizeHeight = height - $(popup.window).height();
 		
 		popup.window.resizeBy(resizeWidth,resizeHeight);
+		
 		popup.location.href = url;
+	},
+	/**
+	 * 현재창의 크기를 리사이즈한다.
+	 *
+	 * @param int width 가로크기
+	 * @param int height 가로크기
+	 */
+	resizeWindow:function(width,height,center) {
+		var resizeWidth = width === null ? 0 : width - $(window).width();
+		var resizeHeight = height === null ? 0 : height - $(window).height();
+		
+		window.resizeBy(resizeWidth,resizeHeight);
+		
+		if (center === true) {
+			var left = (screen.width - $(window).width()) / 2;
+			var top = (screen.height - $(window).height()) / 2;
+			
+			window.moveTo(left,top);
+		}
 	},
 	getCookie:function(name) {
 		var cookies = document.cookie.split(";");
