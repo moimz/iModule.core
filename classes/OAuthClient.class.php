@@ -2,6 +2,7 @@
 class OAuthClient {
 	private $_clientId = null;
 	private $_clientSecret = null;
+	private $_method = 'post';
 	private $_scope = '';
 	private $_redirectUrl;
 	private $_userAgent = null;
@@ -53,6 +54,11 @@ class OAuthClient {
 	
 	function setClientSecret($clientSecret) {
 		$this->_clientSecret = $clientSecret;
+		return $this;
+	}
+	
+	function setMethod($method) {
+		$this->_method = $method;
 		return $this;
 	}
 	
@@ -176,7 +182,7 @@ class OAuthClient {
 			$params['refresh_token'] = $this->_refreshToken;
 		}
 		
-		$token = $this->executeRequest($this->_tokenUrl,$params);
+		$token = $this->executeRequest($this->_tokenUrl,$params,$this->_method);
 		
 		if ($token !== false && !empty($token->access_token)) {
 			$this->setAccessToken($token->access_token,isset($token->token_type) == true ? strtoupper($token->token_type) : 'URL',isset($token->expires_in) == true ? time() + $token->expires_in : 0);
