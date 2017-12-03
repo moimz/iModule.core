@@ -1604,7 +1604,7 @@
 		
 		if (this.triggerHandler("beforesubmit",[this]) === false) return;
 		
-		var count = count ? count : 0;
+		var count = count ? count : 1;
 		var $form = this;
 		var data = $("input[type=file]",$form).length == 0 ? $form.serialize() : new FormData($form[0]);
 		
