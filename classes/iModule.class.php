@@ -799,7 +799,7 @@ class iModule {
 	 * @param string $language 현재 접속한 언어설정이 아닌 다른 언어의 사이트로 연결하고자 할 경우 해당 언어셋 코드
 	 */
 	function getModuleUrl($module,$container,$view=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
-		$domain = $domain == '*' || $domain == null ? $_SERVER['HTTP_HOST'] : $domain;
+		$domain = $domain == '*' || $domain === null ? $_SERVER['HTTP_HOST'] : $domain;
 		$view = $view === null ? $this->view : $view;
 		$idx = $idx === null ? $this->idx : $idx;
 		
@@ -819,10 +819,10 @@ class iModule {
 		$url.= '/'.($language == null ? $this->language : $language);
 		$url.= '/module/'.$module.'/'.$container;
 		
-		if ($view == null || $view == false) return $url;
+		if ($view === null || $view === false) return $url;
 		$url.= '/'.$view;
 		
-		if ($idx == null || $idx == false) return $url;
+		if ($idx === null || $idx === false) return $url;
 		$url.= '/'.$idx;
 		
 		return $url;
