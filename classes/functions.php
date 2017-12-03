@@ -25,7 +25,7 @@ function Request($var,$type='request') {
 	}
 
 	if ($value === null) return null;
-	if (is_array($value) == false) return trim($value);
+	if (is_array($value) == false && is_object($value) == false) return trim($value);
 	return $value;
 }
 
