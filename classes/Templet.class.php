@@ -535,7 +535,7 @@ class Templet {
 	 */
 	function getValues($values=array()) {
 		if (is_array($values) == true) {
-			unset($values['this'],$values['IM'],$values['Module'],$values['Widget'],$values['Templet'],$values['header'],$values['footer']);
+			unset($values['this'],$values['IM'],$values['Module'],$values['Widget'],$values['Templet'],$values['file'],$values['header'],$values['footer'],$values['layout']);
 			return (object)$values;
 		}
 		
@@ -927,7 +927,7 @@ class Templet {
 		
 		$IM = $this->IM;
 		$Templet = $this;
-		$header = PHP_EOL.'<form id="iModuleModalForm">'.PHP_EOL;
+		$header = PHP_EOL.'<form id="iModuleModalForm" autocomplete="on">'.PHP_EOL;
 		$footer = PHP_EOL.'</form>'.PHP_EOL;
 		
 		if (is_file($this->IM->getSiteTemplet()->getPath().'/modal.php') == true) {
