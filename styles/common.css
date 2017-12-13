@@ -14,7 +14,7 @@
  */
 
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
-html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333;}
+html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333; box-sizing:border-box;}
 body {overflow:auto;}
 body[data-scroll] {position:fixed; height:100%;}
 body > div[data-role=wrapper] {width:100%; height:100%;}
@@ -27,7 +27,7 @@ a {outline:none;}
  * alert 영역 디자인 정의
  */
 body > div[data-role=alert] {position:fixed; top:0px; left:0px; width:100%; z-index:20000;}
-body > div[data-role=alert] .message {padding:8px 30px 8px 10px; font-weight:bold; position:relative; line-height:1.6; font-size:13px;}
+body > div[data-role=alert] .message {padding:8px 30px 8px 10px; font-weight:bold; position:relative; line-height:1.6; font-size:14px;}
 body > div[data-role=alert] .message .close {width:30px; height:30px; line-height:30px; text-align:center; font-size:14px; top:3px; right:3px; position:absolute; cursor:pointer; opacity:0.7;}
 body > div[data-role=alert] .default {background:#fdf1af; border-bottom:1px solid #a29239;}
 body > div[data-role=alert] .error {background:#c10000; border-bottom:1px solid #960000; color:#ffff80;}
@@ -79,10 +79,10 @@ div[data-role=modal] > form > header > button {position:absolute; top:20px; righ
 div[data-role=modal] > form > header > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
 div[data-role=modal] > form > header > button:hover {color:#333;}
 div[data-role=modal][data-closable=FALSE] > form > header > button {display:none;}
-div[data-role=modal] > form > main {min-height:50px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:13px; color:#333; text-align:left; display:block;}
+div[data-role=modal] > form > main {min-height:50px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:14px; color:#333; text-align:left; display:block;}
 div[data-role=modal] > form > main[data-fullsize=TRUE] {height:calc(100% - 122px);}
 div[data-role=modal] > form > main > label {display:block; height:30px; line-height:30px; font-weight:bold;}
-div[data-role=modal] > form > main > div[data-role=message] {font-size:13px; line-height:1.6;}
+div[data-role=modal] > form > main > div[data-role=message] {font-size:14px; line-height:1.6;}
 div[data-role=modal] > form > main > div[data-role=message] + div[data-role=input] {margin-top:10px;}
 div[data-role=modal] > form > main > div[data-role=iframe] {display:block; width:100%; height:100%; font-size:0;}
 div[data-role=modal] > form > main > div[data-role=iframe] > iframe {display:block; border:0px; margin:0px; padding:0px; width:100%; height:100%;}
@@ -90,7 +90,7 @@ div[data-role=modal] > form > main > div[data-role=iframe][data-fullsize=TRUE] {
 div[data-role=modal] > form > footer {display:table; table-layout:fixed; width:100%; height:auto; background:transparent; margin:0px; margin-top:20px; padding:0px;}
 div[data-role=modal] > form > main[data-fullsize=TRUE] + footer {margin-top:0px;}
 div[data-role=modal] > form > footer > div {display:table-cell; width:auto; vertical-align:middle;}
-div[data-role=modal] > form > footer > div > button {display:block; width:100%; height:42px; box-sizing:border-box; cursor:pointer; font-size:13px; line-height:42px; border:0; background:#bdbdbd; color:#fff;}
+div[data-role=modal] > form > footer > div > button {display:block; width:100%; height:42px; box-sizing:border-box; cursor:pointer; font-size:14px; line-height:42px; border:0; background:#bdbdbd; color:#fff;}
 div[data-role=modal] > form > footer > div > button:hover {background:#aeaeae;}
 div[data-role=modal] > form > footer > div > button:focus {border:1px dotted rgba(0,0,0,0.5); line-height:40px;}
 div[data-role=modal] > form > footer > div > button[disabled] {background:#bdbdbd !important; opacity:0.7; cursor:not-allowed;}
@@ -122,7 +122,7 @@ div[data-role=inputset].flex {width:100%; min-height:40px; display:table; table-
 div[data-role=inputset].flex > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
 div[data-role=inputset].flex > div[data-role=input] > label {white-space:nowrap;}
 div[data-role=inputset].flex > div[data-role=input]:first-child {border-left:0px;}
-div[data-role=inputset].flex > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:13px; line-height:40px;}
+div[data-role=inputset].flex > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:14px; line-height:40px;}
 
 div[data-role=inputset].grow {width:100%; min-height:40px; display:table;}
 div[data-role=inputset].grow > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
@@ -133,7 +133,7 @@ div[data-role=inputset].grow > div[data-role=input].grow3 {width:33.3333%;}
 div[data-role=inputset].grow > div[data-role=input].grow4 {width:25%;}
 div[data-role=inputset].grow > div[data-role=input].grow5 {width:20%;}
 div[data-role=inputset].grow > div[data-role=input]:first-child {border-left:0px;}
-div[data-role=inputset].grow > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:13px; line-height:40px;}
+div[data-role=inputset].grow > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:14px; line-height:40px;}
 
 div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px; line-height:40px; padding:0px 15px; box-sizing:border-box; cursor:pointer; color:#fff; background:#b5b7c0; border:0;}
 div[data-role=input][data-type=button] > button.icon {padding:0px;}
@@ -242,7 +242,7 @@ div[data-keyword=TRUE] > ul > li.selected {color:#fff; background-color:#428bca;
  * 위지윅에디터
  */
 div[data-role=wysiwyg] {position:relative; overflow:visible;}
-div[data-role=wysiwyg] .fr-view {font-family:inherit; font-size:13px;}
+div[data-role=wysiwyg] .fr-view {font-family:inherit; font-size:14px;}
 div[data-role=wysiwyg] .fr-view table {border-color:#000;}
 
 /**
@@ -293,7 +293,7 @@ div[data-role=calendar] > div.dates > button:hover {background:#ff7829 !importan
  */
 ul[data-role=table] {list-style:none; min-width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 
-ul[data-role=table] > li {display:table; width:100%; font-size:13px; table-layout:fixed; box-sizing:border-box;}
+ul[data-role=table] > li {display:table; width:100%; font-size:14px; table-layout:fixed; box-sizing:border-box;}
 ul[data-role=table] > li {border-bottom:1px solid #e3e4e5;}
 ul[data-role=table].outer > li {border-left:1px solid #e3e4e5; border-right:1px solid #e3e4e5;}
 ul[data-role=table].inner.outer > li {border-right:0px;}
@@ -321,7 +321,7 @@ ul[data-role=table].view > li > span.tbody {width:100%; padding:10px; line-heigh
 
 ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
 
-ul[data-role=table] > li.empty {display:block; height:100px; line-height:100px; font-size:13px; color:#666; text-align:center;}
+ul[data-role=table] > li.empty {display:block; height:100px; line-height:100px; font-size:14px; color:#666; text-align:center;}
 
 ul[data-role=table].small > li > span, ul[data-role=table].small > li > a {height:50px; font-size:12px;}
 
@@ -335,7 +335,7 @@ ul[data-role=table].fixed > li > span.fixed {display:table-cell;}
 /**
  * 캘린더 테이블
  */
-ul[data-role=calendarview] {list-style:none; min-width:100%; overflow-x:auto; font-size:13px; -webkit-overflow-scrolling:touch;}
+ul[data-role=calendarview] {list-style:none; min-width:100%; overflow-x:auto; font-size:14px; -webkit-overflow-scrolling:touch;}
 ul[data-role=calendarview] > li[data-role=week] {display:table; width:100%; table-layout:fixed; box-sizing:border-box;}
 ul[data-role=calendarview] > li[data-role=week] > ul {display:table-row; list-style:none;}
 ul[data-role=calendarview] > li[data-role=week] > ul > li[data-role=date] {display:table-cell; width:auto; vertical-align:top;}
@@ -373,13 +373,13 @@ ul[data-role=form] > li {display:table; width:100%; min-height:60px; table-layou
 ul[data-role=form].inner > li {border-bottom:1px solid #e3e4e5;}
 ul[data-role=form].outer > li {border-left:1px solid #e3e4e5; border-right:1px solid #e3e4e5;}
 
-ul[data-role=form] > li > label {display:table-cell; width:150px; vertical-align:top; line-height:20px; background:#f4f4f4; padding:20px 0px 20px 20px; font-weight:bold; font-size:13px;}
+ul[data-role=form] > li > label {display:table-cell; width:150px; vertical-align:top; line-height:20px; background:#f4f4f4; padding:20px 0px 20px 20px; font-weight:bold; font-size:14px;}
 ul[data-role=form] > li > label.required:after {color:#F44336; content:" *";}
 ul[data-role=form] > li > label.small {width:100px;}
 ul[data-role=form] > li > div {display:table-cell; width:100%; padding:10px 10px 10px 0px; line-height:1; vertical-align:top;}
 ul[data-role=form] > li > div:last-child {padding-right:0px;}
 ul[data-role=form] > li > label + div {padding-left:10px;}
-ul[data-role=form] > li > div > div[data-role=text] {display:table; padding:5px 0px; min-height:30px; line-height:30px; font-size:13px;}
+ul[data-role=form] > li > div > div[data-role=text] {display:table; padding:5px 0px; min-height:30px; line-height:30px; font-size:14px;}
 ul[data-role=form] > li > div > div[data-role=text] > div {display:table-cell; vertical-align:middle; line-height:1.6;}
 ul[data-role=form] > li > div > div[data-role=button] {margin-top:0; text-align:left; padding:0px;}
 ul[data-role=form] > li > div > div[data-role=button] > button {height:40px; line-height:40px; padding:0px 15px; margin:0px;}
@@ -464,7 +464,7 @@ div[data-role=wysiwyg-content] ol {list-style-position:outside; margin-left:25px
 	 */
 	div[data-role=tabbar] {height:60px;}
 	div[data-role=tabbar] > div > ul > li {height:60px;}
-	div[data-role=tabbar] > div > ul > li > button, div[data-role=tabbar] > div > ul > li > a {height:57px; line-height:57px; font-size:13px;}
+	div[data-role=tabbar] > div > ul > li > button, div[data-role=tabbar] > div > ul > li > a {height:57px; line-height:57px; font-size:14px;}
 	div[data-role=tabbar] > div > ul > li.selected > button, div[data-role=tabbar] > div > ul > li.selected > a {height:58px;}
 }
 
