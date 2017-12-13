@@ -77,6 +77,8 @@ class json {
 		$content_type = explode(';',curl_getinfo($ch,CURLINFO_CONTENT_TYPE));
 		$content_type = array_shift($content_type);
 		
+		curl_close($ch);
+		
 		if ($http_code == 200) {
 			$data = json_decode($result);
 			if ($data != null && $data->success == true) {
