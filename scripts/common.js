@@ -86,6 +86,8 @@ var iModule = {
 		$("div[data-role=pagination] > ul > li.disabled > a",$container).on("click",function(e) {
 			e.preventDefault();
 		});
+		
+		$(document).triggerHandler("init");
 	},
 	/**
 	 * 자바스크립트에서 모듈 언어셋이 필요할 경우, iModule 코어에 의하여 언어셋파일을 로드한다.
@@ -791,14 +793,14 @@ var iModule = {
 		var resizeWidth = width === null ? 0 : width - $(window).width();
 		var resizeHeight = height === null ? 0 : height - $(window).height();
 		
-		window.resizeBy(resizeWidth,resizeHeight);
-		
 		if (center === true) {
-			var left = (screen.width - $(window).width()) / 2;
-			var top = (screen.height - $(window).height()) / 2;
+			var left = (screen.width - $(window).width() - resizeWidth) / 2;
+			var top = (screen.height - $(window).height() - resizeHeight) / 2;
 			
 			window.moveTo(left,top);
 		}
+		
+		window.resizeBy(resizeWidth,resizeHeight);
 	},
 	getCookie:function(name) {
 		var cookies = document.cookie.split(";");
