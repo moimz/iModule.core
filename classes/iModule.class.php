@@ -187,9 +187,9 @@ class iModule {
 	/**
 	 * 정상적으로 사이트에 접속시, 현재 접속한 사이트의 기본 URL을 구하고 사이트에 설정된 메뉴들을 저장한다.
 	 *
-	 * @param boolean $is_force_inits 강제로 사이트메뉴를 초기화할지 여부
+	 * @param boolean $is_sitemap 사이트메뉴를 초기화할지 여부
 	 */
-	function initSites($is_force_inits=false) {
+	function initSites($is_sitemap=true) {
 		/**
 		 * 모든 사이트의 RAW 데이터를 저장한다.
 		 */
@@ -279,7 +279,7 @@ class iModule {
 			}
 		}
 		
-		if ($is_force_inits == true || defined('__IM_ADMIN__') == false) {
+		if ($is_sitemap == true) {
 			/**
 			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
 			 */
@@ -625,7 +625,10 @@ class iModule {
 	function getUrl($menu=null,$page=null,$view=null,$idx=null,$isFullUrl=false,$domain=null,$language=null) {
 		if ($this->container != null) {
 			$container = explode('/',$this->container);
-			return $this->getModuleUrl($container[0],$container[1],$view,$idx,$isFullUrl,$domain,$language);
+			$module = $container[0];
+			$container = $container[1];
+			if (defined('__IM_CONTAINER_POPUP__') == true) $container = '@'.$container;
+			return $this->getModuleUrl($module,$container,$view,$idx,$isFullUrl,$domain,$language);
 		}
 		
 		/**
@@ -872,11 +875,11 @@ class iModule {
 	 *
 	 * @param string $domain(옵션) 사이트 도메인 주소 (해당 값이 있을 경우 해당 도메인에 대한 설정값이 반환되며 없을 경우 모든 사이트에 대한 설정값이 반환된다.)
 	 * @param string $language(옵션) 사이트 언어셋코드 (해당 값이 있을 경우 해당 언어셋을 사용하고 있는 사이트정보만 반환된다.)
-	 * @param boolean $is_force_inits 강제로 사이트메뉴를 초기화할지 여부
+	 * @param boolean $is_sitemap 사이트메뉴를 초기화할지 여부
 	 * @return object[] 파라매터 조건에 맞는 사이트정보 (조건에 맞는 사이트가 1뿐이라면 배열이 아닌 사이트정보 Object 가 반환된다.)
 	 */
-	function getSites($domain=null,$language=null,$is_force_inits=false) {
-		if ($this->sites == null) $this->initSites($is_force_inits);
+	function getSites($domain=null,$language=null,$is_sitemap=true) {
+		if ($this->sites == null) $this->initSites($is_sitemap);
 		if ($domain == null && $language == null) return $this->sites;
 		
 		$sites = array();
@@ -974,10 +977,10 @@ class iModule {
 	 * 
 	 * @return object $site
 	 */
-	function getSite() {
+	function getSite($is_sitemap=true) {
 		if ($this->site != null) return $this->site;
-		if ($this->language == null) $this->initSites();
-		$this->site = clone $this->getSites($this->domain,$this->language);
+		if ($this->language == null) $this->initSites($is_sitemap);
+		$this->site = clone $this->getSites($this->domain,$this->language,$is_sitemap);
 		
 		$this->site->logo = json_decode($this->site->logo);
 		$this->site->maskicon = json_decode($this->site->maskicon);
@@ -1612,6 +1615,54 @@ class iModule {
 	}
 	
 	/**
+	 * 사이트 <HEAD> 태그 내부의 리소스를 제거한다.
+	 *
+	 * @param string $type 리소스종류 (style, script, meta or etc)
+	 * @param string[] $value 리소스데이터 (style, script 의 경우 해당 파일의 경로 / 기타 태그의 경우 태그 attribute)
+	 */
+	function removeHeadResource($type,$value,$isFirst=false) {
+		$tag = null;
+		
+		switch ($type) {
+			case 'style' :
+				$path = parse_url($value);
+				if (isset($path['host']) == true) {
+					$tag = '<link rel="stylesheet" href="'.$value.'" type="text/css">';
+				} else {
+					if (is_file(__IM_PATH__.$path['path']) == true) {
+						$value = $path['path'].(isset($path['query']) == true ? '?'.$path['query'].'&' : '?').'v='.filemtime(__IM_PATH__.$path['path']);
+						$tag = '<link rel="stylesheet" href="'.$value.'" type="text/css">';
+					}
+				}
+				break;
+				
+			case 'script' :
+				$path = parse_url($value);
+				if (isset($path['host']) == true) {
+					$tag = '<script src="'.$value.'"></script>';
+				} else {
+					if (is_file(__IM_PATH__.$path['path']) == true) {
+						$value = $path['path'].(isset($path['query']) == true ? '?'.$path['query'].'&' : '?').'v='.filemtime(__IM_PATH__.$path['path']);
+						$tag = '<script src="'.$value.'"></script>';
+					}
+				}
+				break;
+				
+			default :
+				$tag = '<';
+				$tag.= $type;
+				foreach ($value as $tagName=>$tagValue) {
+					$tag.= ' '.$tagName.'="'.$tagValue.'"';
+				}
+				$tag.= '>';
+		}
+		
+		if ($tag != null && ($index = array_search($tag,$this->siteHeader)) !== false) {
+			array_splice($this->siteHeader,$index,1);
+		}
+	}
+	
+	/**
 	 * 사이트 <HEAD> 내부 태그를 가져온다.
 	 *
 	 * @return string $header HEAD HTML
@@ -1738,8 +1789,8 @@ class iModule {
 		$this->fireEvent('afterGetContext','core','error',$values,$html);
 		
 		if ($type == 'LOGIN') {
-			$header = PHP_EOL.'<form id="ErrotForm">'.PHP_EOL;
-			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#ErrotForm").inits(Member.login);</script>'.PHP_EOL;
+			$header = PHP_EOL.'<form id="iModuleErrorForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#iModuleErrorForm").inits(Member.login);</script>'.PHP_EOL;
 			
 			$html = $header.$html.$footer;
 		}
@@ -1819,23 +1870,33 @@ class iModule {
 		/**
 		 * 에러메세지 컨테이너를 설정한다.
 		 */
-		$context = PHP_EOL.'<div data-role="error" data-type="core">'.PHP_EOL;
+		$html = PHP_EOL.'<div data-role="error" data-type="core">'.PHP_EOL;
 		
 		$IM = $this;
 		INCLUDE __IM_PATH__.'/includes/error.php';
-		$context.= ob_get_contents();
+		$html.= ob_get_contents();
 		ob_end_clean();
 		
 		/**
 		 * 에러메세지 컨테이너를 설정한다.
 		 */
-		$context.= PHP_EOL.'</div>'.PHP_EOL;
+		$html.= PHP_EOL.'</div>'.PHP_EOL;
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$values = new stdClass();
+		$values->message = $message;
+		$values->description = $description;
+		$values->type = $type;
+		$values->link = $link;
+		$this->fireEvent('afterGetContext','core','error',$values,$html);
 		
 		if ($type == 'LOGIN') {
-			$header = PHP_EOL.'<form id="ErrotForm">'.PHP_EOL;
-			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#ErrotForm").inits(Member.login);</script>'.PHP_EOL;
+			$header = PHP_EOL.'<form id="iModuleErrorForm">'.PHP_EOL;
+			$footer = PHP_EOL.'</form>'.PHP_EOL.'<script>$("#iModuleErrorForm").inits(Member.login);</script>'.PHP_EOL;
 			
-			$context = $header.$context.$footer;
+			$html = $header.$html.$footer;
 		}
 		
 		/**
@@ -1846,7 +1907,7 @@ class iModule {
 		/**
 		 * 에러메세지를 출력한다.
 		 */
-		echo $context;
+		echo $html;
 		
 		/**
 		 * 기본 푸터파일을 불러온다.

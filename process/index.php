@@ -24,10 +24,10 @@ $_module = Request('_module');
 $_action = Request('_action');
 
 /**
- * 관리자모듈과 첨부파일열기에서는 사이트 데이터를 초기화하지 않는다.
+ * 관리자모듈과 첨부파일열기에서는 사이트맵을 초기화하지 않는다.
  */
 if ($_module == 'admin' || ($_module == 'attachment' && in_array($_action,array('original','view','thumbnail','download')) == true)) {
-	
+	$site = $IM->getSite(false);
 } else {
 	$site = $IM->getSite();
 }
