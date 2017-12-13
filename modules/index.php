@@ -27,6 +27,12 @@ $view = Request('view');
 $idx = Request('idx');
 $IM->menu = '#';
 $IM->page = '#';
+
+if (strpos($container,'@') === 0) {
+	$container = preg_replace('/^@/','',$container);
+	$IM->removeTemplet();
+	define('__IM_CONTAINER_POPUP__',true);
+}
 $IM->setContainerMode($module,$container);
 
 define('__IM_CONTAINER__',true);
