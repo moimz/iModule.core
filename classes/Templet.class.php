@@ -673,6 +673,25 @@ class Templet {
 		 * iModule 코어에서 호출했다면, iModule 기본 header 를 추가한다.
 		 */
 		if ($this->callerType == 'iModule') {
+			/**
+			 * 사이트템플릿을 사용하지 않는 경우 package.json 에 정의된 style 과 script 파일을 제거한다.
+			 */
+			if ($this->caller->useTemplet == false) {
+				if (isset($package->styles) == true && is_array($package->styles) == true) {
+					foreach ($package->styles as $style) {
+						$style = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$style) == true ? $style : $this->getDir().$style;
+						$this->IM->removeHeadResource('style',$style);
+					}
+				}
+				
+				if (isset($package->scripts) == true && is_array($package->scripts) == true) {
+					foreach ($package->scripts as $script) {
+						$script = preg_match('/^(http:\/\/|https:\/\/|\/\/)/',$script) == true ? $script : $this->getDir().$script;
+						$this->IM->removeHeadResource('script',$script);
+					}
+				}
+			}
+			
 			ob_start();
 			INCLUDE __IM_PATH__.'/includes/header.php';
 			$header = ob_get_clean();
