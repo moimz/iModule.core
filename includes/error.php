@@ -8,7 +8,8 @@
  * @file /includes/error.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160905
+ * @version 3.0.0
+ * @modified 2017. 12. 19.
  * @see /classes/iModule.class.php -> printError()
  */
 
@@ -35,8 +36,11 @@ if (defined('__IM__') == false) exit;
 			<h2><?php echo $message; ?></h2>
 			<?php if ($description) { ?><p><?php echo $description; ?></p><?php } ?>
 			
+			<?php if (defined('__IM_CONTAINER_POPUP__') == true) { ?>
+			<button type="button" onclick="self.close();"><?php echo $this->getText('button/close'); ?></button>
+			<?php } else { ?>
 			<a href="<?php echo $link->url; ?>"><?php echo $link->text; ?></a>
-			<?php } ?>
+			<?php }} ?>
 		</div>
 	</div>
 </section>
