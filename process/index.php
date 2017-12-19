@@ -11,6 +11,13 @@
  */
 REQUIRE_ONCE str_replace('/process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
+set_time_limit(0);
+@ini_set('memory_limit',-1);
+@ini_set('zlib.output_compression','Off');
+@ini_set('output_buffering','Off');
+@ini_set('output_handler','');
+@apache_setenv('no-gzip',1);
+
 /**
  * iModule 코어클래스를 선언한다.
  */
@@ -44,7 +51,6 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 } else {
 	if ($_module != null) {
 		$results = $IM->getModule($_module,true)->doProcess($_action);
-		$results->_loadtime = $IM->getLoadTime();
 		
 		if ($results !== null) {
 			header('Content-type:text/json; charset=utf-8',true);
