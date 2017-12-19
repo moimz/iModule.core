@@ -62,12 +62,12 @@ class iModule {
 	 * 각 기능별 core class 를 정의한다.
 	 *
 	 * @public Event $Event 이벤트처리를 위한 Event class (@see /classes/Event.class.php)
-	 * @public Addon $Addon addon을 정의하고 호출하기 위한 Addon class (@see /classes/Addon.class.php)
+	 * @public Plugin $Plugin plugin을 정의하고 호출하기 위한 Plugin class (@see /classes/Plugin.class.php)
 	 * @public Module $Module module을 정의하고 호출하기 위한 Module class (@see /classes/Module.class.php)
 	 * @public Cache $Cache 캐싱처리를 위한 Cache class (@see /classes/Cache.class.php)
 	 */
 	public $Event;
-	public $Addon;
+	public $Plugin;
 	public $Module;
 	public $Cache;
 	
@@ -133,7 +133,7 @@ class iModule {
 			 */
 			if ($_CONFIGS->installed === true) {
 				$this->Event = new Event($this);
-				$this->Addon = new Addon($this);
+				$this->Plugin = new Plugin($this);
 				$this->Module = new Module($this);
 			}
 			
@@ -179,7 +179,7 @@ class iModule {
 		$_CONFIGS->db = isset($_CONFIGS->db) == true ? $_CONFIGS->db : json_decode(Decoder(FileReadLine(__IM_PATH__.'/configs/db.config.php',1)));
 		
 		$this->Event = new Event($this); // ./classes/Event.class.php
-		$this->Addon = new Addon($this); // ./classes/Addon.class.php
+		$this->Plugin = new Plugin($this); // ./classes/Plugin.class.php
 		$this->Module = new Module($this); // ./classes/Module.class.php
 		$this->Cache = new Cache($this); // ./classes/Cache.class.php
 	}
@@ -1532,7 +1532,7 @@ class iModule {
 	 * 자바스크립트용 언어셋 파일을 호출한다.
 	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 이 함수를 호출하여 자바스크립트상에서 대상.getText() 함수로 언어셋을 불러올 수 있다.
 	 *
-	 * @param string $type 불러올 대상의 종류 (module, addon, widget)
+	 * @param string $type 불러올 대상의 종류 (module, plugin, widget)
 	 * @param string $module 불러올 대상의 이름
 	 * @param string $defaultLanguage 불러올 대상의 기본 언어
 	 */

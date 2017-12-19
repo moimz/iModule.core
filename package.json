@@ -27,36 +27,6 @@
 	"configs":["key","db"],
 	"preset":"iModule",
 	"databases":{
-		"addon_table":{
-			"columns":{
-				"addon":{
-					"type":"varchar",
-					"length":20
-				},
-				"version":{
-					"type":"varchar",
-					"length":20
-				},
-				"hash":{
-					"type":"char",
-					"length":32
-				},
-				"configs":{
-					"type":"text"
-				},
-				"targets":{
-					"type":"text"
-				},
-				"active":{
-					"type":"enum",
-					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
-				}
-			},
-			"indexes":{
-				"addon":"primary_key"
-			}
-		},
 		"article_table":{
 			"columns":{
 				"module":{
@@ -94,7 +64,8 @@
 			"columns":{
 				"host":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"자동화작업 대상 사이트 도메인"
 				},
 				"module":{
 					"type":"varchar",
@@ -125,7 +96,8 @@
 			},
 			"indexes":{
 				"host,module,type,date":"primary_key"
-			}
+			},
+			"comment":"자동화를 위한 cron 정보 테이블"
 		},
 		"module_table":{
 			"columns":{
@@ -210,6 +182,36 @@
 			},
 			"indexes":{
 				"module":"primary_key"
+			}
+		},
+		"plugin_table":{
+			"columns":{
+				"plugin":{
+					"type":"varchar",
+					"length":20
+				},
+				"version":{
+					"type":"varchar",
+					"length":20
+				},
+				"hash":{
+					"type":"char",
+					"length":32
+				},
+				"configs":{
+					"type":"text"
+				},
+				"targets":{
+					"type":"text"
+				},
+				"active":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				}
+			},
+			"indexes":{
+				"plugin":"primary_key"
 			}
 		},
 		"sitemap_table":{
