@@ -178,6 +178,10 @@ class mysql {
 				if (isset($schema->auto_increment) == false || $schema->auto_increment != $desc[$i]->Field) return false;
 				$auto_increment = $desc[$i]->Field;
 			}
+			
+			if (isset($compare->comment) == true && $compare->comment != $desc[$i]->Comment) {
+				$this->rawQuery("ALTER TABLE `".$this->_prefix.$table."` CHANGE `".$desc[$i]->Field."` `".$desc[$i]->Field."` ".$desc[$i]->Type." COMMENT '".$compare->comment."'");
+			}
 		}
 		
 		$index = $this->rawQuery('SHOW INDEX FROM `'.$this->_prefix.$table.'`');
@@ -223,6 +227,13 @@ class mysql {
 			}
 		}
 		
+		if (isset($schema->comment) == true) {
+			$comment = $this->rawQuery("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '".$this->_prefix.$table."'");
+			if ($comment[0]->TABLE_COMMENT != $schema->comment) {
+				$this->rawQuery("ALTER TABLE `".$this->_prefix.$table."` COMMENT = '".$schema->comment."'");
+			}
+		}
+		
 		if (isset($schema->auto_increment) == true && $auto_increment != $schema->auto_increment) return false;
 		
 		return true;
@@ -254,9 +265,14 @@ class mysql {
 				$query.= " DEFAULT '".$options->default."'";
 			}
 			
+			if (isset($options->comment) == true) {
+				$query.= " COMMENT '".$options->comment."'";
+			}
+			
 			$isFirst = false;
 		}
 		$query.= ') ENGINE = '.$this->engine.' CHARACTER SET '.$this->charset.' COLLATE '.$this->collation;
+		if (isset($schema->comment) == true) $query.= " COMMENT = '".$schema->comment."'";
 		
 		$this->rawQuery($query);
 		if ($this->getLastError()) return false;
