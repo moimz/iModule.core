@@ -1,12 +1,14 @@
 <?php
 /**
- * This file is part of Moimz Tools - https://www.moimz.com
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
  * @file functions.class.php
  * @author Arzz
- * @version 1.1.8
  * @license MIT License
+ * @version 1.2.0
+ * @modified 2018. 1. 1.
  */
+
 function Request($var,$type='request') {
 	global $_REQUEST, $_SESSION;
 
@@ -29,23 +31,39 @@ function Request($var,$type='request') {
 	return $value;
 }
 
-function Encoder($value,$key='') {
+/**
+ * 복호화가 가능한 방식(AES-256-CBC)으로 문자열을 암호화한다.
+ *
+ * @param string $value 암호화할 문자열
+ * @param string $key 암호화키 (없을경우 설치시 사용한 기본 암호화키)
+ * @param string $mode 암호화된 문자열 인코딩방식 (base64 또는 hex)
+ * @return string $ciphertext
+ */
+function Encoder($value,$key=null,$mode='base64') {
 	global $_CONFIGS;
 	
-	$key = $key ? md5($key) : md5($_CONFIGS->key);
+	$key = $key !== null ? md5($key) : md5($_CONFIGS->key);
 	$padSize = 16 - (strlen($value) % 16);
 	$value = $value.str_repeat(chr($padSize),$padSize);
 	
 	$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
 	
-	return base64_encode($output);
+	return $mode == 'base64' ? base64_encode($output) : bin2hex($output);
 }
 
-function Decoder($value,$key='') {
+/**
+ * 복호화가 가능한 방식(AES-256-CBC)으로 암호화된 문자열을 복호화한다.
+ *
+ * @param string $value 암호화된 문자열
+ * @param string $key 암호화키 (없을경우 설치시 사용한 기본 암호화키)
+ * @param string $mode 암호화된 문자열 인코딩방식 (base64 또는 hex)
+ * @return string $plaintext
+ */
+function Decoder($value,$key=null,$mode='base64') {
 	global $_CONFIGS;
 	
-	$key = $key ? md5($key) : md5($_CONFIGS->key);
-	$value = base64_decode(str_replace(' ','+',$value));
+	$key = $key !== null ? md5($key) : md5($_CONFIGS->key);
+	$value = $mode == 'base64' ? base64_decode(str_replace(' ','+',$value)) : hex2bin($value);
 	
 	$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
 	$valueLen = strlen($output);
