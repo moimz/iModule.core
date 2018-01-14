@@ -153,7 +153,6 @@ class mysql {
 	public function compare($table,$schema) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$desc = $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
-		
 		if (count($desc) != count(array_keys((array)$schema->columns))) return false;
 		
 		$auto_increment = '';
@@ -169,7 +168,7 @@ class mysql {
 				if ($compare->type != $desc[$i]->Type) return false;
 			}
 			
-			if ((isset($compare->default) == true && $compare->default != $desc[$i]->Default) || isset($compare->default) == false && $desc[$i]->Default != null) return false;
+			if ((isset($compare->default) == true && (strlen($compare->default) != strlen($desc[$i]->Default) || $compare->default != $desc[$i]->Default)) || isset($compare->default) == false && $desc[$i]->Default != null) return false;
 			
 			$compare->is_null = isset($compare->is_null) == true && $compare->is_null === true;
 			if (($compare->is_null == true && $desc[$i]->Null == 'NO') || $compare->is_null == false && $desc[$i]->Null == 'YES') return false;
@@ -180,7 +179,13 @@ class mysql {
 			}
 			
 			if (isset($compare->comment) == true && $compare->comment != $desc[$i]->Comment) {
-				$this->rawQuery("ALTER TABLE `".$this->_prefix.$table."` CHANGE `".$desc[$i]->Field."` `".$desc[$i]->Field."` ".$desc[$i]->Type." COMMENT '".$compare->comment."'");
+				$query = 'ALTER TABLE `'.$this->_prefix.$table.'` CHANGE `'.$desc[$i]->Field.'` `'.$desc[$i]->Field.'` '.$desc[$i]->Type;
+				if ($desc[$i]->Null == 'NO') $query.= ' NOT NULL';
+				else $query.= ' NULL';
+				if (isset($compare->default) == true) $query.= " DEFAULT '".$compare->default."'";
+				if ($desc[$i]->Extra == 'auto_increment') $query.= ' AUTO_INCREMENT';
+				$query.= " COMMENT '".$compare->comment."'";
+				$this->rawQuery($query);
 			}
 		}
 		
@@ -227,14 +232,14 @@ class mysql {
 			}
 		}
 		
+		if (isset($schema->auto_increment) == true && $auto_increment != $schema->auto_increment) return false;
+		
 		if (isset($schema->comment) == true) {
 			$comment = $this->rawQuery("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '".$this->_prefix.$table."'");
 			if ($comment[0]->TABLE_COMMENT != $schema->comment) {
 				$this->rawQuery("ALTER TABLE `".$this->_prefix.$table."` COMMENT = '".$schema->comment."'");
 			}
 		}
-		
-		if (isset($schema->auto_increment) == true && $auto_increment != $schema->auto_increment) return false;
 		
 		return true;
 	}
@@ -273,7 +278,6 @@ class mysql {
 		}
 		$query.= ') ENGINE = '.$this->engine.' CHARACTER SET '.$this->charset.' COLLATE '.$this->collation;
 		if (isset($schema->comment) == true) $query.= " COMMENT = '".$schema->comment."'";
-		
 		$this->rawQuery($query);
 		if ($this->getLastError()) return false;
 		
@@ -303,7 +307,9 @@ class mysql {
 		
 		if (isset($schema->auto_increment) == true && $schema->auto_increment) {
 			$auto_increment = filter_var($schema->auto_increment,FILTER_SANITIZE_STRING);
-			$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` CHANGE `'.$auto_increment.'` `'.$auto_increment.'` int('.$schema->columns->{$schema->auto_increment}->length.') NOT NULL AUTO_INCREMENT');
+			$query = 'ALTER TABLE `'.$this->_prefix.$table.'` CHANGE `'.$auto_increment.'` `'.$auto_increment.'` int('.$schema->columns->{$schema->auto_increment}->length.') NOT NULL AUTO_INCREMENT';
+			if (isset($schema->columns->{$schema->auto_increment}->comment) == true) $query.= " COMMENT '".$schema->columns->{$schema->auto_increment}->comment."'";
+			$this->rawQuery($query);
 			if ($this->getLastError()) return false;
 		}
 		
