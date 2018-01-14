@@ -1693,12 +1693,21 @@ class iModule {
 		/**
 		 * PHP 설정값들 중 자바스크립트에 필수적으로 필요한 정보를 불러온다.
 		 */
-		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.'&menu='.($this->menu != null && $this->menu != '#' ? $this->menu : '').'&page='.($this->page != null && $this->page != '#' ? $this->page : '').'&view='.($this->view != null ? $this->view : '').'&container='.($this->container != null ? $this->container : ''));
+		if ($this->container != null) {
+			$temp = explode('/',$this->container);
+			if (defined('__IM_CONTAINER_POPUP__') == true) $container = $temp[0].'/@'.$temp[1];
+			else $container = $this->container;
+		} else {
+			$container = null;
+		}
+		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.($this->menu != null && $this->menu != '#' ? '&menu='.$this->menu : '').($this->page != null && $this->page != '#' ? '&page='.$this->page : '').($this->view != null ? '&view='.$this->view : '').($container != null ? '&container='.$container : ''));
 		
 		/**
 		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.
 		 */
-		$this->addHeadResource('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFont).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
+		if (count($this->webFont) > 0) {
+			$this->addHeadResource('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFont).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
+		}
 		
 		return implode(PHP_EOL,$this->siteHeader).PHP_EOL;
 	}
@@ -2332,9 +2341,8 @@ class iModule {
 	 * @param string $event 이벤트 타입 (afterInitContext or afterDoProcess ... etc.)
 	 * @param string $target 이벤트를 발생시킨 대상 (core 또는 모듈명)
 	 * @param string $caller 이벤트를 발생시킨 지점 (보통 이벤트를 발생시킨 함수명)
-	 * @param object $values 이벤트 리스너에게 전달시켜줄 데이터
-	 * @param object $results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
-	 * @param string &$context 레이아웃에 관여하는 이벤트는 현재까지 파싱된 컨텍스트나 레이아웃 HTML 코드를 전달한다. (call by reference)
+	 * @param object &$values 이벤트 리스너에게 전달시켜줄 데이터
+	 * @param object &$results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
 	 */
 	function fireEvent($event,$target,$caller,&$values=null,&$results=null) {
 		$this->Event->fireEvent($event,$target,$caller,$values,$results);
