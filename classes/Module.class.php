@@ -9,7 +9,8 @@
  * @file /classes/Module.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160907
+ * @version 3.0.0
+ * @modified 2018. 1. 1.
  */
 class Module {
 	/**
