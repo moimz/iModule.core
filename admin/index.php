@@ -16,7 +16,7 @@
  *
  * @see /configs/init.config.php
  */
-REQUIRE_ONCE str_replace('/admin','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'admin','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 define('__IM_ADMIN__',true);
 

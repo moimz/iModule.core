@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.161110
  */
-REQUIRE_ONCE str_replace('/install/process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);
 
 $action = Request('action');

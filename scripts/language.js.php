@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.160904
  */
-REQUIRE_ONCE str_replace('/scripts','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');
 
 $language = Request('language');

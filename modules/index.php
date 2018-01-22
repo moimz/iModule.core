@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.161110
  */
-REQUIRE_ONCE str_replace('/modules','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 /**
  * iModule 코어를 선언하고, 모듈 컨테이너를 불러온다.

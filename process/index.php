@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.160905
  */
-REQUIRE_ONCE str_replace('/process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
 set_time_limit(0);
 @ini_set('memory_limit',-1);

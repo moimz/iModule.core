@@ -9,7 +9,7 @@
  * @license MIT License
  * @version 3.0.0.161110
  */
-REQUIRE_ONCE str_replace('/cron','',dirname(__FILE__)).'/classes/Cron.class.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'cron','',dirname(__FILE__)).'/classes/Cron.class.php';
 
 $hosts = array_slice($argv,1);
 $cron = new Cron($hosts);

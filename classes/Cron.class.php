@@ -27,7 +27,7 @@ class Cron {
 		 * 전역변수 설정
 		 */
 		define('__IM_CRON__',true);
-		define('__IM_PATH__',str_replace('/classes','',str_replace(DIRECTORY_SEPARATOR,'/',__DIR__)));
+		define('__IM_PATH__',str_replace(DIRECTORY_SEPARATOR.'classes','',__DIR__));
 		
 		/**
 		 * 크론작업을 할 사이트 호스트
