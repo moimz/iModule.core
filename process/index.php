@@ -16,7 +16,9 @@ set_time_limit(0);
 @ini_set('zlib.output_compression','Off');
 @ini_set('output_buffering','Off');
 @ini_set('output_handler','');
-@apache_setenv('no-gzip',1);
+if (function_exists('apache_setenv') == true) {
+	@apache_setenv('no-gzip',1);
+}
 
 /**
  * iModule 코어클래스를 선언한다.
