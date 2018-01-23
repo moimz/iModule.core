@@ -91,6 +91,7 @@ class Event {
 		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return null;
 		
 		for ($i=0, $loop=count($this->listeners[$target][$event][$caller]);$i<$loop;$i++) {
+			if ($caller == '*') continue;
 			if ($this->execEvent($event,$target,$caller,$this->listeners[$target][$event][$caller][$i],$values,$results) === false) return false;
 		}
 		
@@ -231,6 +232,13 @@ class Event {
 			
 			if (strpos($event,'before') === 0) unset($results);
 			else $html = &$results;
+		}
+		
+		/**
+		 * 사이트를 구성할 때
+		 */
+		if ($event == 'afterDoLayout') {
+			$html = &$results;
 		}
 		
 		if ($event == 'afterGetContextList') {

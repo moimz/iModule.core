@@ -1932,7 +1932,6 @@ class iModule {
 	 * @return string $headerHTML
 	 */
 	function getHeader() {
-		if (defined('__IM_HEADER_INCLUDED__') == true) return;
 		$site = $this->getSite();
 		
 		/**
@@ -1977,7 +1976,6 @@ class iModule {
 	 * @return string $footerHTML
 	 */
 	function getFooter() {
-		if (defined('__IM_FOOTER_INCLUDED__') == true) return;
 		$site = $this->getSite();
 		
 		/**
