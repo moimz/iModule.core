@@ -433,7 +433,19 @@ div[data-role=wysiwyg-content] ul {list-style-position:outside; list-style-type:
 div[data-role=wysiwyg-content] ol {list-style-position:outside; margin-left:25px;}
 
 
-@media (max-width:767px) {
+@media only screen and (max-width:599px) {
+	/**
+	 * 폼 테이블
+	 */
+	ul[data-role=form] > li {display:block;}
+	ul[data-role=form] > li > label {display:block; width:100%; height:auto; padding:10px 0px 0px 0px; background:#fff; line-height:1.6;}
+	ul[data-role=form] > li > label:after {content:" :";}
+	ul[data-role=form] > li > div {display:block; padding:5px 0px 10px 0px; min-height:40px; line-height:40px;}
+	ul[data-role=form] > li > label + div {padding-left:0px;}
+	ul[data-role=form] > li > div + label {border-left:0px;}
+}
+
+@media only screen and (max-width:767px) {
 	div[data-role=pagination] > div {width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 	div[data-role=pagination] > div > ul {white-space:nowrap;}
 	div[data-role=pagination] > div > ul > li > a:hover {border-color:transparent; background:transparent; text-shadow:none;}
@@ -443,16 +455,6 @@ div[data-role=wysiwyg-content] ol {list-style-position:outside; margin-left:25px
 	div[data-role=modal] > form > header > button {top:10px; right:10px;}
 	div[data-role=modal] > form > main {height:calc(100% - 130px);}
 	div[data-role=modal] > form > main[data-fullsize=TRUE] {height:calc(100% - 110px);}
-	
-	/**
-	 * 페이지 네비게이션
-	 */
-	ul[data-role=form] > li {display:block;}
-	ul[data-role=form] > li > label {display:block; width:100%; height:auto; padding:10px 0px 0px 0px; background:#fff; line-height:1.6;}
-	ul[data-role=form] > li > label:after {content:" :";}
-	ul[data-role=form] > li > div {display:block; padding:5px 0px 10px 0px; min-height:40px; line-height:40px;}
-	ul[data-role=form] > li > label + div {padding-left:0px;}
-	ul[data-role=form] > li > div + label {border-left:0px;}
 	
 	/**
 	 * 테이블
