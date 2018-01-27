@@ -27,6 +27,7 @@ var ENV = {
 	PAGE:<?php echo $page ? '"'.$page.'"' : 'null'; ?>,
 	VIEW:<?php echo $view ? '"'.$view.'"' : 'null'; ?>,
 	CONTAINER:<?php echo $container ? '"'.$container.'"' : 'null'; ?>,
+	IS_CONTAINER_POPUP:<?php echo $container && preg_match('/\/@[^\/]+$/',$container) == true ? 'true' : 'false'; ?>,
 	getProcessUrl:function(module,action) {
 		return ENV.DIR+"/"+ENV.LANGUAGE+"/process/"+module+"/"+action;
 	},
