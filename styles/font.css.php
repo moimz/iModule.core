@@ -15,5 +15,5 @@ else $fontFamily = '';
 if ($language == 'ko') $fontFamily.= '"Apple SD Neo Gothic", "malgun gothic", dotum';
 
 $fontFamily.= ', sans-serif';
-echo 'body {font-family:'.$fontFamily.';}';
+echo 'html, body {font-family:'.$fontFamily.';}';
 ?>
