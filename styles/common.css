@@ -438,7 +438,7 @@ div[data-role=wysiwyg-content] ol {list-style-position:outside; margin-left:25px
 	 * 폼 테이블
 	 */
 	ul[data-role=form] > li {display:block;}
-	ul[data-role=form] > li > label {display:block; width:100%; height:auto; padding:10px 0px 0px 0px; background:#fff; line-height:1.6;}
+	ul[data-role=form] > li > label {display:block; width:100%; height:auto; padding:10px 0px 0px 0px; background:transparent; line-height:1.6;}
 	ul[data-role=form] > li > label:after {content:" :";}
 	ul[data-role=form] > li > div {display:block; padding:5px 0px 10px 0px; min-height:40px; line-height:40px;}
 	ul[data-role=form] > li > label + div {padding-left:0px;}
