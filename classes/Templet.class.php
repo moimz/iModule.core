@@ -192,7 +192,6 @@ class Templet {
 		}
 		
 		$this->caller = $caller;
-		
 		if (is_file($this->templetPath.'/package.json') == true) $this->loaded = $templet;
 		
 		return $this;
@@ -543,6 +542,13 @@ class Templet {
 	}
 	
 	/**
+	 * 템플릿의 package.json 정보를 새로 로드한다.
+	 */
+	function loadPackage() {
+		$this->templetPackage = json_decode(file_get_contents($this->templetPath.'/package.json'));
+	}
+	
+	/**
 	 * 템플릿의 package.json 정보를 반환한다.
 	 *
 	 * @return object $package package.json 정보
@@ -550,7 +556,6 @@ class Templet {
 	function getPackage() {
 		if ($this->loaded === false) return null;
 		if ($this->templetPackage != null) return $this->templetPackage;
-		
 		$this->templetPackage = json_decode(file_get_contents($this->templetPath.'/package.json'));
 		return $this->templetPackage;
 	}
@@ -987,11 +992,6 @@ class Templet {
 			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
 		}
 		
-		$oTempletDir = $this->templetDir;
-		$temp = explode('/externals',$file);
-		$this->templetDir = $temp[0];
-		$this->templetPath = __IM_PATH__.$this->templetDir;
-		
 		/**
 		 * 템플릿파일에서 사용할 변수선언
 		 */
@@ -1010,22 +1010,17 @@ class Templet {
 			}
 		}
 		
-		$Templet = $this;
+		$oTempletDir = $this->templetDir;
+		$temp = explode('/externals',$file);
 		
-		if ($this->callerType == 'Module') {
-			$Module = $this->caller;
-			$me = $this->caller->getClass();
+		if ($oTempletDir != $temp[0]) {
+			$Templet = clone $this;
+			$Templet->templetDir = $temp[0];
+			$Templet->templetPath = __IM_PATH__.$Templet->templetDir;
+			$Templet->loadPackage();
+		} else {
+			$Templet = $this;
 		}
-		
-		if ($this->callerType == 'Widget') {
-			$Widget = $this->caller;
-			if ($Widget->getClass() !== null) {
-				$me = $Widget->getClass();
-				$Module = $me->getModule();
-			}
-		}
-		
-		$Templet = $this;
 		
 		ob_start();
 		INCLUDE __IM_PATH__.$file;
@@ -1099,16 +1094,6 @@ class Templet {
 		$html = PHP_EOL.'<div data-role="pagination" data-page="'.$p.'" data-total="'.$total.'">'.$html.'</div>'.PHP_EOL;
 		
 		return $html;
-	}
-	
-	/**
-	 * 자바스크립트용 언어셋 파일을 호출한다.
-	 * 언어셋은 기본적으로 PHP파일을 통해 사용되나 모듈의 자바스크립트에서 언어셋이 필요할 경우 해당 함수를 호출하여 자바스크립트상에서 모듈명.getLanguage() 함수로 언어셋을 불러올 수 있다.
-	 *
-	 * @todo 템플릿용 자바스크립트 언어셋은 어떻게 처리할지 고민필요
-	 */
-	function loadLanguage() {
-		
 	}
 }
 ?>
