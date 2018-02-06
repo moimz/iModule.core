@@ -48,6 +48,7 @@ var ENV = {
 		return url;
 	},
 	getUrl:function(menu,page,view,idx) {
+		if (menu === false) return ENV.DIR + "/" + ENV.LANGUAGE;
 		if (ENV.CONTAINER !== null) return ENV.getModuleUrl(ENV.CONTAINER.split("/").shift(),ENV.CONTAINER.split("/").pop(),view,idx);
 		
 		var menu = menu === undefined ? null : menu;
