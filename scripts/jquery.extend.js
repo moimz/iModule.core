@@ -396,9 +396,16 @@
 					});
 					
 					$input.on("blur",function(e) {
-						var value = $(this).val().replace("[^0-9\.]*","");
+						var value = $(this).val().replace(/[^0-9\.]*/g,"");
 						$input.val(value);
 					});
+				}
+				
+				/**
+				 * 검색필드인 경우
+				 */
+				if ($input.is("[type=search]") == true) {
+					if ($input.parents("div[data-role=input]").attr("data-search")) $input.keyword($input.parents("div[data-role=input]").attr("data-search"));
 				}
 				
 				/**
