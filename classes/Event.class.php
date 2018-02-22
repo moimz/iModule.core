@@ -88,7 +88,7 @@ class Event {
 			}
 		}
 		
-		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return null;
+		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return true;
 		
 		for ($i=0, $loop=count($this->listeners[$target][$event][$caller]);$i<$loop;$i++) {
 			if ($caller == '*') continue;
