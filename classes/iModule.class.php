@@ -93,10 +93,11 @@ class iModule {
 	private $siteCanonical = null;
 	private $siteImage = null;
 	
-	private $siteHeader = array();
+	private $siteHeaders = array();
+	private $siteBodys = array();
 	private $siteTemplet = null;
 	private $javascriptLanguages = array();
-	private $webFont = array('moimz'); // Moimz 폰트아이콘은 기본적으로 포함된다.
+	private $webFonts = array('moimz'); // Moimz 폰트아이콘은 기본적으로 포함된다.
 	private $webFontDefault = null;
 	
 	/**
@@ -1547,7 +1548,7 @@ class iModule {
 	 * @param boolean $isDefault 사이트 기본폰트로 사용할지 여부
 	 */
 	function loadWebFont($font,$isDefault=false) {
-		if (in_array($font,$this->webFont) == false) $this->webFont[] = $font;
+		if (in_array($font,$this->webFonts) == false) $this->webFonts[] = $font;
 		if ($isDefault == true) $this->webFontDefault = $font;
 	}
 	
@@ -1608,9 +1609,9 @@ class iModule {
 				$tag.= '>';
 		}
 		
-		if ($tag != null && in_array($tag,$this->siteHeader) == false) {
-			if ($isFirst === true) array_unshift($this->siteHeader,$tag);
-			else array_push($this->siteHeader,$tag);
+		if ($tag != null && in_array($tag,$this->siteHeaders) == false) {
+			if ($isFirst === true) array_unshift($this->siteHeaders,$tag);
+			else array_push($this->siteHeaders,$tag);
 		}
 	}
 	
@@ -1657,9 +1658,18 @@ class iModule {
 				$tag.= '>';
 		}
 		
-		if ($tag != null && ($index = array_search($tag,$this->siteHeader)) !== false) {
-			array_splice($this->siteHeader,$index,1);
+		if ($tag != null && ($index = array_search($tag,$this->siteHeaders)) !== false) {
+			array_splice($this->siteHeaders,$index,1);
 		}
+	}
+	
+	/**
+	 * 사이트 <BODY> 태그 마지막에 컨텐츠를 추가한다.
+	 *
+	 * @param string $html 추가할 HTML
+	 */
+	function addBodyContent($html) {
+		$this->siteBodys[] = $html;
 	}
 	
 	/**
@@ -1705,11 +1715,11 @@ class iModule {
 		/**
 		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.
 		 */
-		if (count($this->webFont) > 0) {
-			$this->addHeadResource('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFont).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
+		if (count($this->webFonts) > 0) {
+			$this->addHeadResource('style',__IM_DIR__.'/styles/font.css.php?language='.$this->language.'&font='.implode(',',$this->webFonts).($this->webFontDefault != null ? '&default='.$this->webFontDefault : ''));
 		}
 		
-		return implode(PHP_EOL,$this->siteHeader).PHP_EOL;
+		return implode(PHP_EOL,$this->siteHeaders).PHP_EOL;
 	}
 	
 	/**
@@ -1899,6 +1909,7 @@ class iModule {
 		$values->description = $description;
 		$values->type = $type;
 		$values->link = $link;
+		
 		$this->fireEvent('afterGetContext','core','error',$values,$html);
 		
 		if ($type == 'LOGIN') {
@@ -2062,6 +2073,13 @@ class iModule {
 	 * @return string $layout 레이아웃 HTML
 	 */
 	function getContextLayout($menu,$page,$context) {
+		/**
+		 * BODY 리소스를 추가한다.
+		 */
+		foreach ($this->siteBodys as $body) {
+			$context.= PHP_EOL.$body;
+		}
+		
 		/**
 		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈에서 레이아웃을 처리한다.
 		 */
@@ -2343,6 +2361,7 @@ class iModule {
 	 * @param object &$results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
 	 */
 	function fireEvent($event,$target,$caller,&$values=null,&$results=null) {
+		if ($this->Event === null) return;
 		$this->Event->fireEvent($event,$target,$caller,$values,$results);
 	}
 }
