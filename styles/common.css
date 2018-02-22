@@ -10,9 +10,9 @@
  * @file /styles/style.css
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160906
+ * @version 3.0.0
+ * @modified 2018. 2. 22.
  */
-
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333; box-sizing:border-box;}
 body {overflow:auto;}
@@ -22,6 +22,7 @@ input, textarea, button, select {font-family:inherit; outline:none; font-size:in
 input[type=search] {-webkit-appearance:none;}
 input[type=search]::-webkit-search-decoration {-webkit-appearance:none;}
 a {outline:none;}
+mark[data-markjs=true] {color:#f44336; background:#ffecb3;}
 
 /**
  * alert 영역 디자인 정의
