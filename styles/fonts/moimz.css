@@ -2,7 +2,7 @@
  * Moimz Fonts
  *
  * @license MIT
- * @version 1.0.0
+ * @version 1.0.1
  */
 @font-face {font-family:"moimz"; src:url("../fonts/moimz.woff2") format("woff2"), url("../fonts/moimz.woff") format("woff"), url("../fonts/moimz.ttf") format("truetype"), url("../fonts/moimz.svg") format("svg"); font-weight:normal; font-style:normal}
 
@@ -17,6 +17,9 @@
 	100%{-webkit-transform:rotate(359deg); transform:rotate(359deg)}
 }
 .mi-moimz:before {content:"\e800"}
+.mi-imodule:before {content:"\e801"}
+.mi-minitalk:before {content:"\e802"}
+
 .mi-back:before {content:"\e900"}
 .mi-back-bold:before {content:"\e901"}
 .mi-go:before {content:"\e902"}
@@ -29,6 +32,7 @@
 .mi-angle-up:before {content:"\e909"}
 .mi-angle-down:before {content:"\e910"}
 .mi-angle-right:before {content:"\e911"}
+
 .mi-ok:before {content:"\ea00"}
 .mi-ok-circle:before {content:"\ea01"}
 .mi-ok-circle-o:before {content:"\ea02"}
@@ -45,6 +49,7 @@
 .mi-info:before {content:"\ea13"}
 .mi-info-circle:before {content:"\ea14"}
 .mi-info-circle-o:before {content:"\ea15"}
+
 .mi-plus:before {content:"\eb00"}
 .mi-minus:before {content:"\eb01"}
 .mi-denied:before {content:"\eb02"}
@@ -63,6 +68,7 @@
 .mi-view-grid:before {content:"\eb15"}
 .mi-plus-thin:before {content:"\eb16"}
 .mi-minus-thin:before {content:"\eb17"}
+
 .mi-user:before {content:"\ec00"}
 .mi-group:before {content:"\ec01"}
 .mi-home:before {content:"\ec02"}
@@ -85,4 +91,5 @@
 .mi-push:before {content:"\ec19"}
 .mi-message:before {content:"\ec20"}
 .mi-mail:before {content:"\ec21"}
+
 .mi-loading:before {content:"\ed00"}

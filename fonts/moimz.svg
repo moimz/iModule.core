@@ -1,12 +1,16 @@
 <?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg xmlns="http://www.w3.org/2000/svg">
-<metadata>Copyright (C) 2017 by original authors @ fontello.com</metadata>
+<metadata>Copyright (C) 2018 by original authors @ fontello.com</metadata>
 <defs>
 <font id="moimz" horiz-adv-x="1000" >
 <font-face font-family="moimz" font-weight="400" font-stretch="normal" units-per-em="1000" ascent="850" descent="-150" />
 <missing-glyph horiz-adv-x="1000" />
 <glyph glyph-name="moimz" unicode="&#xe800;" d="M47 440v-338l49-26c81-43 166-87 171-87 3-1 4 45 4 217 0 120 1 218 2 217 18-8 187-94 204-103l22-13 17 9c14 8 201 103 211 107 1 1 2-97 2-217 0-172 1-218 4-217 5 0 90 44 171 87l49 26v338c0 185-1 337-2 337-2 0-46-23-100-51-53-27-132-68-175-89-43-22-100-51-127-65l-49-26-49 26c-27 14-84 43-127 65-43 22-122 62-175 89-54 28-98 51-100 51-1 0-2-152-2-337z m237-345v-118l15-6c8-4 17-8 19-11 3-2 41-22 85-44 44-22 82-41 83-43 2-2 7-3 10-3 8 0 179 83 186 90 2 3 11 7 19 11l15 6v118c0 87-1 118-4 118-2 0-50-24-108-53l-104-54-104 54c-58 29-106 53-108 53-3 0-4-31-4-118z" horiz-adv-x="1000" />
+
+<glyph glyph-name="imodule" unicode="&#xe801;" d="M1000 736v-656c-81-38-162-75-243-112v430c-85-39-171-77-257-116v225c167 77 333 153 500 229z m-736 114l-239-103 239-109 240 109z m1-666v-227l235-107v228z m468 0v-227l-233-107v228z m-733 552v-656l243-112v657z m265-122v-226l235-106v226z" horiz-adv-x="1000" />
+
+<glyph glyph-name="minitalk" unicode="&#xe802;" d="M793 617l-199-93-10-4-208 98-187 88v-437s-3-61-63-151c0 0-71-93-110-110 0 0 305 45 360 188v209l114-53v-389l93-43 94 43v388l115 54v-386l187 89v598l-186-89z" horiz-adv-x="1000" />
 
 <glyph glyph-name="back" unicode="&#xe900;" d="M875 388h-590l232 233-58 59-334-333 333-334 59 59-233 233h591z" horiz-adv-x="1000" />
 
