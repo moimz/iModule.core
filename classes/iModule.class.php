@@ -2019,7 +2019,7 @@ class iModule {
 		/**
 		 * 가져올 컨텍스트에 따라 웹브라우저에서 표시될 사이트제목을 설정한다.
 		 */
-		$this->setSiteTitle($config->title);
+		if ($menu != 'index' || $page != null) $this->setSiteTitle($config->title);
 		
 		/**
 		 * 컨텍스트 종류가 PAGE 일 경우로 이 값은 1차 메뉴에서만 설정가능하다.
