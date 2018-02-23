@@ -419,7 +419,7 @@ div[data-role=pagination] > div > ul > li.disabled > a:hover {border-color:trans
 /**
  * 위지윅 컨텐츠
  */
-div[data-role=wysiwyg-content] {word-break:break-all;}
+div[data-role=wysiwyg-content] {word-break:break-all; line-height:1.6;}
 div[data-role=wysiwyg-content] a {text-decoration:none; color:#1976D2;}
 div[data-role=wysiwyg-content] a:hover {text-decoration:underline; color:#1976D2;}
 div[data-role=wysiwyg-content] .fr-file {display:inline-block; border:1px solid #ddd; border-radius:5px; color:#000; text-decoration:none; vertical-align:middle; padding:5px 10px 5px 30px; background:url(../modules/wysiwyg/images/download.png) no-repeat 10px 50%; background-size:14px 14px;}
