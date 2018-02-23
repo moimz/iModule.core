@@ -575,6 +575,18 @@
 						$(this).status("default");
 					}
 				});
+				
+				if (this.attr("data-auto-height") == "true") {
+					$textarea.data("height",$textarea.height());
+					$textarea.data("padding",$textarea.prop("scrollHeight") - $textarea.height());
+					
+					$textarea.data("height",$textarea.height()).on("keypress keyup",function() {
+						$(this).height($(this).data("height"));
+						if ($(this).val().length > 0 && $(this).prop("scrollHeight") > $(this).height() + $(this).data("padding")) {
+							$(this).height($(this).prop("scrollHeight") - $(this).data("padding"));
+						}
+					});
+				}
 			}
 			
 			/**
