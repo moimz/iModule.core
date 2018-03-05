@@ -781,7 +781,7 @@ var iModule = {
 		
 		popup.window.resizeBy(resizeWidth,resizeHeight);
 		
-		popup.location.href = url;
+		popup.location.replace(url);
 	},
 	/**
 	 * 현재창의 크기를 리사이즈한다.
