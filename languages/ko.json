@@ -77,6 +77,7 @@
 		"UNSELECTED":"항목이 선택되지 않았습니다.",
 		"DB_CREATE_TABLE_ERROR":"데이터베이스 테이블 생성에 실패하였습니다.",
 		"DATABASE_ERROR":"데이터베이스 에러가 발생하였습니다.",
+		"DATABASE_INSERT_ERROR":"데이터베이스에 데이터를 저장하지 못하였습니다.",
 		"EXPIRED_LINK":"만료된 링크입니다."
 	}
 }
