@@ -356,10 +356,12 @@ class Templet {
 			@closedir($siteTemplets);
 			
 			/**
-			 * 사이트를 구성하는 모듈을 찾는다.
+			 * 다른 모듈에서 제공하는 템플릿을 찾는다.
 			 */
-			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->where('is_templet','TRUE')->get();
+			$modules = $this->IM->db()->select($this->IM->Module->getTable('module'))->get();
 			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
+				if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets') == false) continue;
+				
 				if (is_file(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/package.json') == true) {
 					if (is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName()) == true) {
 						$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/modules/'.$caller->getName());
