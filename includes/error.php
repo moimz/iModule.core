@@ -12,7 +12,6 @@
  * @modified 2017. 12. 19.
  * @see /classes/iModule.class.php -> printError()
  */
-
 if (defined('__IM__') == false) exit;
 ?>
 <section class="errorbox">
