@@ -4,13 +4,12 @@
  *
  * iModule의 API요청을 처리한다.
  * 
- * @file index.php
+ * @file /api/index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2017. 11. 22.
+ * @modified 2018. 3. 18.
  */
-
 header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control:post-check=0, pre-check=0', false);
 header('Pragma:no-cache');

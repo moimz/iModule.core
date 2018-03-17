@@ -2,13 +2,22 @@
 /**
  * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * @file functions.class.php
+ * 자주 사용되는 공통함수를 정의한다.
+ *
+ * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
  * @version 1.2.0
- * @modified 2018. 1. 1.
+ * @modified 2018. 3. 18.
  */
 
+/**
+ * 요청된 변수데이터를 가져온다.
+ *
+ * @param string $var 변수명
+ * @param string $type 변수형태 (request : POST or GET 으로 요청된 변수 / session : 세션변수 / cookie : 쿠키변수)
+ * @return any $object
+ */
 function Request($var,$type='request') {
 	global $_REQUEST, $_SESSION;
 
@@ -79,6 +88,13 @@ function Decoder($value,$key=null,$mode='base64') {
 	return substr($output,0,$valueLen-$padSize);
 }
 
+/**
+ * 파일에서 특정라인을 읽어온다.
+ *
+ * @param string $path 읽어올 파일 경로
+ * @param string $line 읽어올 라인
+ * @return string $text
+ */
 function FileReadLine($path,$line) {
 	if (is_file($path) == true) {
 		$file = @file($path);
@@ -139,15 +155,33 @@ function CheckPhoneNumber($phone) {
 	else return preg_match('/^0[0-9]{9,11}$/',$phone);
 }
 
+/**
+ * 이메일형식이 이메일수집봇에 의해 자동으로 수집되지 않도록 변환한다.
+ *
+ * @param string $email 이메일주소
+ * @param boolean $isLink 이메일링크를 포함할지 여부 (기본값 : true)
+ * @return boolean $email 변환된 이메일주소
+ */
 function GetAntiSpamEmail($email,$isLink=true) {
 	$email = str_replace('@','<i class="fa fa-at"></i>',$email);
 	return $isLink == true ? '<span class="iModuleEmail">'.$email.'</span>' : $email;
 }
 
+/**
+ * UNIXTIMESTAMP 를 주어진 포맷에 따라 변환한다.
+ *
+ * @param string $format 변환할 포맷 (@see http://php.net/manual/en/function.date.php)
+ * @param int $time UNIXTIMESTAMP (없을 경우 현재시각)
+ * @param boolean $is_moment momentjs 용 태그를 생성할 지 여부 (@see http://momentjs.com)
+ * @return string $time 변환된 시각
+ */
 function GetTime($format,$time=null,$is_moment=true) {
 	$language = Request('language');
 	$time = $time === null ? time() : $time;
-
+	
+	/**
+	 * PHP date 함수 포맷텍스트를 momentjs 포맷텍스트로 치환하기 위한 배열정의
+	 */
 	$replacements = array(
 		'd' => 'DD',
 		'D' => 'ddd',
@@ -193,7 +227,16 @@ function GetTime($format,$time=null,$is_moment=true) {
 	else return date($format,$time);
 }
 
-function GetPhoneNumber($phone) {
+/**
+ * 폰번호를 변환한다.
+ * @todo 한국 외 다른 나라 형식
+ *
+ * @param string $phone 폰번호
+ * @param int $code 국가코드 (한국 82)
+ * @param boolean $is_included_code 변환된 전화번호에 국가코드(예 : +82)를 포함할지 여부 (기본값 : false)
+ * @return string $phone 변환된 폰번호
+ */
+function GetPhoneNumber($phone,$code='82',$is_included_code=false) {
 	$phone = str_replace('-','',$phone);
 	if (strlen($phone) < 9) return '';
 
@@ -214,15 +257,18 @@ function GetPhoneNumber($phone) {
 	return $value;
 }
 
+/**
+ * 문자열을 종류에 따라 변환한다.
+ *
+ * @param string $str 변환할 문자열
+ * @param int $code 변환종류
+ * @return string $str 변환된 문자열
+ */
 function GetString($str,$code) {
 	switch ($code) {
-		case 'inputbox' :
-			$str = str_replace('<','&lt;',$str);
-			$str = str_replace('>','&gt;',$str);
-			$str = str_replace('"','&quot;',$str);
-			$str = str_replace("'",'\'',$str);
-		break;
-		
+		/**
+		 * input 태그에 들어갈 수 있도록 <, >, " 문자열을 HTML 엔티티 문자열로 변환하고 ' 에 \ 를 추가한다.
+		 */
 		case 'input' :
 			$str = str_replace('<','&lt;',$str);
 			$str = str_replace('>','&gt;',$str);
@@ -230,18 +276,18 @@ function GetString($str,$code) {
 			$str = str_replace("'",'\'',$str);
 		break;
 		
-		case 'decode' :
-			$str = str_replace('&lt;','<',$str);
-			$str = str_replace('&gt;','>',$str);
-			$str = str_replace('&#39;','\'',$str);
-		break;
-
+		/**
+		 * HTML 태그를 HTML 엔티티 문자열로 변환한다.
+		 */
 		case 'replace' :
 			$str = str_replace('<','&lt;',$str);
 			$str = str_replace('>','&gt;',$str);
 			$str = str_replace('"','&quot;',$str);
 		break;
-
+		
+		/**
+		 * XML 태그에 들어갈 수 있도록 &, <, >, ", ' 문자열을 HTML 엔티티 문자열로 변환한다.
+		 */
 		case 'xml' :
 			$str = str_replace('&','&amp;',$str);
 			$str = str_replace('<','&lt;',$str);
@@ -249,12 +295,18 @@ function GetString($str,$code) {
 			$str = str_replace('"','&quot;',$str);
 			$str = str_replace("'",'&apos;',$str);
 		break;
-
+		
+		/**
+		 * 가장 일반적인 HTML 태그를 제외한 나머지 태그를 제거한다.
+		 */
 		case 'default' :
 			$allow = '<p>,<br>,<b>,<span>,<a>,<img>,<embed>,<i>,<u>,<strike>,<font>,<center>,<ol>,<li>,<ul>,<strong>,<em>,<div>,<table>,<tr>,<td>';
 			$str = strip_tags($str, $allow);
 		break;
 
+		/**
+		 * \ 및 태그, HTML 엔티티를 제거한다.
+		 */
 		case 'delete' :
 			$str = stripslashes($str);
 			$str = strip_tags($str);
@@ -262,10 +314,16 @@ function GetString($str,$code) {
 			$str = str_replace('"','&quot;',$str);
 		break;
 
+		/**
+		 * URL 주소를 인코딩한다.
+		 */
 		case 'encode' :
 			$str = urlencode($str);
 		break;
 		
+		/**
+		 * 정규식에 들어갈 수 있도록 정규식에 사용되는 문자열을 치환한다.
+		 */
 		case 'reg' :
 			$str = str_replace('[','\[',$str);
 			$str = str_replace(']','\]',$str);
@@ -282,6 +340,9 @@ function GetString($str,$code) {
 			$str = str_replace('/','\/',$str);
 		break;
 		
+		/**
+		 * 데이터베이스 인덱스에 사용할 수 있게 HTML태그 및 HTML엔티티, 그리고 불필요한 공백문자를 제거한다.
+		 */
 		case 'index' :
 			$str = preg_replace('/<(P|p)>/',' <p>',$str);
 			$str = strip_tags($str);
@@ -295,6 +356,14 @@ function GetString($str,$code) {
 	return trim($str);
 }
 
+/**
+ * 정해진 길이에 따라 주어진 문자열을 자른다.
+ *
+ * @param string $str 자를 문자열
+ * @param int $limit 문자열 길이
+ * @param boolean $is_html 자를 문자열에 HTML 태그가 포함되어 있는지 여부
+ * @return string $str
+ */
 function GetCutString($str,$limit,$is_html=false) {
 	$str = strip_tags($str,'<b><span><strong><i><u><font>');
 	$length = mb_strlen($str,'UTF-8');
@@ -361,9 +430,9 @@ function GetCutString($str,$limit,$is_html=false) {
 		$str = $str;
 	}
 
-	if (sizeof($tags) > 0) {
+	if (count($tags) > 0) {
 		$tags = array_reverse($tags);
-		for ($i=0, $loop=sizeof($tags);$i<$loop;$i++) {
+		for ($i=0, $loop=count($tags);$i<$loop;$i++) {
 			if ($tags[$i] != '-1') $str.= '</'.$tags[$i].'>';
 		}
 	}
@@ -373,6 +442,12 @@ function GetCutString($str,$limit,$is_html=false) {
 	return $str;
 }
 
+/**
+ * 영문 및 숫자로 이루어진 랜덤한 문자열을 가져온다.
+ *
+ * @param int $length 랜덤문자열 길이
+ * @return string $randomText 랜덤문자열
+ */
 function GetRandomString($length=10) {
 	return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"),0,$length);
 }
@@ -392,10 +467,10 @@ function GetDateOfWeek($year,$week) {
 }
 
 /**
- * change ip's 3rd number to *
+ * 아이피주소에서 3번째 자리를 치환한다.
  *
- * @param string $ip (ex : 127.0.0.1)
- * @return string $hiddenIp (ex : 127.0.***.1)
+ * @param string $ip 아이피주소 (ex : 127.0.0.1)
+ * @return string $hiddenIp 변환된 아이피주소 (ex : 127.0.***.1)
  */
 function GetHiddenIp($ip) {
 	$temp = explode('.',$ip);
@@ -403,6 +478,14 @@ function GetHiddenIp($ip) {
 	return implode('.',$temp);
 }
 
+/**
+ * 특정 URL 주소의 파일을 서버에 저장한다.
+ *
+ * @param string $url 저장할 파일주소 (http://domain.com/file.exe)
+ * @param string $filename 저장할 파일명
+ * @param string $filetype 파일 MIME (옵션)
+ * @return boolean $success
+ */
 function SaveFileFromUrl($url,$filename,$filetype=null) {
 	$parseURL = parse_url($url);
 
@@ -445,56 +528,6 @@ function SaveFileFromUrl($url,$filename,$filetype=null) {
 	}
 
 	return true;
-}
-
-function AntiXSS($data) {
-	global $IM;
-	
-	REQUIRE_ONCE __IM_PATH__.'/classes/HTMLPurifier/HTMLPurifier.auto.php';
-
-	$config = HTMLPurifier_Config::createDefault();
-	$config->set('Cache.SerializerPath',$IM->getAttachmentPath().'/temp');
-	$config->set('Attr.EnableID',false);
-	$config->set('Attr.DefaultImageAlt','');
-	$config->set('AutoFormat.Linkify',false);
-	$config->set('HTML.MaxImgLength',null);
-	$config->set('CSS.MaxImgLength',null);
-	$config->set('CSS.AllowTricky',true);
-	$config->set('Core.Encoding','UTF-8');
-	$config->set('HTML.FlashAllowFullScreen',true);
-	$config->set('HTML.SafeEmbed',true);
-	$config->set('HTML.SafeIframe',true);
-	$config->set('HTML.SafeObject',true);
-	$config->set('Output.FlashCompat',true);
-
-	$config->set('URI.SafeIframeRegexp', '#^(?:https?:)?//(?:'.implode('|', array(
-		'www\\.youtube(?:-nocookie)?\\.com/',
-		'maps\\.google\\.com/',
-		'player\\.vimeo\\.com/video/',
-		'www\\.microsoft\\.com/showcase/video\\.aspx',
-		'(?:serviceapi\\.nmv|player\\.music)\\.naver\\.com/',
-		'(?:api\\.v|flvs|tvpot|videofarm)\\.daum\\.net/',
-		'v\\.nate\\.com/',
-		'play\\.mgoon\\.com/',
-		'channel\\.pandora\\.tv/',
-		'www\\.tagstory\\.com/',
-		'play\\.pullbbang\\.com/',
-		'tv\\.seoul\\.go\\.kr/',
-		'ucc\\.tlatlago\\.com/',
-		'vodmall\\.imbc\\.com/',
-		'www\\.musicshake\\.com/',
-		'www\\.afreeca\\.com/player/Player\\.swf',
-		'static\\.plaync\\.co\\.kr/',
-		'video\\.interest\\.me/',
-		'player\\.mnet\\.com/',
-		'sbsplayer\\.sbs\\.co\\.kr/',
-		'img\\.lifestyler\\.co\\.kr/',
-		'c\\.brightcove\\.com/',
-		'www\\.slideshare\\.net/',
-	)).')#');
-
-	$purifier = new HTMLPurifier($config);
-	return $purifier->purify($data);
 }
 
 /**
@@ -551,11 +584,11 @@ function GetFileSize($size,$isKIB=false) {
 }
 
 /**
- * Check installed module version
+ * 서버 요구사항을 확인한다.
  *
- * @param string $dependency type of check version
- * @param string $version minimum version
- * @param object $check {boolean $installed,float $installedVersion}
+ * @param string $dependency 확인할 요구사항 종류 (php, mysql, curl, zip, mbstring, gd)
+ * @param string $version 최소 요구버전
+ * @param object $check 확인결과 (boolean $check->installed : 설치여부,float $check->installedVersion : 설치버전)
  */
 function CheckDependency($dependency,$version) {
 	$check = new stdClass();
@@ -590,11 +623,11 @@ function CheckDependency($dependency,$version) {
 }
 
 /**
- * Check directory's permission
+ * 디렉토리의 퍼미션을 확인한다.
  *
- * @param string $dir directory name
- * @param string $permission minimum permission
- * @param boolean $check
+ * @param string $dir 확인할 디렉토리 경로
+ * @param string $permission 최소 요구 퍼미션 (예 : 707)
+ * @param boolean $check 최소 요구 퍼미션을 만족하는지 여부
  */
 function CheckDirectoryPermission($dir,$permission) {
 	if (is_dir($dir) == true) {
@@ -610,10 +643,10 @@ function CheckDirectoryPermission($dir,$permission) {
 }
 
 /**
- * Create Database from schema
+ * 데이터베이스 테이블을 생성한다.
  *
- * @param object $dbConnect database connector
- * @param object $schema database schema (from json)
+ * @param DB $dbConnect 데이터베이스 함수
+ * @param object $schema 테이블 구조 (package.json 에 정의)
  * @return boolean $success
  */
 function CreateDatabase($dbConnect,$schema) {
@@ -679,9 +712,9 @@ function CreateDatabase($dbConnect,$schema) {
 }
 
 /**
- * Create folder
+ * 디렉토리를 생성한다.
  *
- * @param string $path
+ * @param string $path 생성할 경로
  * @return boolean $success
  */
 function CreateDirectory($path) {
@@ -741,7 +774,7 @@ function GetHexToRgb($hex,$opacity=null) {
 }
 
 /**
- * getallheaders function is apache only
+ * 아파치 웹서버가 아닌경우 아파치 웹서버 전용함수인 getallheaders 함수를 정의한다.
  *
  * @see http://php.net/getallheaders
  * @return $headers

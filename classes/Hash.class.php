@@ -1,4 +1,15 @@
 <?php
+/**
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * 패스워드를 저장하기 위한 SALT 기반 해시를 생성하거나, 패스워드를 검증한다.
+ *
+ * @file /classes/Hash.class.php
+ * @author Arzz
+ * @license MIT License
+ * @version 1.0.0
+ * @modified 2018. 3. 18.
+ */
 define('PBKDF2_COMPAT_HASH_ALGORITHM','SHA256');
 define('PBKDF2_COMPAT_ITERATIONS',12000);
 define('PBKDF2_COMPAT_SALT_BYTES',24);

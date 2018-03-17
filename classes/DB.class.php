@@ -1,15 +1,16 @@
 <?php
 /**
- * This file is part of Moimz Tools - https://www.moimz.com
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * @file DB.class.php
+ * 데이터베이스 클래스를 정의한다.
+ *
+ * @file /classes/DB.class.php
  * @author Arzz
  * @version 1.3.0
  * @license MIT License
  */
 class DB {
 	private $connectors = array();
-	
 	private $code;
 	private $table;
 	

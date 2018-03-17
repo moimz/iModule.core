@@ -8,7 +8,8 @@
  * @file /classes/iModule.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160905
+ * @version 3.0.0
+ * @modified 2018. 3. 18.
  */
 class iModule {
 	/**

@@ -1,4 +1,15 @@
 <?php
+/**
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * OAuth 프로토콜 처리를 위한 클래스를 정의한다.
+ *
+ * @file /classes/OAuthClient.class.php
+ * @author Arzz
+ * @license MIT License
+ * @version 1.0.0
+ * @modified 2018. 3. 18.
+ */
 class OAuthClient {
 	private $_clientId = null;
 	private $_clientSecret = null;
