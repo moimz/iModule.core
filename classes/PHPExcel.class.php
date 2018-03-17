@@ -1180,14 +1180,15 @@ class PHPExcelReader {
 
 	function getExcelData($sheet=0) {
 		$sheet = $this->reader->getSheet($sheet);
-		$column = $sheet->getHighestColumn();
+		$column = $sheet->getCell()->columnIndexFromString($sheet->getHighestColumn());
 		$row = $sheet->getHighestRow();
 
 		$data = array();
 		for($i=1;$i<=$row;$i++){
 			$data[$i-1] = array();
-			for($j='A';$j<=$column;$j++){
-				$data[$i-1][$j] = trim($sheet->getCell($j.$i)->getValue());
+			for($j=0;$j<$column;$j++){
+				$cell = $sheet->getCell()->stringFromColumnIndex($j);
+				$data[$i-1][$cell] = trim($sheet->getCell($cell.$i)->getValue());
 			}
 		}
 
