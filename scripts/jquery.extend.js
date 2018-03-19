@@ -545,6 +545,18 @@
 						});
 					}
 				}
+				
+				/**
+				 * input type이 date 일 경우
+				 */
+				if ($input.is("[type=time]") == true) {
+					$input.attr("placeholder","HH:mm");
+					$input.on("change",function() {
+						if ($(this).val().length > 0 && $(this).val().search(/[0-9]{2}:[0-9]{2}/) == -1) {
+							$input.status("error");
+						}
+					});
+				}
 			}
 			
 			/**
@@ -597,6 +609,7 @@
 				var $label = this.children();
 				var $checkbox = $("input[type=checkbox]",$container);
 				$container.attr("data-type","checkbox");
+				$container.attr("data-name",$checkbox.attr("name"));
 				
 				var $icon = $("<button>").attr("type","button").addClass("checkbox");
 				if ($checkbox.is(":checked") == true) $icon.addClass("on");
@@ -1813,6 +1826,10 @@
 				} else {
 					var $parent = $(this).parents("div[data-role=input]").length == 0 ? null : $(this).parents("div[data-role=input]").eq(0);
 					var $inputset = $parent == null || $parent.parents("div[data-role=inputset]").length == 0 ? null : $parent.parents("div[data-role=inputset]").eq(0);
+					
+					if ($inputset != null) {
+						var $target = $(this).parents("div[data-role=input]");
+					}
 				}
 				
 				if ($parent == null) return;
@@ -1842,24 +1859,20 @@
 				$inputbox.removeClass("success error loading default");
 				$inputbox.addClass(setStatus);
 				if ($inputbox.is("[data-role=inputset]") == true) {
-					$("div[data-role=input]",$inputbox).removeClass("success error loading default").addClass(setStatus);
+					$("div[data-role=input]",$inputbox).removeClass("success error loading default");
+					$target.addClass(setStatus);
 				}
 				
 				var help = message ? message : ($inputbox.attr("data-"+setStatus) ? $inputbox.attr("data-"+setStatus) : null);
 				help = help == null && $inputbox.attr("data-default") ? $inputbox.attr("data-default") : help;
 				
 				if (help !== null) {
-					var $help = $("<div>").attr("data-role","help").addClass(setStatus).html(help);
+					var $help = $("<div>").attr("data-role","help").addClass(setStatus).html("<div>"+help+"</div>");
 					if ($parent.data("isInit") !== true) $parent.inits();
 				}
 				
-				if ($inputbox.is("[data-role=inputset]") == true && ($inputbox.hasClass("flex") == true || $inputbox.hasClass("grow") == true)) {
-					$inputbox.next("div[data-role=help]").remove();
-					if (help !== null) $inputbox.after($help);
-				} else {
-					$("div[data-role=help]",$inputbox).remove();
-					if (help !== null) $inputbox.append($help);
-				}
+				$("div[data-role=help]",$inputbox).remove();
+				if (help !== null) $inputbox.append($help);
 			}
 		});
 		

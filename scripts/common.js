@@ -67,6 +67,7 @@ var iModule = {
 		 * 링크타켓처리
 		 */
 		$("a",$container).on("click",function(e) {
+			if (!$(this).attr("href")) return;
 			if ($(this).attr("href").indexOf("#IM_") == -1) return;
 			var temp = $(this).attr("href").split("#IM_")
 			var link = temp[0];
