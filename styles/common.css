@@ -175,6 +175,7 @@ div[data-role=input][data-type=input] > input[type=date] {opacity:0; width:100%;
 div[data-role=input][data-type=input] > button {background:#fff; position:absolute; top:1px; right:1px; width:38px; height:38px; border:0; line-height:38px; cursor:pointer; color:#666;}
 div[data-role=input][data-type=input] > button:hover {background:#f4f4f4; color:#333;}
 div[data-role=input][data-type=input] > button:focus {border:1px solid #66afe9; top:0px; right:0px; width:40px; height:40px; line-height:38px;}
+div[data-role=input][data-type=input] > button[disabled] {background:#f4f4f4; opacity:0.5; cursor:not-allowed; color:#666;}
 div[data-role=input][data-type=input].extend > input {border-color:#66afe9;}
 div[data-role=input][data-type=input].extend > button {background:#428bca; color:#fff;}
 div[data-role=input][data-type=input].error > input {border-color:#f44336;}

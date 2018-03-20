@@ -545,6 +545,14 @@
 							e.stopPropagation();
 						});
 					}
+					
+					$input.on("disable",function() {
+						$button.disable();
+					});
+					
+					$input.on("enable",function() {
+						$button.enable();
+					});
 				}
 				
 				/**
