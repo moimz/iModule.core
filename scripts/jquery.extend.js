@@ -7,7 +7,8 @@
  * @file /scripts/jquery.extend.js
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160903
+ * @version 3.0.0
+ * @modified 2018. 3. 20.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1867,7 +1868,7 @@
 				help = help == null && $inputbox.attr("data-default") ? $inputbox.attr("data-default") : help;
 				
 				if (help !== null) {
-					var $help = $("<div>").attr("data-role","help").addClass(setStatus).html("<div>"+help+"</div>");
+					var $help = $("<div>").attr("data-role","help").addClass(setStatus).html(help);
 					if ($parent.data("isInit") !== true) $parent.inits();
 				}
 				

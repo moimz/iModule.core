@@ -124,8 +124,7 @@ div[data-role=inputset].flex > div[data-role=input] {display:table-cell; width:a
 div[data-role=inputset].flex > div[data-role=input] > label {white-space:nowrap;}
 div[data-role=inputset].flex > div[data-role=input]:first-child {border-left:0px;}
 div[data-role=inputset].flex > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:14px; line-height:40px;}
-div[data-role=inputset].flex > div[data-role=help] {display:table-row;}
-div[data-role=inputset].flex > div[data-role=help] > div {display:table-cell; padding-top:5px;}
+div[data-role=inputset].flex > div[data-role=help] {display:table-caption; caption-side:bottom; margin-top:5px; margin-left:0px; margin-bottom:5px; border-left:0;}
 
 div[data-role=inputset].grow {width:100%; min-height:40px; display:table;}
 div[data-role=inputset].grow > div[data-role=input] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent;}
@@ -137,8 +136,7 @@ div[data-role=inputset].grow > div[data-role=input].grow4 {width:25%;}
 div[data-role=inputset].grow > div[data-role=input].grow5 {width:20%;}
 div[data-role=inputset].grow > div[data-role=input]:first-child {border-left:0px;}
 div[data-role=inputset].grow > div[data-role=text] {display:table-cell; width:auto; margin-top:0px; white-space:nowrap; overflow:visible; border-left:5px solid transparent; font-size:14px; line-height:40px;}
-div[data-role=inputset].grow > div[data-role=help] {display:table-row;}
-div[data-role=inputset].grow > div[data-role=help] > div {display:table-cell; padding-top:5px;}
+div[data-role=inputset].flex > div[data-role=help] {display:table-caption; caption-side:bottom; margin-top:5px; margin-left:0px; margin-bottom:5px; border-left:0;}
 
 div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px; line-height:40px; padding:0px 15px; box-sizing:border-box; cursor:pointer; color:#fff; background:#b5b7c0; border:0;}
 div[data-role=input][data-type=button] > button.icon {padding:0px;}
