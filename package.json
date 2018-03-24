@@ -240,7 +240,7 @@
 				},
 				"type":{
 					"type":"enum",
-					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','LINK','EMPTY'",
+					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','HTML','LINK','EMPTY'",
 					"default":"EMPTY"
 				},
 				"layout":{

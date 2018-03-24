@@ -2051,6 +2051,13 @@ class iModule {
 		}
 		
 		/**
+		 * 컨텍스트 종류가 HTML 일 경우
+		 */
+		if ($config->type == 'HTML') {
+			return $this->getHtmlContext($config->context);
+		}
+		
+		/**
 		 * 컨텍스트 종류가 MODULE 일 경우
 		 * 설정된 모듈 클래스를 선언하고 모듈클래스내의 getContext 함수를 호출하여 컨텍스트를 가져온다.
 		 * $page->context->module : 불러올 모듈명
@@ -2139,10 +2146,43 @@ class iModule {
 			echo '</div>'.PHP_EOL;
 		}
 		
-		$widget = ob_get_contents();
-		ob_end_clean();
+		$widget = ob_get_clean();
 		
 		return $widget;
+	}
+	
+	/**
+	 * 직접 입력한 HTML 으로 페이지를 구성한다.
+	 *
+	 * @param object $context 입력된 HTML 요소
+	 * @return string $context 컨텍스트 HTML
+	 */
+	function getHtmlContext($context) {
+		$view = $this->getView();
+		
+		/**
+		 * 편집모드 일 경우, 편집페이지를 불러온다.
+		 */
+		if ($view == 'edit') {
+			$context = $this->getModule('admin')->getHtmlEditorContext($this->domain,$this->language,$this->menu,$this->page,$context);
+		} else {
+			$html = $context != null && isset($context->html) == true ? $context->html : '';
+			$css = $context != null && isset($context->css) == true ? $context->css : '';
+			
+			if ($html) $html = $this->getModule('wysiwyg')->decodeContent($html,false);
+			
+			$context = PHP_EOL.'<!-- HTML CONTEXT START -->'.PHP_EOL;
+			$context = '<style>'.$css.'</style>'.PHP_EOL;
+			$context.= '<div data-role="context" data-type="html" data-menu="'.($this->menu.'"'.$this->page ? ' data-page="'.$this->page.'"' : '').'>'.PHP_EOL;
+			if ($this->getModule('member')->isAdmin() == true) $context.= '<a href="'.$this->getUrl($this->menu,$this->page,'edit').'" class="edit"><i class="mi mi-pen"></i><span>페이지 편집</span></a>';
+			$context.= '<div data-role="wysiwyg-content">'.$html.'</div>';
+			$context.= PHP_EOL.'</div>'.PHP_EOL.'<!-- HTML CONTEXT END -->'.PHP_EOL;
+			
+			$values = (object)get_defined_vars();
+			$this->fireEvent('afterGetContext','core','html',$values,$context);
+		}
+		
+		return $context;
 	}
 	
 	/**

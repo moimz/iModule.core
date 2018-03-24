@@ -7,9 +7,9 @@
  * @file /includes/modal.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160905
+ * @version 3.0.0
+ * @modified 2018. 3. 23.
  */
-
 if (defined('__IM__') == false) exit;
 ?>
 <div data-role="modal" data-closable="<?php echo $is_closable == true ? 'TRUE' : 'FALSE'; ?>" data-fullsize="<?php echo $is_fullsize == true ? 'TRUE' : 'FALSE'; ?>" data-width="<?php echo $width; ?>" data-height="<?php echo $height; ?>" data-max-width="<?php echo $max_width; ?>" data-max-height="<?php echo $max_height; ?>">
