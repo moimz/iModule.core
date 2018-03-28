@@ -8,7 +8,8 @@
  * @file /classes/Templet.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160907
+ * @version 3.0.0
+ * @modified 2018. 3. 28.
  */
 class Templet {
 	/**
@@ -676,6 +677,10 @@ class Templet {
 			}
 		}
 		
+		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true)  {
+			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getHeader();
+		}
+		
 		/**
 		 * iModule 코어에서 호출했다면, iModule 기본 header 를 추가한다.
 		 */
@@ -774,6 +779,10 @@ class Templet {
 				INCLUDE $this->getPath().'/footer.php';
 				$html.= ob_get_clean();
 			}
+		}
+		
+		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true)  {
+			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getFooter();
 		}
 		
 		/**

@@ -7,7 +7,8 @@
  * @file /modules/index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.161110
+ * @version 3.0.0
+ * @modified 2018. 3. 28.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 
