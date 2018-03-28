@@ -1645,7 +1645,7 @@
 		
 		if (this.triggerHandler("beforesubmit",[this]) === false) return;
 		
-		var count = count ? count : 1;
+		var count = count !== undefined ? count : 1;
 		var $form = this;
 		var data = $("input[type=file]",$form).length == 0 ? $form.serialize() : new FormData($form[0]);
 		
@@ -1682,7 +1682,7 @@
 				/**
 				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
 				 */
-				if (count == 3) {
+				if (count === false || count == 3) {
 					$form.status("error");
 					iModule.alert.show("error","Server Connect Error!",5);
 				} else {
@@ -1868,7 +1868,7 @@
 				$inputbox.removeClass("success error loading default");
 				$inputbox.addClass(setStatus);
 				if ($inputbox.is("[data-role=inputset]") == true) {
-					$("div[data-role=input]",$inputbox).removeClass("success error loading default");
+					$target.removeClass("success error loading default");
 					$target.addClass(setStatus);
 				}
 				
