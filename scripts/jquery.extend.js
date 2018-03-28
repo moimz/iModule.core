@@ -712,7 +712,7 @@
 					});
 					
 					if ($radio.isValid() !== null && $radio.data("submitValue") != $radio.val()) {
-						$radio.status("default");
+						$("input[type=radio][name="+$(this).attr("name")+"]",$form).status("default");
 					}
 				});
 			}
