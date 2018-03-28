@@ -11,6 +11,7 @@
 /modules/*
 !/modules/index.php
 /templets/*
+/templets/default/*
 /widgets/*
 !/widgets/index.php
 .project
