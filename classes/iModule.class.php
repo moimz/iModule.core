@@ -276,7 +276,13 @@ class iModule {
 		 */
 		if (defined('__IM_SITE__') == true) {
 			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || Request('language') != $site->language) {
-				header("location:".($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/');
+				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/';
+				if ($this->menu != 'index' || $this->page != null) {
+					$redirectUrl.= $this->menu ? $this->menu : '';
+					$redirectUrl.= $this->page ? '/'.$this->page : '';
+				}
+				header("HTTP/1.1 301 Moved Permanently");
+				header("location:".$redirectUrl);
 				exit;
 			}
 		}
@@ -1487,7 +1493,13 @@ class iModule {
 	 * @param $langcode
 	 */
 	function setLanguage($language) {
-		$this->language = $language;
+		if ($language == 'default') {
+			$site = $this->db()->select($this->table->site)->where('domain',$_SERVER['HTTP_HOST'])->where('is_default','TRUE')->getOne();
+			if ($site == null) $this->language = 'ko';
+			else $this->language = $site->language;
+		} else {
+			$this->language = $language;
+		}
 	}
 	
 	/**
