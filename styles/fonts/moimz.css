@@ -2,8 +2,8 @@
  * Moimz Fonts
  *
  * @license MIT Lincese
- * @version 1.0.3
- * @modified 2018. 3. 24.
+ * @version 1.0.4
+ * @modified 2018. 4. 2.
  */
 @font-face {font-family:"moimz"; src:url("../fonts/moimz.woff2") format("woff2"), url("../fonts/moimz.woff") format("woff"), url("../fonts/moimz.ttf") format("truetype"), url("../fonts/moimz.svg") format("svg"); font-weight:normal; font-style:normal}
 
@@ -97,3 +97,12 @@
 .mi-move:before {content:"\ec24"}
 
 .mi-loading:before {content:"\ed00"}
+
+.mi-google:before {content:"\ef00"}
+.mi-google-plus:before {content:"\ef01"}
+.mi-facebook:before {content:"\ef02"}
+.mi-twitter:before {content:"\ef03"}
+.mi-naver:before {content:"\ef04"}
+.mi-github:before {content:"\ef05"}
+.mi-kakao-talk:before {content:"\ef06"}
+.mi-kakao-story:before {content:"\ef07"}
