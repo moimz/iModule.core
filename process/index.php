@@ -24,7 +24,7 @@ if (function_exists('apache_setenv') == true) {
  * iModule 코어클래스를 선언한다.
  */
 $IM = new iModule();
-$IM->setLanguage(Request('_language'));
+$IM->setLanguage(Request('_language') ? Request('_language') : 'default');
 
 /**
  * 요청작업을 수행할 모듈 및 요청작업코드
