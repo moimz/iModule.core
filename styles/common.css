@@ -216,7 +216,7 @@ div[data-role=input][data-type=radio].success > label > button {border-color:#4c
 
 div[data-role=input] + div[data-role=input], div[data-role=input] + div[data-role=inputset], div[data-role=inputset] + div[data-role=input], div[data-role=inputset] + div[data-role=inputset] {margin-top:5px;}
 
-div[data-role=help] {font-size:12px; line-height:1.6; color:#666; margin:5px 0px 10px 0px;}
+div[data-role=help] {font-size:12px; line-height:1.6; color:#666; margin:5px 0px 10px 0px; display: table-row;width: 100%;}
 div[data-role=help].error {color:#f44336;}
 div[data-role=help].success {color:#4caf50;}
 div[data-role=input][data-type=checkbox] > div[data-role=help], div[data-role=input][data-type=radio] > div[data-role=help] {margin-top:5px;}
