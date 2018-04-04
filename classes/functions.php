@@ -113,7 +113,7 @@ function FileReadLine($path,$line) {
  * @return boolean $isValid
  */
 function CheckEmail($email) {
-	return preg_match('/^[[:alnum:]]+([_.-\]\+[[:alnum:]]+)*[_.-]*@([[:alnum:]]+([.-][[:alnum:]]+)*)+.[[:alpha:]]{2,4}$/',$email);
+	return preg_match('/^[_\.0-9a-zA-Z-]+@([0-9a-zA-Z][0-9a-zA-Z-]+\.)+[a-zA-Z]{2,6}$/i',$email);
 }
 
 /**
