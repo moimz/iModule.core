@@ -675,6 +675,7 @@ class iModule {
 		/**
 		 * 각각의 파라매터값이 false 가 아닐때까지 하위메뉴 주소를 만들고 반환한다.
 		 */
+		if ($language === false) return $url;
 		$url.= '/'.($language == null ? $this->language : $language);
 		if ($menu === null || $menu === false) return $url;
 		$url.= '/'.$menu;
