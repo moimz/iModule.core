@@ -43,6 +43,7 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-column-header-checkbox {border-color:#d1d1d0;}
 .x-grid-cell-inner a {color:#5070be; text-decoration:none;}
 .x-grid-cell-row-checker {vertical-align:top !important;}
+.x-grid-cell-inner i.xi, .x-grid-cell-inner i.xi2, .x-grid-cell-inner i.fa, .x-grid-cell-inner i.mi {margin:-2px 0px; height:20px; line-height:19px; vertical-align:middle;}
 
 .x-grid-group-hd {border-bottom:2px solid #222; padding-top:20px;}
 .x-grid-item:first-child .x-grid-group-hd {padding-top:8px;}
