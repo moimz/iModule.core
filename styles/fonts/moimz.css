@@ -1,9 +1,13 @@
 /**
- * Moimz Fonts
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * @license MIT Lincese
- * @version 1.0.4
- * @modified 2018. 4. 2.
+ * 자주 사용되는 아이콘을 웹폰트 형태로 제공한다.
+ *
+ * @file /styles/fonts/moimz.css
+ * @author Arzz
+ * @license MIT License
+ * @version 1.1.0
+ * @modified 2018. 4. 6.
  */
 @font-face {font-family:"moimz"; src:url("../fonts/moimz.woff2") format("woff2"), url("../fonts/moimz.woff") format("woff"), url("../fonts/moimz.ttf") format("truetype"), url("../fonts/moimz.svg") format("svg"); font-weight:normal; font-style:normal}
 
@@ -95,6 +99,8 @@
 .mi-pen:before {content:"\ec22"}
 .mi-form:before {content:"\ec23"}
 .mi-move:before {content:"\ec24"}
+.mi-link:before {content:"\ec25"}
+.mi-unlink:before {content:"\ec26"}
 
 .mi-loading:before {content:"\ed00"}
 
