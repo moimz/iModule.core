@@ -8,7 +8,8 @@
 		"nickname":"닉네임",
 		"error":"에러",
 		"info":"안내",
-		"confirm":"확인"
+		"confirm":"확인",
+		"no_layout":"레이아웃 없음"
 	},
 	"button":{
 		"prev":"이전",

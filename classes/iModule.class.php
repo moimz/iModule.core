@@ -2128,10 +2128,11 @@ class iModule {
 		 * 사이트 레이아웃을 사용하지 않는다고 선언된 경우 ($this->useTemplet 값이 false) 컨텍스트 HTML 코드를 그대로 반환한다.
 		 */
 		if ($this->useTemplet == false) return $context;
+		
 		/**
 		 * 템플릿의 레이아웃을 불러온다.
 		 */
-		return $this->getSiteTemplet()->getLayout($config->layout,$context);
+		return $config->layout == 'NONE' ? $context : $this->getSiteTemplet()->getLayout($config->layout,$context);
 	}
 	
 	/**

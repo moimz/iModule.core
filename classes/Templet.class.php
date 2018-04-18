@@ -514,7 +514,9 @@ class Templet {
 	function getLayouts() {
 		$package = $this->getPackage();
 		
-		$layouts = array();
+		$layouts = array(
+			array('layout'=>'NONE','description'=>$this->IM->getText('text/no_layout'))
+		);
 		if (isset($package->layouts) == true) {
 			foreach ($package->layouts as $layout=>$description) {
 				if (is_file($this->getPath().'/layouts/'.$layout.'.php') == true) {
