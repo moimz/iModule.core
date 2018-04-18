@@ -539,6 +539,24 @@ class iModule {
 	}
 	
 	/**
+	 * iModule 코어의 상대경로를 가져온다.
+	 *
+	 * @param string $dir
+	 */
+	function getDir() {
+		return __IM_DIR__;
+	}
+	
+	/**
+	 * iModule 코어의 절대경로를 가져온다.
+	 *
+	 * @param string $path
+	 */
+	function getPath() {
+		return __IM_PATH__;
+	}
+	
+	/**
 	 * 템플릿 객체를 가져온다.
 	 *
 	 * @param object $caller 템플릿을 요청하는 클래스 (iModule, Module, Widget)
