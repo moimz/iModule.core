@@ -298,29 +298,33 @@ class iModule {
 				/**
 				 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
 				 */
-				if (strpos($this->sites[$i]->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->sites[$i]->templet,1)) == true) {
-					$mModule = $this->getModule(substr($this->sites[$i]->templet,1));
-					$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
-					$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
-				} else {
-					$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+				if (strpos($this->sites[$i]->templet,'#') === 0) {
+					$temp = explode('.',substr($this->sites[$i]->templet,1));
+					if ($this->getModule()->isSitemap($temp[0]) == true) {
+						$mModule = $this->getModule($temp[0]);
+						$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
+						$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
+						continue;
+					}
+				}
+				
+				$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+				
+				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
+					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
+					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
 					
-					for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
-						$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
-						$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
-						
-						$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
-						$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
-						$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
-						if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
-						
-						if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
-						
-						if ($sitemap[$j]->page == '') {
-							$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
-						} else {
-							$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
-						}
+					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
+					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
+					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
+					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
+					
+					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+					
+					if ($sitemap[$j]->page == '') {
+						$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
+					} else {
+						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
 					}
 				}
 			}
@@ -2018,10 +2022,13 @@ class iModule {
 	 */
 	function getPageContext($menu,$page) {
 		/**
-		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈의 컨텍스트를 호출한다.
+		 * 사이트맵 구성을 사용하는 모듈과 템플릿의 경우, 바로 해당 모듈의 컨텍스트를 호출한다.
 		 */
-		if (strpos($this->getSite()->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->getSite()->templet,1)) == true) {
-			return $this->getModule(substr($this->getSite()->templet,1))->getContext();
+		if (strpos($this->getSite()->templet,'#') === 0) {
+			$temp = explode('.',substr($this->getSite()->templet,1));
+			if ($this->getModule()->isSitemap($temp[0]) == true) {
+				return $this->getModule($temp[0])->getContext();
+			}
 		}
 		
 		/**
@@ -2104,8 +2111,11 @@ class iModule {
 		/**
 		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈에서 레이아웃을 처리한다.
 		 */
-		if (strpos($this->getSite()->templet,'#') === 0 && $this->getModule()->isSitemap(substr($this->getSite()->templet,1)) == true) {
-			return $context;
+		if (strpos($this->getSite()->templet,'#') === 0) {
+			$temp = explode('.',substr($this->getSite()->templet,1));
+			if ($this->getModule()->isSitemap($temp[0]) == true) {
+				return $context;
+			}
 		}
 		
 		/**

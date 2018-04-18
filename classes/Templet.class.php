@@ -313,14 +313,14 @@ class Templet {
 			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
 				if (is_file(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/package.json') == true) {
 					$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module);
-					if ($templet->isLoaded() === true) $templets[] = $templet;
+					if ($templet->isLoaded() === true && isset($templet->getPackage()->layouts) == true) $templets[] = $templet;
 				} else {
 					$templetsPath = @opendir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets');
 					
 					while ($templetName = @readdir($templetsPath)) {
 						if ($templetName != '.' && $templetName != '..' && is_dir(__IM_PATH__.'/modules/'.$modules[$i]->module.'/templets/'.$templetName) == true) {
 							$templet = $this->IM->getTemplet($caller,'#'.$modules[$i]->module.'.'.$templetName);
-							if ($templet->isLoaded() === true) $templets[] = $templet;
+							if ($templet->isLoaded() === true && isset($templet->getPackage()->layouts) == true) $templets[] = $templet;
 						}
 					}
 					@closedir($templetsPath);
