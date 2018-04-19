@@ -1061,13 +1061,13 @@ class Templet {
 	 * @param string $file(옵션) 페이지 네비게이션 템플릿 파일명 (.php 제외)
 	 * @return string $html
 	 */
-	function getPagination($p,$total,$pagenum,$link,$mode='LEFT',$file=null) {
+	function getPagination($p,$total,$pagenum,$link,$mode='FIXED',$file=null) {
 		$link = $link;
 		if (strpos($link,'#') !== 0) $link.= $this->IM->getQueryString();
 		
 		$total = $total == 0 ? 1 : $total;
 		
-		if ($mode == 'LEFT') {
+		if ($mode == 'FIXED') {
 			$startPage = floor(($p-1)/$pagenum) * $pagenum + 1;
 			$endPage = $startPage + $pagenum - 1 < $total ? $startPage + $pagenum - 1 : $total;
 			$prevPageStart = $startPage - $pagenum > 0 ? $startPage - $pagenum : false;
