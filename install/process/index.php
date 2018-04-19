@@ -108,6 +108,7 @@ if ($action == 'install') {
 		$db = new stdClass();
 		$db->type = 'mysql';
 		$db->host = Request('db_host');
+		$db->port = Request('db_port');
 		$db->username = Request('db_id');
 		$db->password = Request('db_password');
 		$db->database = Request('db_name');

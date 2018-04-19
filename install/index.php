@@ -91,6 +91,11 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					</div>
 					
 					<div data-role="input">
+						<label data-language="db_port"></label>
+						<input type="text" name="db_port" class="inputControl" value="3306">
+					</div>
+					
+					<div data-role="input">
 						<label data-language="db_id"></label>
 						<input type="text" name="db_id" class="inputControl">
 					</div>
