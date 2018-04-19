@@ -14,7 +14,7 @@
  * @modified 2018. 3. 24.
  */
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
-html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333; box-sizing:border-box;}
+html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#333;}
 body {overflow:auto;}
 body[data-scroll] {position:fixed; height:100%;}
 body > div[data-role=wrapper] {width:100%; height:100%;}
