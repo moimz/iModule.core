@@ -2,12 +2,13 @@
 /**
  * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
  *
- * iModule의 설치작업을 처리한다.
+ * iModule의 설치화면을 구성한다.
  * 
- * @file index.php
+ * @file /install/index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.161110
+ * @version 3.0.0
+ * @modified 2018. 4. 20.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 

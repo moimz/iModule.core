@@ -8,8 +8,10 @@
  * @file index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160831
+ * @version 3.0.0
+ * @modified 2018. 4. 20.
  */
+define('__IM_SITE__',true);
 
 /**
  * 파일의 절대경로를 계산하여 init.confing.php 파일을 불러온다.
@@ -18,8 +20,6 @@
  */
 
 REQUIRE_ONCE dirname($_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
-
-define('__IM_SITE__',true);
 
 /**
  * iModule 코어를 선언하고, 레이아웃을 불러온다.

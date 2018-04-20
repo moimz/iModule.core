@@ -4,10 +4,11 @@
  *
  * iModule의 설치작업을 처리한다.
  * 
- * @file index.php
+ * @file /install/process/index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.161110
+ * @version 3.0.0
+ * @modified 2018. 4. 20.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);
