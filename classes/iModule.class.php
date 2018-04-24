@@ -2240,8 +2240,8 @@ class iModule {
 		 * 웹폰트 아이콘일 경우
 		 * fa, xi, xi2 의 경우만 현재 지원한다.
 		 */
-		if (preg_match('/^(fa|xi|xi2) /i',$icon,$match) == true) {
-			$fontName = array('fa'=>'FontAwesome','xi'=>'XEIcon','xi2'=>'XEIcon2');
+		if (preg_match('/^(mi|fa|xi|xi2) /i',$icon,$match) == true) {
+			$fontName = array('mi'=>'moimz','fa'=>'FontAwesome','xi'=>'XEIcon','xi2'=>'XEIcon2');
 			$this->loadWebFont($fontName[$match[1]]);
 			return '<i class="icon '.$icon.'"></i>';
 		}
