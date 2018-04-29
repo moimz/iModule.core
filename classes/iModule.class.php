@@ -1051,12 +1051,23 @@ class iModule {
 		/**
 		 * 사이트 전체메뉴를 가져온다.
 		 */
-		$sitemap = $this->getMenus(null,$domain,$language);
-		for ($i=0, $loop=count($sitemap);$i<$loop;$i++) {
+		$sitemap = array();
+		$menus = $this->getMenus(null,$domain,$language);
+		foreach ($menus as $menu) {
+			if (isset($menu->is_hide) == true && $menu->is_hide == true) continue;
+			
 			/**
 			 * 메뉴의 하위 메뉴를 가져온다.
 			 */
-			$sitemap[$i]->pages = $this->getPages($sitemap[$i]->menu,null,$domain,$language);
+			$menu->pages = array();
+			$pages = $this->getPages($menu->menu,null,$domain,$language);
+			foreach ($pages as $page) {
+				if (isset($page->is_hide) == true && $page->is_hide == true) continue;
+				
+				$menu->pages[] = $page;
+			}
+			
+			$sitemap[] = $menu;
 		}
 		
 		$this->sitemap[$site] = $sitemap;
