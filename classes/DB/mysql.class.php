@@ -1,11 +1,14 @@
 <?php
 /**
- * This file is part of Moimz Tools - https://www.moimz.com
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * @file mysql.class.php
+ * MySQL 인터페이스를 정의한다.
+ *
+ * @file /classes/DB/mysql.class.php
  * @author Arzz
- * @version 1.1.7
  * @license MIT License
+ * @version 1.1.8
+ * @modified 2018. 5. 6.
  */
 class mysql {
 	private $db;

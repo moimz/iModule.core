@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.2.0
- * @modified 2018. 3. 18.
+ * @version 1.3.0
+ * @modified 2018. 5. 6.
  */
 
 /**
@@ -55,7 +55,11 @@ function Encoder($value,$key=null,$mode='base64') {
 	$padSize = 16 - (strlen($value) % 16);
 	$value = $value.str_repeat(chr($padSize),$padSize);
 	
-	$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	if (function_exists('openssl_encrypt') == true) {
+		$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	} else {
+		$output = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
+	}
 	
 	return $mode == 'base64' ? base64_encode($output) : bin2hex($output);
 }
@@ -74,7 +78,12 @@ function Decoder($value,$key=null,$mode='base64') {
 	$key = $key !== null ? md5($key) : md5($_CONFIGS->key);
 	$value = $mode == 'base64' ? base64_decode(str_replace(' ','+',$value)) : hex2bin($value);
 	
-	$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	if (function_exists('openssl_decrypt') == true) {
+		$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	} else {
+		$output = mcrypt_decrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
+	}
+	
 	$valueLen = strlen($output);
 	if ($valueLen % 16 > 0) return false;
 
@@ -613,6 +622,9 @@ function CheckDependency($dependency,$version) {
 		$check->installedVersion = null;
 	} elseif ($dependency == 'gd') {
 		$check->installed = function_exists('ImageCreateFromJPEG');
+		$check->installedVersion = null;
+	} elseif ($dependency == 'encrypt') {
+		$check->installed = function_exists('openssl_encrypt') || function_exists('mcrypt_encrypt');
 		$check->installedVersion = null;
 	} else {
 		$check->installed = false;

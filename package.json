@@ -9,7 +9,8 @@
 		"curl":"*",
 		"zip":"*",
 		"mbstring":"*",
-		"gd":"*"
+		"gd":"*",
+		"encrypt":"*"
 	},
 	"requirements":{
 		"modules/admin":"3.0.0",
