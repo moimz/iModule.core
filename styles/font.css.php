@@ -1,4 +1,15 @@
 <?php
+/**
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * 사용하려고 하는 웹폰트명을 받아, 웹폰트파일 및 폰트스타일시트를 불러온다.
+ *
+ * @file /styles/font.css.php
+ * @author Arzz
+ * @license MIT License
+ * @version 1.0.0
+ * @modified 2018. 5. 6.
+ */
 header("Content-Type:text/css");
 
 $language = isset($_GET['language']) == true ? $_GET['language'] : 'ko';
