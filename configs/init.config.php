@@ -8,7 +8,8 @@
  * @file /configs/init.config.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160831
+ * @version 3.0.0
+ * @modified 2018. 5. 11.
  */
 
 /**
@@ -76,6 +77,15 @@ try {
 if ($_CONFIGS->db === null || $_CONFIGS->db === false) $_CONFIGS->installed = false;
 
 /**
+ * session 기본 설정
+ */
+$session_name = session_name('IMSESSID');
+if (isset($_CONFIGS->sessionDomain) == true) {
+	session_set_cookie_params(0,'/',$_CONFIGS->sessionDomain);
+}
+session_start();
+
+/**
  * class 파일을 자동으로 불러오기 위한 __autoload 설정을 정의힌다.
  * 우선적으로 /classes 폴더를 우선탐색하며, class 이름이 Module 로 시작할 경우 각 모듈의 최상위폴더의 Module[모듈명].class.php 파일을 탐색한다.
  * 모든 class 파일은 [클래스명].class.php 파일명의 규칙을 지켜야한다.
@@ -93,14 +103,6 @@ function iModuleAutoLoader($class) {
 	}
 }
 spl_autoload_register('iModuleAutoLoader');
-
-/**
- * session 기본 설정
- */
-if (isset($_CONFIGS->sessionDomain) == true) {
-	session_set_cookie_params(0,'/',$_CONFIGS->sessionDomain);
-}
-session_start();
 
 if (defined('__DEBUG_MODE__') == true) {
 	error_reporting(E_ALL);
