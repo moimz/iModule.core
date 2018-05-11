@@ -1,3 +1,14 @@
+/**
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ *
+ * iModule 에 포함된 ExtJS 라이브러리 스타일시트를 확장하고 iModule 에 맞게 재정의한다.
+ * 
+ * @file /styles/extjs.extend.css
+ * @author Arzz (arzz@arzz.com)
+ * @license GPLv3
+ * @version 3.0.0
+ * @modified 2018. 5. 6.
+ */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
