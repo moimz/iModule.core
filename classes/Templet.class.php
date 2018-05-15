@@ -669,18 +669,16 @@ class Templet {
 		$Templet = $this;
 		
 		/**
-		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getHeader 메소드가 있는 경우 iModule 코어에서는 템플릿 header 파일을 불러오지 않는다.
+		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getHeader 메소드가 있는 경우 헤더를 중복해서 불러오지 않도록 설정한다.
 		 */
-		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == false) {
+		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true) {
+			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getHeader();
+		} else {
 			if (is_file($this->getPath().'/header.php') == true) {
 				ob_start();
 				INCLUDE $this->getPath().'/header.php';
 				$html.= ob_get_clean();
 			}
-		}
-		
-		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true)  {
-			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getHeader();
 		}
 		
 		/**
