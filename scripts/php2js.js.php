@@ -7,10 +7,10 @@
  * @file /scripts/php2js.js.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.161110
+ * @version 3.0.0
+ * @modified 2018. 5. 27.
  */
- 
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',__DIR__).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');
 
 $menu = Request('menu');

@@ -10,9 +10,9 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2018. 5. 6.
+ * @modified 2018. 5. 27.
  */
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'admin','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'admin','',__DIR__).'/configs/init.config.php';
 
 define('__IM_ADMIN__',true);
 

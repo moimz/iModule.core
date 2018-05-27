@@ -8,12 +8,12 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 18.
+ * @modified 2018. 5. 27.
  */
 header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control:post-check=0, pre-check=0', false);
 header('Pragma:no-cache');
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'api','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'api','',__DIR__).'/configs/init.config.php';
 
 $IM = new iModule();
 $headers = getallheaders();

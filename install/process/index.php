@@ -8,9 +8,9 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 4. 20.
+ * @modified 2018. 5. 27.
  */
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);
 
 $action = Request('action');

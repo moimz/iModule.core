@@ -8,9 +8,9 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 28.
+ * @modified 2018. 5. 27.
  */
-REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',dirname($_SERVER['SCRIPT_FILENAME'])).'/configs/init.config.php';
+REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
 /**
  * iModule 코어를 선언하고, 모듈 컨테이너를 불러온다.

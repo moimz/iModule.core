@@ -18,8 +18,7 @@ define('__IM_SITE__',true);
  *
  * @see /configs/init.config.php
  */
-
-REQUIRE_ONCE dirname($_SERVER['SCRIPT_FILENAME']).'/configs/init.config.php';
+REQUIRE_ONCE __DIR__.'/configs/init.config.php';
 
 /**
  * iModule 코어를 선언하고, 레이아웃을 불러온다.
