@@ -402,7 +402,6 @@ div[data-role=tabbar] > div > ul > li.selected > button, div[data-role=tabbar] >
 div[data-role=tabbar] > div > ul > li.selected + li > button {border-left:0px;}
 div[data-role=tabbar] > div > ul > li.selected + li > a {border-left:0px;}
 div[data-role=tabbar] > div > ul > li > button:hover, div[data-role=tabbar] > div > ul > li > a:hover {background:#fff; color:#1a1a1a;}
-div[data-role=tabbar] + form {padding-top:20px;}
 
 /**
  * 페이지 네비게이션
@@ -437,7 +436,7 @@ div[data-role=wysiwyg-content] img {max-width:100%;}
 div[data-role=wysiwyg-content] ul:not([data-role]) {list-style-position:outside; list-style-type:disc; margin-left:25px;}
 div[data-role=wysiwyg-content] ol:not([data-role]) {list-style-position:outside; margin-left:25px;}
 
-div[data-role=context][data-type=html] {position:relative;}
+div[data-role=context][data-type=html] {position:relative; min-height:40px;}
 div[data-role=context][data-type=html] > a.edit {display:block; position:absolute; z-index:10; top:0; right:0; height:40px; line-height:40px; padding:0px; box-sizing:border-box; vertical-align:middle; margin-left:5px; text-decoration:none; cursor:pointer; background:#2196f3; color:#fff; font-size:0;}
 div[data-role=context][data-type=html] > a.edit > i {width:40px; height:40px; line-height:40px; vertical-align:middle; text-align:center; font-size:14px;}
 div[data-role=context][data-type=html] > a.edit > span {height:40px; line-height:40px; display:inline-block; vertical-align:middle; padding-right:15px; font-size:14px;}
