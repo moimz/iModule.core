@@ -58,7 +58,7 @@ if ($action == 'directory') {
 	
 	$results->success = true;
 	$results->directory = $directory;
-	$results->created = CheckDirectoryPermission(__IM_PATH__.DIRECTORY_SEPARATOR.$directory,$permission);
+	$results->created = CheckDirectoryPermission(strpos($directory,'/') === 0 ? $directory : __IM_PATH__.DIRECTORY_SEPARATOR.$directory,$permission);
 	$results->permission = $permission;
 }
 

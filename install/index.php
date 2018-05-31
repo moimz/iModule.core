@@ -65,6 +65,9 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					<?php foreach ($package->directories as $directory=>$permission) { if (preg_match('/^@/',$directory) == true && is_dir(__IM_PATH__.DIRECTORY_SEPARATOR.str_replace('@','',$directory)) == false) continue; ?>
 					<li data-directory="<?php echo str_replace('@','',$directory); ?>" data-permission="<?php echo $permission; ?>"></li>
 					<?php } ?>
+					<?php if (isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true) { ?>
+					<li data-directory="<?php echo str_replace('@','',$_CONFIGS->attachment->path); ?>" data-permission="0707"></li>
+					<?php } ?>
 					<?php foreach ($package->configs as $config) { ?>
 					<li data-config="<?php echo $config; ?>"></li>
 					<?php } ?>
