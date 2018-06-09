@@ -14,7 +14,6 @@
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
 .x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:20px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin-right:5px; vertical-align:middle;}
-.x-grid-cell-inner > i.icon.fa, .x-grid-cell-inner > i.icon.xi, .x-grid-cell-inner > i.icon.xi2 {width:auto;}
 
 .x-grid-button {height:100% !important; vertical-align:middle !important;}
 .x-grid-button .x-grid-cell-inner {padding:2px !important;}
@@ -28,7 +27,6 @@
 .x-grid-button .x-grid-cell-inner button.red {background:#d35051}
 .x-grid-button .x-grid-cell-inner button.red:hover {background:#c32a31;}
 .x-grid-button .x-grid-cell-inner button.red[disabled] {background:#e08485 !important;}
-
 .x-fieldset.x-form-wysiwyg {overflow:visible !important;}
 .x-fieldset.x-form-wysiwyg .x-fieldset-body {overflow:visible !important;}
 
