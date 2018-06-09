@@ -241,7 +241,7 @@ class Widget {
 	 */
 	function getRandomId() {
 		if ($this->randomId == null) {
-			$widget = ucfirst(preg_replace_callback('/\.([a-z]{1})/',create_function('$match','return strtoupper($match[1]);'),$this->loaded));
+			$widget = implode(array_map('ucfirst',explode('.',$this->loaded)));
 			$this->randomId = 'Widget'.ucfirst($widget).'-'.GetRandomString(10);
 		}
 		return $this->randomId;
