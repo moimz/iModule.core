@@ -916,7 +916,9 @@ class iModule {
 		$sites = array();
 		for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 			if ($this->sites[$i]->domain == $domain && $this->sites[$i]->language == $language) return $this->sites[$i];
+			if ($this->sites[$i]->domain == $domain && $language == 'default' && $this->sites[$i]->is_default == 'TRUE') return $this->sites[$i];
 			if ($domain == null && $this->sites[$i]->language == $language) $sites[] = $this->sites[$i];
+			if ($domain == null && $language == 'default' && $this->sites[$i]->is_default == 'TRUE') $sites[] = $this->sites[$i];
 			if ($language == null && $this->sites[$i]->domain == $domain) $sites[] = $this->sites[$i];
 		}
 		
@@ -1011,7 +1013,14 @@ class iModule {
 	function getSite($is_sitemap=true) {
 		if ($this->site != null) return $this->site;
 		if ($this->language == null) $this->initSites($is_sitemap);
-		$this->site = clone $this->getSites($this->domain,$this->language,$is_sitemap);
+		$current = $this->getSites($this->domain,$this->language,$is_sitemap);
+		
+		/**
+		 * 현재 접속한 언어셋의 사이트가 없을 경우, 기본언어셋의 사이트를 가져온다.
+		 */
+		$current = $current == null ? $this->getSites($this->domain,'default',$is_sitemap) : $current;
+		if ($current == null) return $this->printError('NOT_FOUND_SITE');
+		$this->site = clone $current;
 		
 		$this->site->logo = json_decode($this->site->logo);
 		$this->site->maskicon = json_decode($this->site->maskicon);
@@ -1875,7 +1884,7 @@ class iModule {
 	function printError($code=null,$value=null,$message=null,$is_force_html=false) {
 		if (isset($_SERVER['SCRIPT_NAME']) == true && in_array($_SERVER['SCRIPT_NAME'],array('/scripts/php2js.js.php')) == true) exit;
 		
-		if (is_string($code) == true) {
+		if (preg_match('/\/process\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == false && is_string($code) == true) {
 			if (preg_match('/^NOT_FOUND/',$code) == true) {
 				header('HTTP/1.1 404 Not Found');
 			} elseif (preg_match('/^FORBIDDEN/',$code) == true) {
