@@ -202,7 +202,7 @@ class Module {
 		if ($package == null) return '';
 		
 		if (isset($package->title->{$this->IM->language}) == true) return $package->title->{$this->IM->language};
-		else return $this->title->{$package->language};
+		else return $package->title->{$package->language};
 	}
 	
 	/**
