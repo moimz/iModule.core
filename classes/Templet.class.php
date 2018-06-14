@@ -879,10 +879,6 @@ class Templet {
 		 */
 		if ($this->callerType !== 'Widget') $this->IM->fireEvent('beforeGetContext',$this->caller->getName(),$file,$values);
 		
-		foreach ($values as $key=>$value) {
-			if (in_array($key,array('IM','Module','Widget','Templet','header','footer','this')) == false) ${$key} = $value;
-		}
-		
 		$html = '';
 		
 		/**
