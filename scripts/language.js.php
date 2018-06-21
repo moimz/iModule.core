@@ -46,8 +46,19 @@ for ($i=0, $loop=count($languages);$i<$loop;$i++) {
 		} else {
 			$lang = null;
 		}
+		
+		if ($lang != null) echo 'iModule.addLanguage("'.$type.'","'.ucfirst($target).'",'.$lang.','.($oLang == null ? 'null' : $oLang).');'.PHP_EOL;
+	} elseif ($type == 'plugin') {
+		if (is_file(__IM_PATH__.'/plugins/'.$target.'/languages/'.$language.'.json') == true) {
+			$lang = file_get_contents(__IM_PATH__.'/plugins/'.$target.'/languages/'.$language.'.json');
+			if ($language != $defaultLanguage) $oLang = file_get_contents(__IM_PATH__.'/plugins/'.$target.'/languages/'.$defaultLanguage.'.json');
+		} elseif (is_file(__IM_PATH__.'/plugins/'.$target.'/languages/'.$defaultLanguage.'.json') == true) {
+			$lang = file_get_contents(__IM_PATH__.'/plugins/'.$target.'/languages/'.$defaultLanguage.'.json');
+		} else {
+			$lang = null;
+		}
+		
+		if ($lang != null) echo 'iModule.addLanguage("'.$type.'","'.$target.'",'.$lang.','.($oLang == null ? 'null' : $oLang).');'.PHP_EOL;
 	}
-	
-	if ($lang != null) echo 'iModule.addLanguage("'.$type.'","'.ucfirst($target).'",'.$lang.','.($oLang == null ? 'null' : $oLang).');'.PHP_EOL;
 }
 ?>

@@ -105,6 +105,9 @@ var iModule = {
 			if (type == "module") {
 				if (window[target] === undefined) window[target] = {};
 				var targetObject = window[target];
+			} else if (type == "plugin") {
+				if (window.Plugin.plugins[target] === undefined) window.Plugin.plugins[target] = {};
+				var targetObject = window.Plugin.plugins[target];
 			}
 			
 			targetObject._LANG = lang;
@@ -482,8 +485,6 @@ var iModule = {
 					$modal.css("margin","10px auto");
 				}
 			}
-			
-//			$form.css("minWidth","100%").css("width","100%").css("minHeight","100%").css("height","100%");
 		},
 		/**
 		 * 모달창을 서버로 부터 가져온다.
@@ -834,5 +835,20 @@ var iModule = {
 		}
 	
 		document.cookie = name + "=" + escape(value) + "; path="+path+";"+expiretime;
+	}
+};
+
+/**
+ * 플러그인 전역변수 설정
+ */
+var Plugin = {
+	plugins:{},
+	getText:function(plugin,code) {
+		if (Plugin.plugins[plugin] === undefined) return code;
+		else return Plugin.plugins[plugin].getText(code);
+	},
+	getErrorText:function(plugin,code) {
+		if (Plugin.plugins[plugin] === undefined) return code;
+		else return Plugin.plugins[plugin].getErrorText(code);
 	}
 };
