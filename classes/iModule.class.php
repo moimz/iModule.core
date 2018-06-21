@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 18.
+ * @modified 2018. 6. 21.
  */
 class iModule {
 	/**
@@ -42,6 +42,7 @@ class iModule {
 	 * @public object[] $menus : 사이트별 모든 메뉴설정값
 	 * @public object[] $pages : 사이트별 특정 메뉴에 해당하는 모든 페이지설정값
 	 * @public object[] $modules : 불러온 모듈 클래스
+	 * @public object[] $plugins : 불러온 플러그인 클래스
 	 */
 	public $sites = array();
 	public $siteLinks = array();
@@ -49,6 +50,7 @@ class iModule {
 	public $pages = array();
 	public $sitemap = array();
 	public $modules = array();
+	public $plugins = array();
 	
 	/**
 	 * 언어셋을 정의한다.
@@ -501,7 +503,7 @@ class iModule {
 	 * 이미 모듈 클래스가 선언되어 있다면 선언되어 있는 모듈클래스를 반환한다. (중복선언하지 않음)
 	 *
 	 * @param string $module(옵션) 모듈이름 (/modules 내부의 해당모듈의 폴더명)
-	 * @param boolean $isForceLoad(기본값 false) 모듈이 설치되어 있지 않더라도 모듈 클래스를 호출할지 여부
+	 * @param boolean $isForceLoad(옵션) 설치가 되지 않은 모듈이라도 강제로 모듈클래스를 호출할지 여부
 	 * @return object $module 모듈클래스
 	 */
 	function getModule($module=null,$isForceLoad=false) {
@@ -524,6 +526,36 @@ class iModule {
 		if ($this->modules[$module] === false) $this->printError('LOAD_MODULE_FAIL : '.$module);
 		
 		return $this->modules[$module];
+	}
+	
+	/**
+	 * 플러그인 클래스를 불러온다.
+	 * 이미 플러그인 클래스가 선언되어 있다면 선언되어 있는 플러그인클래스를 반환한다. (중복선언하지 않음)
+	 *
+	 * @param string $plugin(옵션) 플러그인이름 (/plugins 내부의 해당모듈의 폴더명)
+	 * @param boolean $isForceLoad(옵션) 설치가 되지 않은 플러그인이라도 강제로 플러그인클래스를 호출할지 여부
+	 * @return object $plugin 플러그인 클래스
+	 */
+	function getPlugin($plugin=null,$isForceLoad=false) {
+		if ($plugin == null) return $this->Plugin;
+		
+		/**
+		 * 선언되어 있는 해당 플러그인 클래스가 없을 경우, 새로 선언한다.
+		 */
+		if (isset($this->plugins[$plugin]) == false) {
+			/**
+			 * 모듈코어 클래스를 새로 선언하고, 모듈코어 클래스에서 모듈 클래스를 불러온다.
+			 */
+			$class = new Plugin($this);
+			$this->plugins[$plugin] = $class->load($plugin,$isForceLoad);
+		}
+		
+		/**
+		 * 모듈클래스를 호출하지 못했을 경우, 에러메세지를 출력한다.
+		 */
+		if ($this->plugins[$plugin] === false) $this->printError('LOAD_PLUGIN_FAIL : '.$plugin);
+		
+		return $this->plugins[$plugin];
 	}
 	
 	/**
@@ -571,7 +603,7 @@ class iModule {
 	/**
 	 * 전체 템플릿목록을 가져온다.
 	 *
-	 * @param object $caller 템플릿목록을 요청하는 클래스 (iModule, Module, Widget)
+	 * @param object $caller 템플릿목록을 요청하는 클래스 (iModule, Module, Plugin, Widget)
 	 * @return Templet[] $templets 템플릿목록
 	 */
 	function getTemplets($caller) {
