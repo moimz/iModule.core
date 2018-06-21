@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 1. 1.
+ * @modified 2018. 6. 21.
  */
 class Module {
 	/**
@@ -64,7 +64,7 @@ class Module {
 		
 		/**
 		 * 모듈에서 사용하는 DB 테이블 별칭 정의
-		 * @see 모듈폴더의 package.json 의 databases 참고
+		 * @see iModule 코어 package.json 의 databases 참고
 		 */
 		$this->table = new stdClass();
 		$this->table->module = 'module_table';
@@ -110,7 +110,7 @@ class Module {
 	 * [코어] 모듈을 불러온다.
 	 *
 	 * @param string $module 모듈명
-	 * @param boolean $forceLoad(옵션) 모듈이 설치가 되지 않아도 강제로 모듈클래스를 호출할지 여부
+	 * @param boolean $forceLoad(옵션) 설치가 되지 않은 모듈이라도 강제로 모듈클래스를 호출할지 여부
 	 * @return Module $Module 모듈클래스
 	 */
 	function load($module,$forceLoad=false) {
@@ -581,10 +581,6 @@ class Module {
 	 */
 	function getAdminModules() {
 		$modules = $this->IM->db()->select($this->table->module)->where('is_admin','TRUE')->get();
-		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
-//			$modules[$i] = $this->IM->getModule($modules[$i]->module);
-		}
-		
 		return $modules;
 	}
 	
