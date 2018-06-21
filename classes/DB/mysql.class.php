@@ -857,7 +857,7 @@ class mysql {
 		return array('[F]'=>array($expr,$bindParams));
 	}
 	
-	public static function subQuery($db='') {
+	public function subQuery($db='') {
 		return new mysql($db ? $db : $this->db,true);
 	}
 	
