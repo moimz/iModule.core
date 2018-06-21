@@ -150,6 +150,16 @@ class Templet {
 			}
 		}
 		
+		if ($this->callerType == 'Plugin') {
+			/**
+			 * 플러그인이 로드된 상태가 아니라면
+			 */
+			if ($caller->getName() == false) return $this;
+			
+			$this->templetPath = $caller->getPath().'/templets/'.$templet;
+			$this->templetDir = $caller->getDir().'/templets/'.$templet;
+		}
+		
 		if ($this->callerType == 'Widget') {
 			/**
 			 * 위젯이 로드된 상태가 아니라면
@@ -394,6 +404,19 @@ class Templet {
 					@closedir($templetsPath);
 				}
 			}
+		}
+		
+		if ($type == 'Plugin') {
+			if ($caller->getName() == false) return array();
+			$templetsPath = @opendir($caller->getPath().'/templets');
+			
+			while ($templetName = @readdir($templetsPath)) {
+				if ($templetName != '.' && $templetName != '..' && is_dir($caller->getPath().'/templets/'.$templetName) == true) {
+					$templet = $this->IM->getTemplet($caller,$templetName);
+					if ($templet->isLoaded() === true) $templets[] = $templet;
+				}
+			}
+			@closedir($templetsPath);
 		}
 		
 		return $templets;
