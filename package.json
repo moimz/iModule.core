@@ -199,16 +199,31 @@
 					"type":"char",
 					"length":32
 				},
+				"database":{
+					"type":"varchar",
+					"length":20,
+					"default":"default"
+				},
+				"db_size":{
+					"type":"bigint",
+					"length":15,
+					"default":0
+				},
+				"is_admin":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"FALSE"
+				},
+				"is_active":{
+					"type":"enum",
+					"length":"'TRUE','FALSE'",
+					"default":"TRUE"
+				},
 				"configs":{
 					"type":"text"
 				},
 				"targets":{
 					"type":"text"
-				},
-				"active":{
-					"type":"enum",
-					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
 				}
 			},
 			"indexes":{
