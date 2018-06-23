@@ -681,6 +681,10 @@ class Templet {
 			$me = $this->caller->getClass();
 		}
 		
+		if ($this->callerType == 'Plugin') {
+			$me = $this->caller;
+		}
+		
 		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
@@ -783,6 +787,10 @@ class Templet {
 			$me = $this->caller->getClass();
 		}
 		
+		if ($this->callerType == 'Plugin') {
+			$me = $this->caller;
+		}
+		
 		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
@@ -857,6 +865,10 @@ class Templet {
 			$me = $this->caller->getClass();
 		}
 		
+		if ($this->callerType == 'Plugin') {
+			$me = $this->caller;
+		}
+		
 		if ($this->callerType == 'Widget') {
 			$Widget = $this->caller;
 			if ($Widget->getClass() !== null) {
@@ -915,6 +927,10 @@ class Templet {
 		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
+		}
+		
+		if ($this->callerType == 'Plugin') {
+			$me = $this->caller;
 		}
 		
 		if ($this->callerType == 'Widget') {
@@ -1030,6 +1046,10 @@ class Templet {
 		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
+		}
+		
+		if ($this->callerType == 'Plugin') {
+			$me = $this->caller;
 		}
 		
 		if ($this->callerType == 'Widget') {
