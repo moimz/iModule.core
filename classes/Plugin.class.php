@@ -489,8 +489,8 @@ class Plugin {
 			if ($dependency == 'core') {
 				if (version_compare($version,__IM_VERSION__,'>') == true) return false;
 			} else {
-				if ($this->isInstalled($dependency) == false) return false;
-				if (version_compare($version,$this->getInstalled($dependency)->version,'>') == true) return false;
+				if ($this->IM->getModule()->isInstalled($dependency) == false) return false;
+				if (version_compare($version,$this->IM->getModule()->getInstalled($dependency)->version,'>') == true) return false;
 			}
 		}
 		
