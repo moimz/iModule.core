@@ -123,17 +123,17 @@ class Event {
 		$listenerName = array_shift($temp);
 		
 		/**
-		 * 이벤트리스너를 추가한 대상이 에드온일 경우, Addon 코어클래스를 호출한다.
-		 */ 
-		if ($listenerType == 'addon') {
-			$Addon = new Addon($listenerName);
-		}
-		
-		/**
 		 * 이벤트리스너를 추가한 대상이 모듈일 경우, 자기 자신의 모듈을 호출한다.
 		 */
 		if ($listenerType == 'module') {
 			$me = $this->IM->getModule($listenerName);
+		}
+		
+		/**
+		 * 이벤트리스너를 추가한 대상이 플러그인일 경우, 해당 플러그인 객체를 호출한다.
+		 */ 
+		if ($listenerType == 'plugin') {
+			$me = $this->IM->getPlugin($listenerName);
 		}
 		
 		/**
@@ -274,11 +274,14 @@ class Event {
 			$permission = &$results;
 		}
 		
+		/**
+		 * 이벤트리스너가 정의된 파일의 경로를 정의한다.
+		 */
 		$listenerPath = '';
-		if ($listenerType == 'addon') {
-			$listenerPath = __IM_PATH__.'/addons/'.$listenerName.'/'.$event.'.php';
-		} else {
+		if ($listenerType == 'module') {
 			$listenerPath = __IM_PATH__.'/modules/'.$listenerName.'/events/'.$event.'.php';
+		} elseif ($listenerType == 'plugin') {
+			$listenerPath = __IM_PATH__.'/plugins/'.$listenerName.'/events/'.$event.'.php';
 		}
 		
 		if ($listenerPath != '' && is_file($listenerPath) == true) {
