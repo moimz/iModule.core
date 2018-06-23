@@ -2404,11 +2404,19 @@ class iModule {
 		}
 		
 		/**
+		 * 현재 사이트 정보를 가져온다.
+		 */
+		$site = $this->getSite();
+		
+		/**
+		 * 레이아웃을 구성하기전 beforeDoLayout 이벤트를 발생시킨다.
+		 */
+		$this->fireEvent('beforeDoLayout','core','*',$site);
+		
+		/**
 		 * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.
 		 */
 		$this->getModule()->loadGlobals();
-		
-		$site = $this->getSite();
 		
 		/**
 		 * 컨텍스트를 가지고 오기전 beforeGetContext 이벤트를 발생시킨다.
