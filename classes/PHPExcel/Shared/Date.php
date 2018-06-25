@@ -147,7 +147,7 @@ class PHPExcel_Shared_Date
 		    0;
 
 		// Return
-		return $returnValue + $timezoneAdjustment;
+		return $returnValue - $timezoneAdjustment;
 	}	//	function ExcelToPHP()
 
 
