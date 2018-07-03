@@ -13,16 +13,16 @@
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',__DIR__).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');
 
+$language = Request('language');
 $menu = Request('menu');
 $page = Request('page');
 $view = Request('view');
 $container = Request('container');
-$IM = new iModule();
 ?>
 var ENV = {
 	DIR:"<?php echo __IM_DIR__; ?>",
 	VERSION:"<?php echo __IM_VERSION__; ?>",
-	LANGUAGE:"<?php echo $IM->language; ?>",
+	LANGUAGE:"<?php echo $language; ?>",
 	MENU:<?php echo $menu ? '"'.$menu.'"' : 'null'; ?>,
 	PAGE:<?php echo $page ? '"'.$page.'"' : 'null'; ?>,
 	VIEW:<?php echo $view ? '"'.$view.'"' : 'null'; ?>,

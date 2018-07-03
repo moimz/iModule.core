@@ -22,10 +22,10 @@ $IM = new iModule();
 /**
  * 컨테이너 호출변수
  */
-$module = Request('module');
-$container = Request('container');
-$view = Request('view');
-$idx = Request('idx');
+$module = Request('_module');
+$container = Request('_container');
+$view = Request('_view');
+$idx = Request('_idx');
 $IM->menu = '#';
 $IM->page = '#';
 

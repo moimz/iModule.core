@@ -119,11 +119,11 @@ class iModule {
 		 */
 		$this->site = null;
 		$this->domain = isset($_SERVER['HTTP_HOST']) == true ? strtolower($_SERVER['HTTP_HOST']) : '';
-		$this->language = Request('language');
-		$this->menu = Request('menu') == null ? 'index' : preg_replace('/[^a-zA-Z_0-9]/','',Request('menu'));
-		$this->page = Request('page') == null ? null : preg_replace('/[^a-zA-Z_0-9]/','',Request('page'));
-		$this->view = Request('view') == null ? null : Request('view');
-		$this->idx = Request('idx') == null || is_array(Request('idx')) == true ? null : Request('idx');
+		$this->language = Request('_language');
+		$this->menu = Request('_menu') == null ? 'index' : preg_replace('/[^a-zA-Z_0-9]/','',Request('_menu'));
+		$this->page = Request('_page') == null ? null : preg_replace('/[^a-zA-Z_0-9]/','',Request('_page'));
+		$this->view = Request('_view') == null ? null : Request('_view');
+		$this->idx = Request('_idx') == null || is_array(Request('_idx')) == true ? null : Request('_idx');
 		
 		if ($mode !== 'SAFETY') {
 			/**
@@ -277,7 +277,7 @@ class iModule {
 		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
 		 */
 		if (defined('__IM_SITE__') == true) {
-			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || Request('language') != $site->language) {
+			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
 				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/';
 				if ($this->menu != 'index' || $this->page != null) {
 					$redirectUrl.= $this->menu ? $this->menu : '';
@@ -903,9 +903,9 @@ class iModule {
 	 */
 	function getQueryString($query=array(),$queryString=null) {
 		$queryString = $queryString == null ? $_SERVER['QUERY_STRING'] : $queryString;
-		$query = array_merge(array('menu'=>'','page'=>'','view'=>'','idx'=>'','module'=>'','container'=>'','language'=>''),$query);
+		$query = array_merge(array('_menu'=>'','_page'=>'','_view'=>'','_idx'=>'','_module'=>'','_container'=>'','_language'=>''),$query);
 		
-		if (isset($_SERVER['REDIRECT_URL']) == true && preg_match('/\/module\/([^\/]+)/',$_SERVER['REDIRECT_URL']) == true) $query = array_merge(array('container'=>'','idx'=>'','language'=>''),$query);
+		if (isset($_SERVER['REDIRECT_URL']) == true && preg_match('/\/module\/([^\/]+)/',$_SERVER['REDIRECT_URL']) == true) $query = array_merge(array('_container'=>'','_idx'=>'','_language'=>''),$query);
 		$querys = explode('&',$queryString);
 		
 		for ($i=0, $total=count($querys);$i<$total;$i++) {
