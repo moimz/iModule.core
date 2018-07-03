@@ -21,9 +21,9 @@
 	
 	$.propHooks.checked = {
 		set:function(el,value) {
+			var oValue = el.checked;
 			el.checked = value;
-			if (value == true) $(el).trigger("change");
-			else $(el).trigger("change");
+			if (oValue != value) $(el).trigger("change");
 		}
 	};
 	
@@ -37,9 +37,9 @@
 	
 	$.attrHooks.checked = {
 		set:function(el,value) {
+			var oValue = el.checked;
 			el.checked = value;
-			if (value == true) $(el).trigger("change");
-			else $(el).trigger("change");
+			if (oValue != value) $(el).trigger("change");
 		}
 	};
 	
@@ -2107,12 +2107,12 @@
 		return this;
 	};
 	
-	$.fn.checked = function(checked) {
+	$.fn.checked = function(checked,is_event) {
 		if (checked === undefined) {
 			return this.prop("checked");
 		} else {
 			if (this.is("input[type=radio]") == true || this.is("input[type=checkbox]") == true) {
-				this.prop("checked",checked);
+				this.prop("checked",checked,is_event !== false);
 			}
 			
 			return this;
