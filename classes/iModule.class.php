@@ -123,7 +123,7 @@ class iModule {
 		$this->menu = Request('menu') == null ? 'index' : preg_replace('/[^a-zA-Z_0-9]/','',Request('menu'));
 		$this->page = Request('page') == null ? null : preg_replace('/[^a-zA-Z_0-9]/','',Request('page'));
 		$this->view = Request('view') == null ? null : Request('view');
-		$this->idx = Request('idx') == null ? null : Request('idx');
+		$this->idx = Request('idx') == null || is_array(Request('idx')) == true ? null : Request('idx');
 		
 		if ($mode !== 'SAFETY') {
 			/**
