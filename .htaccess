@@ -21,7 +21,7 @@ RewriteRule ^([a-z]{2})/process/([^/\.]+)/([^/\.]+)/(.*?)$ process/index.php?_la
 RewriteRule ^([a-z]{2})/process/([^/\.]+)/([^/\.]+)/?$ process/index.php?_language=$1&_module=$2&_action=$3&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^/\.]+)/?$ modules/index.php?_language=$1&_module=$2%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/?$ modules/index.php?_language=$1&_module=$2&&_container=$3&%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ modules/index.php?_language=$1&_module=$2&_container=$3&view=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/([^/\.]+)/?$ modules/index.php?_language=$1&_module=$2&_container=$3&_view=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^/\.]+)/([^/\.]+)/([^/\.]+)/(.*?)$ modules/index.php?_language=$1&_module=$2&_container=$3&_view=$4&_idx=$5&%{QUERY_STRING} [L]
 
 RewriteRule ^([a-z]{2})/([^/\.]+)/([^/\.]+)/([^/\.]+)/(.*?)$ index.php?_language=$1&_menu=$2&_page=$3&_view=$4&_idx=$5&%{QUERY_STRING} [L]
