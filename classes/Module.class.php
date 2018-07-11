@@ -682,6 +682,7 @@ class Module {
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
 		if ($this->isInstalled($module) == false) {
+			$sort = $this->IM->db()->select($this->table->module)->count() + 1;
 			$this->IM->db()->insert($this->table->module,array(
 				'module'=>$module,
 				'hash'=>$this->getHash($module),
@@ -697,7 +698,8 @@ class Module {
 				'is_sitemap'=>isset($package->sitemap) == true && $package->sitemap === true ? 'TRUE' : 'FALSE',
 				'is_cron'=>isset($package->cron) == true && $package->cron === true ? 'TRUE' : 'FALSE',
 				'configs'=>$configs,
-				'targets'=>$targets
+				'targets'=>$targets,
+				'sort'=>$sort
 			))->execute();
 			
 			$mode = 'install';
