@@ -682,7 +682,7 @@ class Module {
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
 		if ($this->isInstalled($module) == false) {
-			$sort = $this->IM->db()->select($this->table->module)->count() + 1;
+			$sort = $this->IM->db()->select($this->table->module)->count();
 			$this->IM->db()->insert($this->table->module,array(
 				'module'=>$module,
 				'hash'=>$this->getHash($module),
