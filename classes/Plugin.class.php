@@ -503,7 +503,7 @@ class Plugin {
 	 * @return object[] $plugins
 	 */
 	function getAdminPlugins() {
-		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_admin','TRUE')->get();
+		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_admin','TRUE')->orderBy('sort','asc')->get();
 		return $plugins;
 	}
 	
@@ -513,7 +513,7 @@ class Plugin {
 	 * @return object[] $plugins
 	 */
 	function getCronPlugins() {
-		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_cron','TRUE')->get();
+		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_cron','TRUE')->orderBy('sort','asc')->get();
 		
 		return $plugins;
 	}
