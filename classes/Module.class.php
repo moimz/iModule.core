@@ -580,7 +580,7 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getAdminModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_admin','TRUE')->get();
+		$modules = $this->IM->db()->select($this->table->module)->where('is_admin','TRUE')->orderBy('sort','asc')->get();
 		return $modules;
 	}
 	
@@ -590,7 +590,7 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getContextModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_context','TRUE')->get();
+		$modules = $this->IM->db()->select($this->table->module)->where('is_context','TRUE')->orderBy('sort','asc')->get();
 		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
 			$modules[$i]->title = $this->getTitle($modules[$i]->module);
 		}
@@ -604,7 +604,7 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getCronModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_cron','TRUE')->get();
+		$modules = $this->IM->db()->select($this->table->module)->where('is_cron','TRUE')->orderBy('sort','asc')->get();
 		
 		return $modules;
 	}
