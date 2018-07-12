@@ -355,6 +355,41 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		}
 	}
 });
+Ext.define("Ext.moimz.Component",{override:"Ext.Component",onBoxReady:function(width,height) {
+	var me = this, label;
+	
+	if (me.ariaLabelledBy || me.ariaDescribedBy) {
+		if (me.ariaLabelledBy) {
+			label = me.getAriaLabelEl(me.ariaLabelledBy);
+			
+			if (label) {
+				me.ariaEl.dom.setAttribute('aria-labelledby', label);
+			}
+		}
+		
+		if (me.ariaDescribedBy) {
+			label = me.getAriaLabelEl(me.ariaDescribedBy);
+			
+			if (label) {
+				me.ariaEl.dom.setAttribute('aria-describedby', label);
+			}
+		}
+	}
+	
+	if (me.resizable) {
+		me.initResizable(me.resizable);
+	}
+	
+	if (me.autoScroll) me.body.on("scroll",function() { setTimeout(function() { me.storedScrollY = me.getScrollY(); },100); });
+	
+	if (me.draggable) {
+		me.initDraggable();
+	}
+
+	if (me.hasListeners.boxready) {
+		me.fireEvent('boxready', me, width, height);
+	}
+}});
 Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:function(ct,position) {
 	var me = this;
 	me.callParent(arguments);
