@@ -287,6 +287,14 @@
 					"length":11,
 					"default":-1
 				},
+				"header":{
+					"type":"longtext",
+					"is_null":true
+				},
+				"footer":{
+					"type":"longtext",
+					"is_null":true
+				},
 				"context":{
 					"type":"text"
 				},

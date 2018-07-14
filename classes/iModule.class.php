@@ -316,6 +316,12 @@ class iModule {
 					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
 					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
 					
+					$sitemap[$j]->header = json_decode($sitemap[$j]->header);
+					$sitemap[$j]->header = $sitemap[$j]->header == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->header;
+					
+					$sitemap[$j]->footer = json_decode($sitemap[$j]->footer);
+					$sitemap[$j]->footer = $sitemap[$j]->footer == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->footer;
+					
 					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
 					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
 					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
@@ -2122,13 +2128,24 @@ class iModule {
 			return $this->getPageContext($menu,$config->context->page);
 		}
 		
+		$context = '';
+		
+		/**
+		 * 사이트맵에서 설정된 컨텍스트 헤더를 가져온다.
+		 */
+		if ($config->header->type == 'TEXT') {
+			$context.= '<div data-role="context-header">'.$this->getModule('wysiwyg')->decodeContent($config->header->text).'</div>'.PHP_EOL;
+		} elseif ($group->header->type == 'EXTERNAL') {
+			$context.= '<div data-role="context-header">'.$this->getSiteTemplet()->getExternal($config->header->external).'</div>'.PHP_EOL;
+		}
+		
 		/**
 		 * 컨텍스트 종류가 EXTERNAL 일 경우
 		 * 서버내 특정 디렉토리에 존재하는 PHP 파일 내용을 가지고 온다.
 		 * $config->context->external : 불러올 외부 PHP 파일명
 		 */
 		if ($config->type == 'EXTERNAL') {
-			return $this->getExternalContext($config->context->external);
+			$context.= $this->getExternalContext($config->context->external);
 		}
 		
 		/**
@@ -2137,14 +2154,14 @@ class iModule {
 		 * $page->context->widget : 위젯마법사를 이용해 만들어진 위젯레이아웃 코드
 		 */
 		if ($config->type == 'WIDGET') {
-			return $this->getWidgetContext($page->context->widget);
+			$context.= $this->getWidgetContext($page->context->widget);
 		}
 		
 		/**
 		 * 컨텍스트 종류가 HTML 일 경우
 		 */
 		if ($config->type == 'HTML') {
-			return $this->getHtmlContext($config->context);
+			$context.= $this->getHtmlContext($config->context);
 		}
 		
 		/**
@@ -2155,10 +2172,19 @@ class iModule {
 		 * $page->context->widget : 해당 모듈에 전달할 환경설정값 (예 : 템플릿명 등)
 		 */
 		if ($config->type == 'MODULE') {
-			return $this->getModule($config->context->module)->getContext($config->context->context,$config->context->configs);
+			$context.= $this->getModule($config->context->module)->getContext($config->context->context,$config->context->configs);
 		}
 		
-		return null;
+		/**
+		 * 사이트맵에서 설정된 컨텍스트 푸터를 가져온다.
+		 */
+		if ($config->footer->type == 'TEXT') {
+			$context.= '<div data-role="context-footer">'.$this->getModule('wysiwyg')->decodeContent($config->footer->text).'</div>';
+		} elseif ($config->footer->type == 'EXTERNAL') {
+			$context.= '<div data-role="context-context-">'.$this->getSiteTemplet()->getExternal($config->footer->external).'</div>';
+		}
+		
+		return $context;
 	}
 	
 	/**
