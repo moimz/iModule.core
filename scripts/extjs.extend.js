@@ -30,34 +30,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 			me.failureType = Ext.form.action.Action.CLIENT_INVALID;
 			form.afterAction(me, false);
 			
-			var invalid = form.getFields().filterBy(function(field) {
-				return !field.validate();
-			});
-			
-			if (invalid.items.length > 0) {
-				var topField = invalid.items.shift();
-				if (form.owner.getScrollable() != null) {
-					var position = topField.getPosition()[1];
-					
-					if (position - 80 < form.owner.getScrollable().getPosition().y) {
-						form.owner.scrollBy(0,position - 80,true);
-					}
-					
-					if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
-						form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
-					}
-				} else if (form.owner.ownerCt.scrollable != null) {
-					var position = topField.getPosition()[1] - form.owner.getPosition()[1];
-					
-					if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
-						form.owner.ownerCt.scrollTo(0,position - 80,true);
-					}
-					
-					if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
-						form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
-					}
-				}
-			}
+			this.scrollToFirstErrorField();
 		}
 	},
 	onSuccess:function(response) {
@@ -70,34 +43,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 			if (result.errors && formActive) {
 				form.markInvalid(result.errors);
 				
-				var invalid = form.getFields().filterBy(function(field) {
-					return field.isDirty();
-				});
-				
-				if (invalid.items.length > 0) {
-					var topField = invalid.items.shift();
-					if (form.owner.getScrollable() != null) {
-						var position = topField.getPosition()[1];
-						
-						if (position - 10 < form.owner.getScrollable().getPosition().y) {
-							form.owner.scrollBy(0,position - 10,true);
-						}
-						
-						if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
-							form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
-						}
-					} else if (form.owner.ownerCt.scrollable != null) {
-						var position = topField.getPosition()[1] - form.owner.getPosition()[1];
-						
-						if (position - 10 < form.owner.ownerCt.getScrollable().getPosition().y) {
-							form.owner.ownerCt.scrollTo(0,position - 10,true);
-						}
-						
-						if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
-							form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
-						}
-					}
-				}
+				setTimeout(this.scrollToFirstErrorField,100,form);
 			}
 			this.failureType = Ext.form.action.Action.SERVER_INVALID;
 			success = false;
@@ -105,6 +51,38 @@ Ext.define("Ext.moimz.form.action.Submit",{
 		
 		if (formActive) {
 			form.afterAction(this, success);
+		}
+	},
+	scrollToFirstErrorField:function(form) {
+		var form = form ? form : this.form;
+		
+		var invalid = form.getFields().filterBy(function(field) {
+			return field.getActiveErrors().length > 0;
+		});
+		
+		if (invalid.items.length > 0) {
+			var topField = invalid.items.shift();
+			if (form.owner.getScrollable() != null) {
+				var position = topField.getPosition()[1];
+				
+				if (position - 80 < form.owner.getScrollable().getPosition().y) {
+					form.owner.scrollBy(0,position - 80,true);
+				}
+				
+				if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
+					form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
+				}
+			} else if (form.owner.ownerCt.scrollable != null) {
+				var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+				
+				if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
+					form.owner.ownerCt.scrollTo(0,position - 80,true);
+				}
+				
+				if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
+					form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
+				}
+			}
 		}
 	}
 });
