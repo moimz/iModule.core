@@ -19,7 +19,9 @@
 		"close":"닫기",
 		"login":"로그인",
 		"logout":"로그아웃",
+		"save":"저장",
 		"delete":"삭제",
+		"preview":"미리보기",
 		"back_to_main":"메인페이지로 돌아가기",
 		"go_back":"이전페이지로 돌아가기"
 	},
