@@ -2135,7 +2135,7 @@ class iModule {
 		 */
 		if ($config->header->type == 'TEXT') {
 			$context.= '<div data-role="context-header">'.$this->getModule('wysiwyg')->decodeContent($config->header->text).'</div>'.PHP_EOL;
-		} elseif ($group->header->type == 'EXTERNAL') {
+		} elseif ($config->header->type == 'EXTERNAL') {
 			$context.= '<div data-role="context-header">'.$this->getSiteTemplet()->getExternal($config->header->external).'</div>'.PHP_EOL;
 		}
 		
