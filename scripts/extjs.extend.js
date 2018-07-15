@@ -39,8 +39,8 @@ Ext.define("Ext.moimz.form.action.Submit",{
 				if (form.owner.getScrollable() != null) {
 					var position = topField.getPosition()[1];
 					
-					if (position - 10 < form.owner.getScrollable().getPosition().y) {
-						form.owner.scrollBy(0,position - 10,true);
+					if (position - 80 < form.owner.getScrollable().getPosition().y) {
+						form.owner.scrollBy(0,position - 80,true);
 					}
 					
 					if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
@@ -49,8 +49,8 @@ Ext.define("Ext.moimz.form.action.Submit",{
 				} else if (form.owner.ownerCt.scrollable != null) {
 					var position = topField.getPosition()[1] - form.owner.getPosition()[1];
 					
-					if (position - 10 < form.owner.ownerCt.getScrollable().getPosition().y) {
-						form.owner.ownerCt.scrollTo(0,position - 10,true);
+					if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
+						form.owner.ownerCt.scrollTo(0,position - 80,true);
 					}
 					
 					if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
