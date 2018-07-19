@@ -16,6 +16,38 @@ Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidt
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false});
 Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,enableColumnMove:false});
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
+Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorField:function(form) {
+	var form = form ? form : this;
+	
+	var invalid = form.getFields().filterBy(function(field) {
+		return field.getActiveErrors().length > 0;
+	});
+	
+	if (invalid.items.length > 0) {
+		var topField = invalid.items.shift();
+		if (form.owner.getScrollable() != null) {
+			var position = topField.getPosition()[1];
+			
+			if (position - 80 < form.owner.getScrollable().getPosition().y) {
+				form.owner.scrollBy(0,position - 80,true);
+			}
+			
+			if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
+				form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
+			}
+		} else if (form.owner.ownerCt.scrollable != null) {
+			var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+			
+			if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
+				form.owner.ownerCt.scrollTo(0,position - 80,true);
+			}
+			
+			if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
+				form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
+			}
+		}
+	}
+}});
 Ext.define("Ext.moimz.form.Panel",{override:"Ext.form.Panel",trackResetOnLoad:true});
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
 Ext.define("Ext.moimz.form.action.Submit",{
@@ -30,7 +62,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 			me.failureType = Ext.form.action.Action.CLIENT_INVALID;
 			form.afterAction(me, false);
 			
-			this.scrollToFirstErrorField();
+			form.scrollToFirstErrorField();
 		}
 	},
 	onSuccess:function(response) {
@@ -43,7 +75,7 @@ Ext.define("Ext.moimz.form.action.Submit",{
 			if (result.errors && formActive) {
 				form.markInvalid(result.errors);
 				
-				setTimeout(this.scrollToFirstErrorField,100,form);
+				setTimeout(form.scrollToFirstErrorField,100,form);
 			}
 			this.failureType = Ext.form.action.Action.SERVER_INVALID;
 			success = false;
@@ -51,38 +83,6 @@ Ext.define("Ext.moimz.form.action.Submit",{
 		
 		if (formActive) {
 			form.afterAction(this, success);
-		}
-	},
-	scrollToFirstErrorField:function(form) {
-		var form = form ? form : this.form;
-		
-		var invalid = form.getFields().filterBy(function(field) {
-			return field.getActiveErrors().length > 0;
-		});
-		
-		if (invalid.items.length > 0) {
-			var topField = invalid.items.shift();
-			if (form.owner.getScrollable() != null) {
-				var position = topField.getPosition()[1];
-				
-				if (position - 80 < form.owner.getScrollable().getPosition().y) {
-					form.owner.scrollBy(0,position - 80,true);
-				}
-				
-				if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
-					form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
-				}
-			} else if (form.owner.ownerCt.scrollable != null) {
-				var position = topField.getPosition()[1] - form.owner.getPosition()[1];
-				
-				if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
-					form.owner.ownerCt.scrollTo(0,position - 80,true);
-				}
-				
-				if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
-					form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
-				}
-			}
 		}
 	}
 });
