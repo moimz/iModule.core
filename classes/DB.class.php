@@ -8,9 +8,17 @@
  * @author Arzz
  * @version 1.3.0
  * @license MIT License
+ * @modified 2018. 7. 28.
  */
 class DB {
+	/**
+	 * 데이터베이스 관련 변수설정
+	 *
+	 * @private $connectors 데이터베이스 코드별 접속정보
+	 * @private $connections 데이터베이스 코드별 커넥션
+	 */
 	private $connectors = array();
+	private $connections = array();
 	private $code;
 	private $table;
 	
@@ -35,18 +43,25 @@ class DB {
 			
 			if (!$db) return $this;
 			
-			if (file_exists(__IM_PATH__.'/classes/DB/'.$db->type.'.class.php') == false) die('Not Support Database : '.$db->type);
+			if (is_file(__IM_PATH__.'/classes/DB/'.$db->type.'.class.php') == false) die('Not Support Database : '.$db->type);
 			
 			if (isset($db->charset) == false) $db->charset = 'utf8';
 			REQUIRE_ONCE __IM_PATH__.'/classes/DB/'.$db->type.'.class.php';
 			
-			$this->connectors[$code] = new $db->type($db);
+			$this->connectors[$code] = $db;
+		}
+		
+		$dbClass = new $this->connectors[$code]->type($this->connectors[$code]);
+		if (isset($this->connections[$code]) == false) {
+			$this->connections[$code] = $dbClass->connect();
+		} else {
+			$dbClass->connect($this->connections[$code]);
 		}
 		
 		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
-		$this->connectors[$code]->setPrefix($prefix);
+		$dbClass->setPrefix($prefix);
 		
-		return $this->connectors[$code];
+		return $dbClass;
 	}
 	
 	function createCode($type,$host,$username,$password,$database,$port=null,$charset=null) {

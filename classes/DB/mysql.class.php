@@ -41,6 +41,13 @@ class mysql {
 			if (isset($this->db->port) == false) $this->db->port = 3306;
 			if (isset($this->db->charset) == false) $this->db->charset = 'utf8';
 			$this->isSubQuery = $isSubQuery;
+		}
+	}
+	
+	public function connect($mysqli=null) {
+		if ($mysqli != null) {
+			$this->_mysqli = $mysqli;
+		} else {
 			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port) or $this->error('There was a problem connecting to the database');
 			
 			$this->version = $this->_mysqli->server_info;
@@ -55,6 +62,8 @@ class mysql {
 			}
 			$this->_mysqli->set_charset($this->db->charset);
 		}
+		
+		return $this->_mysqli;
 	}
 	
 	public function db() {

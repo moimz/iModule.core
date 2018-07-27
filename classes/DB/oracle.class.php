@@ -31,15 +31,22 @@ class oracle {
 			if (isset($this->db->port) == false) $this->db->port = 1521;
 			if (isset($this->db->charset) == false) $this->db->charset = 'AL32UTF8';
 			$this->isSubQuery = $isSubQuery;
-			
-			$this->_oci = oci_connect($this->db->username,$this->db->password,isset($this->db->sid) == true ? $this->db->sid : $this->db->host.':'.$this->db->port.'/'.$this->db->database,$this->db->charset) or $this->error('There was a problem connecting to the database');
 		}
 	}
 	
+	function connect($oci=null) {
+		if ($oci != null) {
+			$this->_oci = $oci;
+		} else {
+			$this->_oci = oci_connect($this->db->username,$this->db->password,isset($this->db->sid) == true ? $this->db->sid : $this->db->host.':'.$this->db->port.'/'.$this->db->database,$this->db->charset) or $this->error('There was a problem connecting to the database');
+		}
+		
+		return $this->_oci;
+	}
+	
 	public function check($db) {
-		if (isset($db->port) == false) $db->port = 3306;
-		$mysqli = @new mysqli($db->host,$db->username,$db->password,$db->database,$db->port);
-		if ($mysqli->connect_errno) return false;
+		$oci = oci_connect($db->username,$db->password,isset($db->sid) == true ? $db->sid : $db->host.':'.$db->port.'/'.$db->database,$db->charset);
+		if (!$oci) return false;
 		return true;
 	}
 	

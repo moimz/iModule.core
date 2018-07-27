@@ -355,9 +355,10 @@ class iModule {
 	 * @return DB $DB
 	 */
 	function db($code='default',$prefix=null) {
-		$db = new DB();
+		if ($this->DB == null) $this->DB = new DB();
+		
 		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
-		return $db->db($code,$prefix);
+		return $this->DB->db($code,$prefix);
 	}
 	
 	/**
