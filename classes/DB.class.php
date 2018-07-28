@@ -6,7 +6,7 @@
  *
  * @file /classes/DB.class.php
  * @author Arzz
- * @version 1.3.0
+ * @version 1.4.0
  * @license MIT License
  * @modified 2018. 7. 28.
  */

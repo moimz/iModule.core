@@ -7,7 +7,7 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.1.8
+ * @version 1.2.0
  * @modified 2018. 5. 6.
  */
 class mysql {

@@ -1,12 +1,15 @@
 <?php
 /**
- * This file is part of Moimz Tools - https://www.moimz.com
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * Oracle 인터페이스를 정의한다.
  *
  * @file oracle.class.php
  * @author Arzz
- * @version 1.0.2
  * @license MIT License
- * @todo do not use yet
+ * @version 1.1.0
+ * @modified 2018. 7. 28.
+ * @todo SELECT 관련된 쿼리 이외 다른부분은 아직 작업되지 않음
  */
 class oracle {
 	private $db;
