@@ -49,19 +49,19 @@ class mysql {
 			$this->_mysqli = $mysqli;
 		} else {
 			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port) or $this->error('There was a problem connecting to the database');
-			
-			$this->version = $this->_mysqli->server_info;
-			if (version_compare($this->version,'5.6.4','>=') == true) $this->engine = 'InnoDB';
-			else $this->engine = 'MyISAM';
-			if (version_compare($this->version,'5.5.3','>=') == true) {
-				$this->charset = 'utf8mb4';
-				$this->collation = 'utf8mb4_unicode_ci';
-			} else {
-				$this->charset = 'utf8';
-				$this->collation = 'utf8_general_ci';
-			}
-			$this->_mysqli->set_charset($this->db->charset);
 		}
+		
+		$this->version = $this->_mysqli->server_info;
+		if (version_compare($this->version,'5.6.4','>=') == true) $this->engine = 'InnoDB';
+		else $this->engine = 'MyISAM';
+		if (version_compare($this->version,'5.5.3','>=') == true) {
+			$this->charset = 'utf8mb4';
+			$this->collation = 'utf8mb4_unicode_ci';
+		} else {
+			$this->charset = 'utf8';
+			$this->collation = 'utf8_general_ci';
+		}
+		$this->_mysqli->set_charset($this->db->charset);
 		
 		return $this->_mysqli;
 	}
