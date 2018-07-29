@@ -173,6 +173,15 @@ class Event {
 		}
 		
 		/**
+		 * 주소처리
+		 */
+		if ($event == 'afterGetUrl') {
+			$get = $caller;
+			unset($values->url);
+			$url = &$results;
+		}
+		
+		/**
 		 * 데이터처리
 		 */
 		if ($event == 'beforeGetData' || $event == 'afterGetData') {
