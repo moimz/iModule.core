@@ -122,6 +122,7 @@ if ($action == 'install') {
 		} else {
 			$dbConnect = new mysql($db);
 			$dbConnect->setPrefix(__IM_DB_PREFIX__);
+			$dbConnect->connect();
 			
 			$check = $dbConnect->exists('member_table') == true && $dbConnect->select('member_table')->where('email',$admin_email)->where('idx',1,'>')->has();
 			if ($check == true) $errors['admin_email'] = 'admin_email_exists';
