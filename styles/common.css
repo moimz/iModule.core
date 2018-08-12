@@ -255,13 +255,14 @@ div[data-role=wysiwyg] .fr-view table {border-color:#000;}
 div[data-role=button] {font-size:0; text-align:center; padding-left:5px;}
 div[data-role=button] > button, div[data-role=button] > a {display:inline-block; height:40px; line-height:38px; padding:0px 15px; box-sizing:border-box; border:1px solid rgba(0,0,0,0.1); color:#222; background:#fff; vertical-align:middle; margin-right:5px; text-decoration:none; cursor:pointer; font-size:1rem;}
 div[data-role=button] > button:hover, div[data-role=button] > a:hover {background:#f4f4f4;}
+div[data-role=button] > button[disabled] {background:#f4f4f4; color:#222; opacity:0.5; cursor:not-allowed;}
 div[data-role=button] > button[type=submit], div[data-role=button] > .submit {background:#2196f3; color:#fff;}
 div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:hover {background:#1e88e5; color:#fff;}
-div[data-role=button] > button[disabled] {background:#f4f4f4 !important; color:#222 !important; opacity:0.5; cursor:not-allowed;}
+div[data-role=button] > button[type=submit][disabled], div[data-role=button] > .submit[disabled] {background:#1e88e5; color:#fff;}
 div[data-role=button] > button:focus, div[data-role=button] > a:focus {border-color:rgba(0,0,0,0.5);}
 div[data-role=button] > .danger {background:#f44336; color:#fff;}
-div[data-role=button] > .danger[disabled] {background:#f44336 !important; color:#fff !important;}
 div[data-role=button] > .danger:hover {background:#e53935; color:#fff;}
+div[data-role=button] > .danger[disabled] {background:#f44336; color:#fff;}
 
 div[data-role=input] + div[data-role=button], div[data-role=inputset] + div[data-role=button] {margin-top:5px;}
 ul[data-role=table] + div[data-role=button] {margin-top:20px;}
