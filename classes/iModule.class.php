@@ -86,6 +86,7 @@ class iModule {
 	 * @private string $siteTitle 웹브라우저에 표시되는 사이트제목
 	 * @private string $siteDescription SEO를 위한 META 태그에 정의될 사이트소개
 	 * @private string $siteCanonical SEO를 위한 현재 페이지에 접근할 수 있는 유니크한 사이트주소 (필수 GET 변수만 남겨둔 페이지 URL)
+	 * @private string $siteRobots SEO를 위한 검색로봇 색인규칙
 	 * @private string $siteImage OG META 태그를 위한 사이트 이미지 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
 	 */
 	public $site;
@@ -94,6 +95,7 @@ class iModule {
 	private $siteTitle = null;
 	private $siteDescription = null;
 	private $siteCanonical = null;
+	private $siteRobots = null;
 	private $siteImage = null;
 	
 	private $siteHeaders = array();
@@ -1414,6 +1416,29 @@ class iModule {
 	}
 	
 	/**
+	 * 현재 페이지의 검색로봇 규칙을 가져온다.
+	 * SEO를 위해 사용된다.
+	 *
+	 * @see https://developers.google.com/search/reference/robots_meta_tag?hl=ko
+	 * @return string $robots
+	 */
+	function getSiteRobots() {
+		return $this->siteRobots !== null ? $this->siteRobots : 'all';
+	}
+	
+	/**
+	 * 현재 페이지의 검색로봇 규칙을 설정한다.
+	 * SEO를 위해 사용된다.
+	 * 
+	 * @see https://developers.google.com/search/reference/robots_meta_tag?hl=ko
+	 * @param string $robots
+	 * @return null
+	 */
+	function setSiteRobots($robots) {
+		$this->siteRobots = $robots;
+	}
+	
+	/**
 	 * 사이트 템플릿 객체를 반환한다.
 	 *
 	 * @return Templet $siteTemplet
@@ -2076,6 +2101,7 @@ class iModule {
 		 */
 		if ($this->getSiteDescription()) $this->addHeadResource('meta',array('name'=>'description','content'=>$this->getSiteDescription()));
 		$this->addHeadResource('link',array('rel'=>'canonical','href'=>$this->getSiteCanonical()));
+		$this->addHeadResource('meta',array('name'=>'robots','content'=>$this->getSiteRobots()));
 		
 		/**
 		 * 모바일기기 및 애플 디바이스를 위한 TOUCH-ICON 태그를 정의한다.
