@@ -18,6 +18,7 @@ REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/ini
  * @see /classes/iMdoule.class.php
  */
 $IM = new iModule();
+$IM->getSite();
 
 /**
  * 컨테이너 호출변수
