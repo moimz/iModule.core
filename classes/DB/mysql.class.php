@@ -464,14 +464,12 @@ class mysql {
 	}
 	
 	public function where($whereProp,$whereValue=null,$operator=null) {
-		$whereValue = $whereValue === null ? '' : $whereValue;
 		if ($operator) $whereValue = array($operator=>$whereValue);
 		$this->_where[] = array('AND',$whereValue,$whereProp);
 		return $this;
 	}
 	
 	public function orWhere($whereProp,$whereValue=null,$operator=null) {
-		$whereValue = $whereValue === null ? '' : $whereValue;
 		if ($operator) $whereValue = array($operator=>$whereValue);
 		$this->_where[] = array('OR',$whereValue,$whereProp);
 		return $this;
