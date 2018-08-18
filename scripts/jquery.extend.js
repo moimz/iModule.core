@@ -169,10 +169,8 @@
 						
 						var $parent = $(this).parent();
 						var $button = $("button",$parent);
-						var $item = $(this).val().length > 0 ? $("option[value='"+$(this).val()+"']",$(this)) : [];
-						if ($item.length == 0) {
-						
-						} else {
+						var $item = $("option[value='"+$(this).val()+"']",$(this));
+						if ($item.length == 1) {
 							$("span",$button).html($item.html());
 						}
 					});
