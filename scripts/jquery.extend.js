@@ -1768,6 +1768,7 @@
 				if (status == "loading") {
 					if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
 					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
+					$(this).outerWidth($(this).outerWidth());
 					$(this).html('<i class="mi mi-loading"></i>');
 					$(this).disable();
 				} else if (status == "default" || status == "success" || status == "error") {
