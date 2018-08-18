@@ -260,6 +260,7 @@ div[data-role=button] > button[type=submit], div[data-role=button] > .submit {ba
 div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:hover {background:#1e88e5; color:#fff;}
 div[data-role=button] > button[type=submit][disabled], div[data-role=button] > .submit[disabled] {background:#1e88e5; color:#fff;}
 div[data-role=button] > button:focus, div[data-role=button] > a:focus {border-color:rgba(0,0,0,0.5);}
+div[data-role=button] > button > i, div[data-role=button] > button > a > i {float:left; width:30px; height:38px; text-align:center; margin:0px 0px 0px -10px; padding:0; line-height:38px; vertical-align:middle;}
 div[data-role=button] > .danger {background:#f44336; color:#fff;}
 div[data-role=button] > .danger:hover {background:#e53935; color:#fff;}
 div[data-role=button] > .danger[disabled] {background:#f44336; color:#fff;}
