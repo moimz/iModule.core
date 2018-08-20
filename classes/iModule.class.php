@@ -1976,7 +1976,7 @@ class iModule {
 	 * @param string $message(옵션) 변환된 에러메세지
 	 * @return null
 	 */
-	function printError($code=null,$value=null,$message=null,$is_force_html=false) {
+	function printError($code=null,$value=null,$message=null) {
 		if (isset($_SERVER['SCRIPT_NAME']) == true && in_array($_SERVER['SCRIPT_NAME'],array('/scripts/php2js.js.php')) == true) exit;
 		
 		if (preg_match('/\/process\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == false && is_string($code) == true) {
@@ -1988,7 +1988,7 @@ class iModule {
 		}
 		
 		$headers = getallheaders();
-		if (preg_match('/\/api\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && $is_force_html == false) {
+		if (preg_match('/\/api\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true) {
 			$results = new stdClass();
 			$results->success = false;
 			$results->error = $code;
@@ -1997,7 +1997,7 @@ class iModule {
 			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 		}
 		
-		if (preg_match('/\/process\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && isset($headers['X-Requested-With']) == true && $is_force_html == false) {
+		if (preg_match('/\/process\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && isset($headers['X-Requested-With']) == true) {
 			$results = new stdClass();
 			$results->success = false;
 			$this->language = Request('_language');
