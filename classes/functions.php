@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.3.0
- * @modified 2018. 5. 6.
+ * @version 1.4.0
+ * @modified 2018. 8. 21.
  */
 
 /**
@@ -19,8 +19,6 @@
  * @return any $object
  */
 function Request($var,$type='request') {
-	global $_REQUEST, $_SESSION;
-
 	switch ($type) {
 		case 'request' :
 			$value = isset($_REQUEST[$var]) == true ? $_REQUEST[$var] : null;
@@ -38,6 +36,19 @@ function Request($var,$type='request') {
 	if ($value === null) return null;
 	if (is_array($value) == false && is_object($value) == false) return trim($value);
 	return $value;
+}
+
+/**
+ * 요청된 변수 중 필수데이터를 가져온다.
+ *
+ * @param string $var 변수명
+ * @return any $object
+ */
+function Param($var) {
+	global $IM;
+	
+	if (isset($_REQUEST[$var]) == false) return $IM->printError('MISSING_PARAMETER',$var);
+	return $_REQUEST[$var];
 }
 
 /**
