@@ -1987,17 +1987,21 @@ class iModule {
 			}
 		}
 		
-		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && $is_force_html == false) {
+		$headers = getallheaders();
+		if (preg_match('/\/api\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && $is_force_html == false) {
 			$results = new stdClass();
 			$results->success = false;
+			$results->error = $code;
+			$results->message = $value;
 			
-			if ($match[1] == 'api') {
-				$results->error = $code;
-				$results->message = $value;
-			} elseif ($match[1] == 'process') {
-				$this->language = Request('_language');
-				$results->message = $this->getErrorText($code,$value,$message);
-			}
+			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+		}
+		
+		if (preg_match('/\/process\/index\.php/',$_SERVER['SCRIPT_NAME'],$match) == true && isset($headers['X-Requested-With']) == true && $is_force_html == false) {
+			$results = new stdClass();
+			$results->success = false;
+			$this->language = Request('_language');
+			$results->message = $this->getErrorText($code,$value,$message);
 			
 			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 		}
