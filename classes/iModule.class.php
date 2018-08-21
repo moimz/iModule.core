@@ -742,7 +742,7 @@ class iModule {
 		/**
 		 * 각각의 파라매터값이 false 가 아닐때까지 하위메뉴 주소를 만들고 반환한다.
 		 */
-		if ($language === false || ($language == null && $menu === false)) return ($url ? $url : '/');
+		if ($language === false) return ($url ? $url : '/');
 		$url.= '/'.($language == null ? $this->language : $language);
 		if ($menu === null || $menu === false) return $url;
 		$url.= '/'.$menu;
@@ -1454,7 +1454,7 @@ class iModule {
 	 * @return null
 	 */
 	function setViewDescription($description) {
-		$this->viewDescription = $description;
+		$this->viewDescription = trim(strip_tags($description));
 	}
 	
 	/**
@@ -1558,7 +1558,7 @@ class iModule {
 	 * @return string $url
 	 */
 	function getIndexUrl() {
-		return $this->indexUrl == null ? $this->getUrl(false) : $this->indexUrl;
+		return $this->indexUrl == null ? $this->getHost(true) : $this->indexUrl;
 	}
 	
 	/**
