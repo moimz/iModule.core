@@ -1980,7 +1980,7 @@ class iModule {
 		}
 
 		$link = new stdClass();
-		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getUrl(false) : $_SERVER['HTTP_REFERER'];
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
 		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
@@ -2058,14 +2058,7 @@ class iModule {
 		if ($this->language == null) {
 			$this->language = 'ko';
 		}
-		/*
-		if (preg_match('/\/(api|process)\/index\.php/',$_SERVER['PHP_SELF']) == true) {
-			$results = new stdClass();
-			$results->success = false;
-			$results->message = $this->getErrorText($code,$value,$message);
-			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK));
-		}
-		*/
+		
 		$this->setSiteTitle('ERROR!');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
 		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
@@ -2087,7 +2080,7 @@ class iModule {
 		}
 		
 		$link = new stdClass();
-		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getUrl(false) : $_SERVER['HTTP_REFERER'];
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
 		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
