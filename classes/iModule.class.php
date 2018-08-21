@@ -85,18 +85,22 @@ class iModule {
 	 * @public boolean $useTemplet 사이트템플릿 사용여부
 	 * @private string $siteTitle 웹브라우저에 표시되는 사이트제목
 	 * @private string $siteDescription SEO를 위한 META 태그에 정의될 사이트소개
-	 * @private string $siteCanonical SEO를 위한 현재 페이지에 접근할 수 있는 유니크한 사이트주소 (필수 GET 변수만 남겨둔 페이지 URL)
-	 * @private string $siteRobots SEO를 위한 검색로봇 색인규칙
-	 * @private string $siteImage OG META 태그를 위한 사이트 이미지 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
+	 * @private string $canonical SEO를 위한 현재 페이지에 접근할 수 있는 유니크한 사이트주소 (필수 GET 변수만 남겨둔 페이지 URL)
+	 * @private string $robots SEO를 위한 검색로봇 색인규칙
+	 * @private string $viewTitle META 태그를 위한 뷰페이지 제목 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
+	 * @private string $viewDescription META 태그를 위한 뷰페이지 설명 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
+	 * @private string $viewImage META 태그를 위한 뷰페이지 이미지 (각 모듈이나 애드온에서 페이지별로 변경할 수 있다.)
 	 */
 	public $site;
 	public $useTemplet = true;
 	
 	private $siteTitle = null;
 	private $siteDescription = null;
-	private $siteCanonical = null;
-	private $siteRobots = null;
-	private $siteImage = null;
+	private $canonical = null;
+	private $robots = null;
+	private $viewTitle = null;
+	private $viewDescription = null;
+	private $viewImage = null;
 	
 	private $siteHeaders = array();
 	private $siteBodys = array();
@@ -738,7 +742,7 @@ class iModule {
 		/**
 		 * 각각의 파라매터값이 false 가 아닐때까지 하위메뉴 주소를 만들고 반환한다.
 		 */
-		if ($language === false) return $url;
+		if ($language === false || ($language == null && $menu === false)) return ($url ? $url : '/');
 		$url.= '/'.($language == null ? $this->language : $language);
 		if ($menu === null || $menu === false) return $url;
 		$url.= '/'.$menu;
@@ -928,7 +932,7 @@ class iModule {
 		}
 		
 		for ($i=0, $loop=count($links);$i<$loop;$i++) {
-			$links[$i]->url = ($links[$i]->is_ssl == 'TRUE' ? 'https://' : 'http://').$links[$i]->domain.__IM_DIR__.'/'.$links[$i]->language;
+			$links[$i]->url = ($links[$i]->is_ssl == 'TRUE' ? 'https://' : 'http://').$links[$i]->domain.__IM_DIR__.($links[$i]->language == $this->language ? '' : '/'.$links[$i]->language);
 		}
 		
 		$this->siteLinks = $links;
@@ -1203,7 +1207,7 @@ class iModule {
 	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
 	 * @return object $maskIcon mask 아이콘 설정 {url:mask 아이콘 url, color : mask 아이콘 색상}
 	 */
-	function getMaskIcon($isFullUrl=false) {
+	function getSiteMaskIcon($isFullUrl=false) {
 		/**
 		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
 		 */
@@ -1286,44 +1290,7 @@ class iModule {
 		 * 페이지 이미지가 사용되지 않는다고 설정된 경우나, 알수없는 $type 값일 경우 NULL을 반환한다.
 		 */
 		if ($config->image == 0 || in_array($type,array('original','view','thumbnail')) == false) return null;
-		
 		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$config->image.'/preview.png';
-	}
-	
-	/**
-	 * 뷰페이지 이미지를 가져온다.
-	 * 뷰페이지 이미지는 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
-	 * 사용하고자 하는 경우에 따라 $type 값을 통해 이미지 최대 크기를 정할 수 있다.
-	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
-	 * 설정된 뷰페이지 이미지가 없을 경우 페이지 이미지를 가져온다.
-	 *
-	 * @param string $type 이미지 크기 종류(기본 original)
-	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
-	 * @return string $imageUrl 이미지 URL
-	 */
-	function getViewImage($type='original',$isFullUrl=false) {
-		/**
-		 * 모듈등에서 설정되어 있는 뷰페이지 이미지가 없는 경우 페이지 이미지를 반환한다.
-		 */
-		if ($this->siteImage == null || $this->siteImage <= 0) return $this->getPageImage($type,$isFullUrl);
-		
-		/**
-		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
-		 */
-		if ($this->site == null) return null;
-		
-		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->siteImage.'/preview.png';
-	}
-	
-	/**
-	 * 뷰페이지 이미지를 설정한다.
-	 * 모듈 등에 의하여 특정 뷰페이지의 이미지를 변경할 수 있으며, 해당 이미지는 OG 메타태그를 구성하기 위해서 사용된다.
-	 *
-	 * @param int $image attachment 모듈에 의해 지정된 이미지파일의 고유 idx 값
-	 * @return null
-	 */
-	function setViewImage($image) {
-		$this->siteImage = $image;
 	}
 	
 	/**
@@ -1400,8 +1367,8 @@ class iModule {
 	 *
 	 * @return string $canonical 고유 URL
 	 */
-	function getSiteCanonical() {
-		return $this->siteCanonical !== null ? $this->siteCanonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
+	function getCanonical() {
+		return $this->canonical !== null ? $this->canonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
 	}
 	
 	/**
@@ -1411,8 +1378,8 @@ class iModule {
 	 * @param string $canonical 고유 URL 은 반드시 도메인을 포함한 전체 URL이어야 한다.
 	 * @return null
 	 */
-	function setSiteCanonical($canonical) {
-		$this->siteCanonical = $canonical;
+	function setCanonical($canonical) {
+		$this->canonical = preg_match('/^http(s)?:\/\//',$canonical) == true ? $canonical : $this->getHost(true).$canonical;
 	}
 	
 	/**
@@ -1422,8 +1389,8 @@ class iModule {
 	 * @see https://developers.google.com/search/reference/robots_meta_tag?hl=ko
 	 * @return string $robots
 	 */
-	function getSiteRobots() {
-		return $this->siteRobots !== null ? $this->siteRobots : 'all';
+	function getRobots() {
+		return $this->robots !== null ? $this->robots : 'all';
 	}
 	
 	/**
@@ -1434,8 +1401,90 @@ class iModule {
 	 * @param string $robots
 	 * @return null
 	 */
-	function setSiteRobots($robots) {
-		$this->siteRobots = $robots;
+	function setRobots($robots) {
+		$this->robots = $robots;
+	}
+	
+	/**
+	 * 뷰페이지 제목을 가져온다.
+	 * 뷰페이지 제목은 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 설정된 뷰페이지 제목이 없을 경우 사이트 설명을 가져온다.
+	 *
+	 * @return string $title 뷰페이지 설명
+	 */
+	function getViewTitle() {
+		/**
+		 * 모듈등에서 설정되어 있는 뷰페이지 설명이 없는 경우 사이트 설명을 반환한다.
+		 */
+		if ($this->viewTitle == null || strlen($this->viewTitle) == 0) return $this->getSiteTitle();
+		return $this->viewTitle;
+	}
+	
+	/**
+	 * 뷰페이지 제목을 설정한다.
+	 * 모듈 등에 의하여 특정 뷰페이지의 제목을 변경할 수 있으며, 해당 설명은 OG 메타태그를 구성하기 위해서 사용된다.
+	 *
+	 * @param string $title 뷰페이지 제목
+	 * @return null
+	 */
+	function setViewTitle($title) {
+		$this->viewTitle = $title;
+	}
+	
+	/**
+	 * 뷰페이지 설명을 가져온다.
+	 * 뷰페이지 설명은 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 설정된 뷰페이지 설명이 없을 경우 사이트 설명을 가져온다.
+	 *
+	 * @return string $description 뷰페이지 설명
+	 */
+	function getViewDescription() {
+		/**
+		 * 모듈등에서 설정되어 있는 뷰페이지 설명이 없는 경우 사이트 설명을 반환한다.
+		 */
+		if ($this->viewDescription == null || strlen($this->viewDescription) == 0) return $this->getSiteDescription();
+		return $this->viewDescription;
+	}
+	
+	/**
+	 * 뷰페이지 설명을 설정한다.
+	 * 모듈 등에 의하여 특정 뷰페이지의 설명을 변경할 수 있으며, 해당 설명은 OG 메타태그를 구성하기 위해서 사용된다.
+	 *
+	 * @param string $description 뷰페이지 설명
+	 * @return null
+	 */
+	function setViewDescription($description) {
+		$this->viewDescription = $description;
+	}
+	
+	/**
+	 * 뷰페이지 이미지를 가져온다.
+	 * 뷰페이지 이미지는 사이트 템플릿에 사용되거나, OG 메타태그를 구성하기 위해서 사용된다.
+	 * 사용하고자 하는 경우에 따라 $type 값을 통해 이미지 최대 크기를 정할 수 있다.
+	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
+	 * 설정된 뷰페이지 이미지가 없을 경우 페이지 이미지를 가져온다.
+	 *
+	 * @param string $type 이미지 크기 종류(기본 original)
+	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @return string $imageUrl 이미지 URL
+	 */
+	function getViewImage($isFullUrl=false) {
+		/**
+		 * 모듈등에서 설정되어 있는 뷰페이지 이미지가 없는 경우 페이지 이미지를 반환한다.
+		 */
+		if ($this->viewImage == null) return $this->getPageImage('view',$isFullUrl);
+		return $isFullUrl == true && preg_match('/http(s)?:\/\//',$this->viewImage) == false ? $this->getHost(true).$this->viewImage : $this->viewImage;
+	}
+	
+	/**
+	 * 뷰페이지 이미지를 설정한다.
+	 * 모듈 등에 의하여 특정 뷰페이지의 이미지를 변경할 수 있으며, 해당 이미지는 OG 메타태그를 구성하기 위해서 사용된다.
+	 *
+	 * @param int $image 이미지 경로
+	 * @return null
+	 */
+	function setViewImage($image) {
+		$this->viewImage = $image;
 	}
 	
 	/**
@@ -2103,9 +2152,18 @@ class iModule {
 		/**
 		 * 사이트 설명 META 태그 및 고유주소 META 태그를 정의한다. (SEO)
 		 */
-		if ($this->getSiteDescription()) $this->addHeadResource('meta',array('name'=>'description','content'=>$this->getSiteDescription()));
-		$this->addHeadResource('link',array('rel'=>'canonical','href'=>$this->getSiteCanonical()));
-		$this->addHeadResource('meta',array('name'=>'robots','content'=>$this->getSiteRobots()));
+		if ($this->getViewDescription()) $this->addHeadResource('meta',array('name'=>'description','content'=>preg_replace('/(\r|\n)/',' ',$this->getViewDescription())));
+		$this->addHeadResource('link',array('rel'=>'canonical','href'=>$this->getCanonical()));
+		$this->addHeadResource('meta',array('name'=>'robots','content'=>$this->getRobots()));
+		
+		/**
+		 * OG 태그를 설정한다.
+		 */
+		$this->addHeadResource('meta',array('property'=>'og:type','content'=>'website'));
+		$this->addHeadResource('meta',array('property'=>'og:title','content'=>$this->getViewTitle()));
+		$this->addHeadResource('meta',array('property'=>'og:description','content'=>preg_replace('/(\r|\n)/',' ',$this->getViewDescription())));
+		if ($this->getViewImage('view',true)) $this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
+		$this->addHeadResource('meta',array('property'=>'twitter:card','content'=>'summary_large_image'));
 		
 		/**
 		 * 모바일기기 및 애플 디바이스를 위한 TOUCH-ICON 태그를 정의한다.
@@ -2127,8 +2185,8 @@ class iModule {
 		/**
 		 * Safari 브라우저를 위한 Mask아이콘 태그를 정의한다.
 		 */
-		if ($this->getMaskIcon() !== null) {
-			$this->addHeadResource('link',array('rel'=>'mask-icon','href'=>$this->getMaskIcon()->url,'color'=>$this->getMaskIcon()->color));
+		if ($this->getSiteMaskIcon() !== null) {
+			$this->addHeadResource('link',array('rel'=>'mask-icon','href'=>$this->getSiteMaskIcon()->url,'color'=>$this->getSiteMaskIcon()->color));
 		}
 		
 		/**
