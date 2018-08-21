@@ -47,8 +47,13 @@ function Request($var,$type='request') {
 function Param($var) {
 	global $IM;
 	
-	if (isset($_REQUEST[$var]) == false) return $IM->printError('MISSING_PARAMETER',$var);
-	return $_REQUEST[$var];
+	if (isset($_REQUEST[$var]) == false) {
+		if (isset($IM) == true) return $IM->printError('MISSING_PARAMETER',$var);
+		return null;
+	}
+	$value = $_REQUEST[$var];
+	if (is_array($value) == false && is_object($value) == false) return trim($value);
+	return $value;
 }
 
 /**
