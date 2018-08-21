@@ -1558,7 +1558,7 @@ class iModule {
 	 * @return string $url
 	 */
 	function getIndexUrl() {
-		return $this->indexUrl == null ? $this->getHost(true) : $this->indexUrl;
+		return $this->indexUrl == null ? __IM_DIR__ ? __IM_DIR__ : '/' : $this->indexUrl;
 	}
 	
 	/**
