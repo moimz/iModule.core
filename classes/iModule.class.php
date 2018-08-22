@@ -39,6 +39,7 @@ class iModule {
 	 *
 	 * @public object[] $sites : 사이트 설정값
 	 * @public object[] $siteLinks : 사이트 링크값
+	 * @public object[] $siteDefaultLanguages : 사이트 기본 언어셋
 	 * @public object[] $menus : 사이트별 모든 메뉴설정값
 	 * @public object[] $pages : 사이트별 특정 메뉴에 해당하는 모든 페이지설정값
 	 * @public object[] $modules : 불러온 모듈 클래스
@@ -46,6 +47,7 @@ class iModule {
 	 */
 	public $sites = array();
 	public $siteLinks = array();
+	public $siteDefaultLanguages = array();
 	public $menus = array();
 	public $pages = array();
 	public $sitemap = array();
@@ -262,6 +264,7 @@ class iModule {
 			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
 			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
 			$this->language = $site->language;
+			$this->siteDefaultLanguages[$this->domain] = $site->language;
 		} else {
 			/**
 			 * 언어셋이 지정되었고, 해당 언어셋이 현재 사이트에서 사용중인지 확인한다. 만약 사용중인 언어셋이 아니라면 기본언어셋을 사용한다.
@@ -1558,7 +1561,10 @@ class iModule {
 	 * @return string $url
 	 */
 	function getIndexUrl() {
-		return $this->indexUrl == null ? __IM_DIR__ ? __IM_DIR__ : '/' : $this->indexUrl;
+		if ($this->indexUrl !== null) return $this->indexUrl;
+		
+		if ($this->getDefaultLanguage() == $this->language) return __IM_DIR__ ? __IM_DIR__ : '/';
+		else return $this->getUrl(false);
 	}
 	
 	/**
@@ -1593,6 +1599,23 @@ class iModule {
 		} else {
 			$this->language = $language;
 		}
+	}
+	
+	/**
+	 * 도메인의 기본 언어셋을 가져온다.
+	 *
+	 * @param string $domain 도메인주소
+	 * @return string $language
+	 */
+	function getDefaultLanguage($domain=null) {
+		if (isset($this->siteDefaultLanguages[$domain]) == true) return $this->siteDefaultLanguages[$domain];
+		
+		$site = $this->db()->select($this->table->site)->where('domain',$domain)->where('is_default','TRUE')->getOne();
+		if ($site == null) $language = $this->language;
+		else $language = $site->language;
+		
+		$this->siteDefaultLanguages[$domain] = $language;
+		return $this->siteDefaultLanguages[$domain];
 	}
 	
 	/**
