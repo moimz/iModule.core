@@ -548,7 +548,7 @@ function SaveFileFromUrl($url,$filename,$filetype=null) {
 	fclose($fp);
 
 	if (file_exists($filename) == false || filesize($filename) == 0) {
-		unlink($filepath);
+		unlink($filename);
 		$filepath = '';
 	}
 
