@@ -1259,7 +1259,7 @@ class iModule {
 		/**
 		 * 사이트 관리자에 설정된 로고파일을 가져온다.
 		 */
-		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->site->logo->{$type}.'/preview.png';
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->site->image.'/preview.png';
 	}
 	
 	/**
@@ -1476,7 +1476,8 @@ class iModule {
 		 * 모듈등에서 설정되어 있는 뷰페이지 이미지가 없는 경우 페이지 이미지를 반환한다.
 		 */
 		if ($this->viewImage == null) return $this->getPageImage('view',$isFullUrl);
-		return $isFullUrl == true && preg_match('/http(s)?:\/\//',$this->viewImage) == false ? $this->getHost(true).$this->viewImage : $this->viewImage;
+		if (is_string($this->viewImage) == true) return $isFullUrl == true && preg_match('/http(s)?:\/\//',$this->viewImage) == false ? $this->getHost(true).$this->viewImage : $this->viewImage;
+		else return $isFullUrl == true ? $this->getHost(true).$this->viewImage->path : $this->viewImage->path;
 	}
 	
 	/**
@@ -2175,10 +2176,17 @@ class iModule {
 		/**
 		 * OG 태그를 설정한다.
 		 */
+		$this->addHeadResource('meta',array('property'=>'og:url','content'=>$this->getCanonical()));
 		$this->addHeadResource('meta',array('property'=>'og:type','content'=>'website'));
 		$this->addHeadResource('meta',array('property'=>'og:title','content'=>$this->getViewTitle()));
 		$this->addHeadResource('meta',array('property'=>'og:description','content'=>preg_replace('/(\r|\n)/',' ',$this->getViewDescription())));
-		if ($this->getViewImage('view',true)) $this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
+		if (is_object($this->viewImage) == true) {
+			$this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
+			$this->addHeadResource('meta',array('property'=>'og:image:width','content'=>$this->viewImage->width));
+			$this->addHeadResource('meta',array('property'=>'og:image:height','content'=>$this->viewImage->height));
+		} elseif ($this->getViewImage() != null) {
+			$this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
+		}
 		$this->addHeadResource('meta',array('property'=>'twitter:card','content'=>'summary_large_image'));
 		
 		/**
