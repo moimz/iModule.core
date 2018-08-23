@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 28.
+ * @modified 2018. 8. 23.
  */
 class Templet {
 	/**
@@ -634,7 +634,7 @@ class Templet {
 	 * @param object $values 템플릿에 사용되는 변수들
 	 * @return string $html 헤더 HTML
 	 */
-	function getHeader($values=array()) {
+	function getHeader($values=array(),$file='header') {
 		/**
 		 * 템플릿을 불러오지 못했을 경우 에러메세지를 출력한다.
 		 */
@@ -696,16 +696,14 @@ class Templet {
 		$Templet = $this;
 		
 		/**
-		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getHeader 메소드가 있는 경우 헤더를 중복해서 불러오지 않도록 설정한다.
+		 * 모듈에서 사이트 템플릿을 구성하고 해당 모듈에 getHeader 함수가 있는 경우, 해당 함수를 호출한다.
 		 */
 		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true) {
-			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getHeader();
-		} else {
-			if (is_file($this->getPath().'/header.php') == true) {
-				ob_start();
-				INCLUDE $this->getPath().'/header.php';
-				$html.= ob_get_clean();
-			}
+			$html.= $this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getHeader();
+		} elseif ($file !== null && is_file($this->getPath().'/'.$file.'.php') == true) {
+			ob_start();
+			INCLUDE $this->getPath().'/'.$file.'.php';
+			$html.= ob_get_clean();
 		}
 		
 		/**
@@ -759,7 +757,7 @@ class Templet {
 	 * @param object $values 템플릿에 사용되는 변수들
 	 * @return string $html 헤더 HTML
 	 */
-	function getFooter($values=array()) {
+	function getFooter($values=array(),$file='footer') {
 		/**
 		 * 템플릿을 불러오지 못했을 경우 푸터를 반환하지 않는다.
 		 */
@@ -802,18 +800,14 @@ class Templet {
 		$Templet = $this;
 		
 		/**
-		 * 모듈에서 사이트템플릿을 구성하고 해당 모듈에 getFooter 메소드가 있는 경우 iModule 코어에서는 템플릿 footer 파일을 불러오지 않는다.
+		 * 모듈에서 사이트 템플릿을 구성하고 해당 모듈에 getHeader 함수가 있는 경우, 해당 함수를 호출한다.
 		 */
-		if ($this->callerType != 'iModule' || strpos($this->getName(),'#') !== 0 || method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getFooter') == false) {
-			if (is_file($this->getPath().'/footer.php') == true) {
-				ob_start();
-				INCLUDE $this->getPath().'/footer.php';
-				$html.= ob_get_clean();
-			}
-		}
-		
-		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getHeader') == true)  {
-			$this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getFooter();
+		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0 && method_exists($this->IM->getModule(explode('.',substr($this->getName(),1))[0]),'getFooter') == true) {
+			$html.= $this->IM->getModule(explode('.',substr($this->getName(),1))[0])->getFooter();
+		} elseif ($file !== null && is_file($this->getPath().'/'.$file.'.php') == true) {
+			ob_start();
+			INCLUDE $this->getPath().'/'.$file.'.php';
+			$html.= ob_get_clean();
 		}
 		
 		/**

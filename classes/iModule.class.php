@@ -306,6 +306,8 @@ class iModule {
 				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 				
+				$sitemap = null;
+				
 				/**
 				 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
 				 */
@@ -313,13 +315,11 @@ class iModule {
 					$temp = explode('.',substr($this->sites[$i]->templet,1));
 					if ($this->getModule()->isSitemap($temp[0]) == true) {
 						$mModule = $this->getModule($temp[0]);
-						$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getMenus();
-						$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = $mModule->getPages();
-						continue;
+						$sitemap = method_exists($mModule,'getSitemap') == true ? $mModule->getSitemap($this->sites[$i]->domain,$this->sites[$i]->language) : null;
 					}
 				}
 				
-				$sitemap = $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+				$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
 				
 				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
 					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
@@ -333,7 +333,6 @@ class iModule {
 					
 					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
 					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
-					$sitemap[$j]->image = isset($sitemap[$j]->image) == true && $sitemap[$j]->image ? __IM_DIR__.'/attachment/view/'.$sitemap[$j]->image.'/preview.png' : null;
 					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
 					
 					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
@@ -367,7 +366,7 @@ class iModule {
 		if ($this->DB == null) $this->DB = new DB();
 		
 		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
-		return $this->DB->db($code,$prefix);
+		return $this->DB->get($code,$prefix);
 	}
 	
 	/**
@@ -999,7 +998,6 @@ class iModule {
 		if ($this->site != null) return $this->site;
 		if ($this->language == null) $this->initSites($is_sitemap);
 		$current = $this->getSites($this->domain,$this->language,$is_sitemap);
-		
 		/**
 		 * 현재 접속한 언어셋의 사이트가 없을 경우, 기본언어셋의 사이트를 가져온다.
 		 */
@@ -1242,10 +1240,11 @@ class iModule {
 	 * 설정된 사이트이미지가 없을 경우 NULL 을 반환한다.
 	 *
 	 * @param string $type 이미지 크기 종류(기본 original)
-	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @param boolean $isFullUrl 전체경로 여부 (true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL)
+	 * @param boolean $isObject 파일객체 반환여부 (true : 파일객체, false : 파일경로)
 	 * @return string $imageUrl 이미지 URL
 	 */
-	function getSiteImage($type='original',$isFullUrl=false) {
+	function getSiteImage($type='original',$isFullUrl=false,$isObject=false) {
 		/**
 		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
 		 */
@@ -1254,11 +1253,13 @@ class iModule {
 		/**
 		 * 사이트 이미지를 사용하지 않는다고 설정된 경우나, 알수없는 $type 값일 경우 NULL을 반환한다.
 		 */
+		if ($this->site->image == -1) return __IM_DIR__.'/images/logo/preview.jpg';
 		if ($this->site->image == 0 || in_array($type,array('original','view','thumbnail')) == false) return null;
 		
 		/**
 		 * 사이트 관리자에 설정된 로고파일을 가져온다.
 		 */
+		if ($isObject == true) return $this->getModule('attachment')->getFileInfo($this->site->image);
 		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$this->site->image.'/preview.png';
 	}
 	
@@ -1270,10 +1271,11 @@ class iModule {
 	 * 설정된 페이지 이미지가 없을 경우 사이트 이미지를 가져온다.
 	 *
 	 * @param string $type 이미지 크기 종류(기본 original)
-	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @param boolean $isFullUrl 전체경로 여부 (true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL)
+	 * @param boolean $isObject 파일객체 반환여부 (true : 파일객체, false : 파일경로)
 	 * @return string $imageUrl 이미지 URL
 	 */
-	function getPageImage($type='original',$isFullUrl=false) {
+	function getPageImage($type='original',$isFullUrl=false,$isObject=false) {
 		/**
 		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
 		 */
@@ -1282,18 +1284,18 @@ class iModule {
 		/**
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
-		$config = $this->page == null ? $this->getMenus($this->menu) : $this->getPages($this->menu,$this->page);
+		$menu = $this->getMenus($this->menu);
+		$page = $this->page == null ? null : $this->getPages($this->menu,$this->page);
+		$image = 0;
+		if ($page != null && $page->image > 0) $image = $page->image;
+		if ($image == 0 && $menu->image > 0) $image = $menu->image;
 		
 		/**
 		 * 페이지 이미지가 설정되지 않은 경우, 사이트 이미지를 반환한다.
 		 */
-		if ($config->image == -1) return $this->getSiteImage($type,$isFullUrl);
-		
-		/**
-		 * 페이지 이미지가 사용되지 않는다고 설정된 경우나, 알수없는 $type 값일 경우 NULL을 반환한다.
-		 */
-		if ($config->image == 0 || in_array($type,array('original','view','thumbnail')) == false) return null;
-		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$config->image.'/preview.png';
+		if ($image == 0) return $this->getSiteImage($type,$isFullUrl,$isObject);
+		if ($isObject == true) return $this->getModule('attachment')->getFileInfo($image);
+		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/'.$type.'/'.$image.'/preview.png';
 	}
 	
 	/**
@@ -1467,15 +1469,17 @@ class iModule {
 	 * $type 이 original 일 경우 원본이미지를, view 일 경우 최대 가로사이즈 1000픽셀 이미지를, thumbnail 일 경우 최대 가로 사이즈 500픽셀 이미지를 반환한다.
 	 * 설정된 뷰페이지 이미지가 없을 경우 페이지 이미지를 가져온다.
 	 *
-	 * @param string $type 이미지 크기 종류(기본 original)
 	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
+	 * @param boolean $isObject 파일객체 반환여부 (true : 파일객체, false : 파일경로)
 	 * @return string $imageUrl 이미지 URL
 	 */
-	function getViewImage($isFullUrl=false) {
+	function getViewImage($isFullUrl=false,$isObject=false) {
 		/**
 		 * 모듈등에서 설정되어 있는 뷰페이지 이미지가 없는 경우 페이지 이미지를 반환한다.
 		 */
-		if ($this->viewImage == null) return $this->getPageImage('view',$isFullUrl);
+		if ($this->viewImage == null) return $this->getPageImage('view',$isFullUrl,$isObject);
+		if ($isObject == true) return $this->viewImage;
+		
 		if (is_string($this->viewImage) == true) return $isFullUrl == true && preg_match('/http(s)?:\/\//',$this->viewImage) == false ? $this->getHost(true).$this->viewImage : $this->viewImage;
 		else return $isFullUrl == true ? $this->getHost(true).$this->viewImage->path : $this->viewImage->path;
 	}
@@ -2180,12 +2184,14 @@ class iModule {
 		$this->addHeadResource('meta',array('property'=>'og:type','content'=>'website'));
 		$this->addHeadResource('meta',array('property'=>'og:title','content'=>$this->getViewTitle()));
 		$this->addHeadResource('meta',array('property'=>'og:description','content'=>preg_replace('/(\r|\n)/',' ',$this->getViewDescription())));
-		if (is_object($this->viewImage) == true) {
+		
+		$viewImage = $this->getViewImage(true,true);
+		if (is_object($viewImage) == true) {
 			$this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
-			$this->addHeadResource('meta',array('property'=>'og:image:width','content'=>$this->viewImage->width));
-			$this->addHeadResource('meta',array('property'=>'og:image:height','content'=>$this->viewImage->height));
-		} elseif ($this->getViewImage() != null) {
-			$this->addHeadResource('meta',array('property'=>'og:image','content'=>$this->getViewImage(true)));
+			$this->addHeadResource('meta',array('property'=>'og:image:width','content'=>$viewImage->width));
+			$this->addHeadResource('meta',array('property'=>'og:image:height','content'=>$viewImage->height));
+		} elseif ($viewImage != null) {
+			$this->addHeadResource('meta',array('property'=>'og:image','content'=>$viewImage));
 		}
 		$this->addHeadResource('meta',array('property'=>'twitter:card','content'=>'summary_large_image'));
 		
@@ -2241,16 +2247,6 @@ class iModule {
 	 * @return string $context 컨텍스트 HTML
 	 */
 	function getPageContext($menu,$page) {
-		/**
-		 * 사이트맵 구성을 사용하는 모듈과 템플릿의 경우, 바로 해당 모듈의 컨텍스트를 호출한다.
-		 */
-		if (strpos($this->getSite()->templet,'#') === 0) {
-			$temp = explode('.',substr($this->getSite()->templet,1));
-			if ($this->getModule()->isSitemap($temp[0]) == true) {
-				return $this->getModule($temp[0])->getContext();
-			}
-		}
-		
 		/**
 		 * 페이지명이 NULL 일 경우 1차 메뉴의 설정을 가져오고 페이지명이 있을 경우 2차 메뉴의 설정을 가져온다.
 		 */
@@ -2346,16 +2342,6 @@ class iModule {
 		 */
 		foreach ($this->siteBodys as $body) {
 			$context.= PHP_EOL.$body;
-		}
-		
-		/**
-		 * 사이트맵 구성을 사용하는 모듈의 경우 바로 해당 모듈에서 레이아웃을 처리한다.
-		 */
-		if (strpos($this->getSite()->templet,'#') === 0) {
-			$temp = explode('.',substr($this->getSite()->templet,1));
-			if ($this->getModule()->isSitemap($temp[0]) == true) {
-				return $context;
-			}
 		}
 		
 		/**
@@ -2581,7 +2567,7 @@ class iModule {
 		/**
 		 * 레이아웃을 구성하기전 beforeDoLayout 이벤트를 발생시킨다.
 		 */
-		$this->fireEvent('beforeDoLayout','core','*',$site);
+		$this->fireEvent('beforeDoLayout','core','doLayout');
 		
 		/**
 		 * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.
