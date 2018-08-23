@@ -264,6 +264,11 @@
 					"length":100,
 					"default":""
 				},
+				"icon":{
+					"type":"varchar",
+					"length":100,
+					"is_null":true
+				},
 				"type":{
 					"type":"enum",
 					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','HTML','LINK','EMPTY'",
@@ -275,11 +280,6 @@
 				},
 				"description":{
 					"type":"text",
-					"is_null":true
-				},
-				"icon":{
-					"type":"varchar",
-					"length":100,
 					"is_null":true
 				},
 				"image":{
