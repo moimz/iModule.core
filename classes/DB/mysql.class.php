@@ -32,15 +32,13 @@ class mysql {
 	
 	private $_tableLockMethod = 'READ';
 	
-	private $isSubQuery = false;
 	public $count = 0;
 
-	public function __construct($db=null,$isSubQuery=false) {
+	public function __construct($db=null) {
 		if ($db !== null) {
 			$this->db = $db;
 			if (isset($this->db->port) == false) $this->db->port = 3306;
 			if (isset($this->db->charset) == false) $this->db->charset = 'utf8';
-			$this->isSubQuery = $isSubQuery;
 		}
 	}
 	
@@ -49,6 +47,7 @@ class mysql {
 			$this->_mysqli = $mysqli;
 		} else {
 			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port) or $this->error('There was a problem connecting to the database');
+			$this->_mysqli->set_charset($this->db->charset);
 		}
 		
 		$this->version = $this->_mysqli->server_info;
@@ -61,9 +60,12 @@ class mysql {
 			$this->charset = 'utf8';
 			$this->collation = 'utf8_general_ci';
 		}
-		$this->_mysqli->set_charset($this->db->charset);
 		
 		return $this->_mysqli;
+	}
+	
+	public function disconnect() {
+		if ($this->_mysqli) $this->_mysqli->close();
 	}
 	
 	public function db() {
@@ -397,7 +399,6 @@ class mysql {
 	
 	public function get($field=null) {
 		$stmt = $this->_buildQuery();
-		if ($this->isSubQuery == true) return $this;
 		
 		$stmt->execute();
 		$this->_stmtError = $stmt->error;
@@ -421,8 +422,6 @@ class mysql {
 	}
 	
 	public function insert($table,$data) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'INSERT into '.$this->_prefix.$table;
 		$this->_tableDatas = $data;
 		
@@ -430,8 +429,6 @@ class mysql {
 	}
 	
 	public function replace($table,$data) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'REPLACE into '.$this->_prefix.$table;
 		$this->_tableDatas = $data;
 		
@@ -439,8 +436,6 @@ class mysql {
 	}
 	
 	public function update($table,$data) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'UPDATE '.$this->_prefix.$table.' SET ';
 		$this->_tableDatas = $data;
 		
@@ -448,16 +443,12 @@ class mysql {
 	}
 	
 	public function delete($table) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'DELETE FROM '.$this->_prefix.$table;
 		
 		return $this;
 	}
 	
 	public function truncate($table) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'TRUNCATE TABLE '.$this->_prefix.$table;
 		
 		return $this;
@@ -479,7 +470,7 @@ class mysql {
 		$allowedTypes = array('LEFT','RIGHT','OUTER','INNER','LEFT OUTER','RIGHT OUTER');
 		$joinType = strtoupper(trim($joinType));
 		if ($joinType && in_array($joinType,$allowedTypes) == false)
-			die ('Wrong JOIN type: '.$joinType);
+			die('Wrong JOIN type: '.$joinType);
 		if (is_object($joinTable) == false) {
 			$joinTable = $this->_prefix.filter_var($joinTable,FILTER_SANITIZE_STRING);
 		}
@@ -564,9 +555,6 @@ class mysql {
 			$this->_bindParam($value);
 			return ' '.$operator.' ? ';
 		}
-		$subQuery = $value->getSubQuery();
-		$this->_bindParams($subQuery['params']);
-		return ' '.$operator.' ('.$subQuery['query'].') '.$subQuery['alias'];
 	}
 	
 	private function _buildQuery() {
@@ -577,7 +565,6 @@ class mysql {
 		$this->_buildOrderBy();
 		$this->_buildLimit();
 		$this->_lastQuery = $this->replacePlaceHolders($this->_query,$this->_bindParams);
-		if ($this->isSubQuery == true) return;
 
 		$stmt = $this->_prepareQuery();
 		if (count($this->_bindParams) > 1) call_user_func_array(array($stmt,'bind_param'),$this->refValues($this->_bindParams));
@@ -822,8 +809,6 @@ class mysql {
 	}
 	
 	public function getSubQuery() {
-		if (!$this->isSubQuery) return null;
-		
 		array_shift($this->_bindParams);
 		$val = array('query'=>$this->_query,'params'=>$this->_bindParams,'alias'=>$this->host);
 		$this->reset();
@@ -864,10 +849,6 @@ class mysql {
 	
 	public function func($expr,$bindParams=null) {
 		return array('[F]'=>array($expr,$bindParams));
-	}
-	
-	public function subQuery($db='') {
-		return new mysql($db ? $db : $this->db,true);
 	}
 	
 	public function copy() {
@@ -954,11 +935,6 @@ class mysql {
 	public function _transaction_status_check() {
 		if (!$this->_transaction_in_progress) return;
 		$this->rollback();
-	}
-	
-	public function __destruct() {
-		if ($this->isSubQuery == false) return;
-		if ($this->_mysqli) $this->_mysqli->close();
 	}
 }
 ?>

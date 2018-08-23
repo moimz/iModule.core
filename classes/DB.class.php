@@ -6,9 +6,9 @@
  *
  * @file /classes/DB.class.php
  * @author Arzz
- * @version 1.4.0
+ * @version 1.5.0
  * @license MIT License
- * @modified 2018. 7. 28.
+ * @modified 2018. 8. 23.
  */
 class DB {
 	/**
@@ -16,19 +16,15 @@ class DB {
 	 *
 	 * @private $connectors 데이터베이스 코드별 접속정보
 	 * @private $connections 데이터베이스 코드별 커넥션
+	 * @private $classes 최종 호출된 데이터베이스 클래스
 	 */
 	private $connectors = array();
 	private $connections = array();
+	private $classes = array();
 	private $code;
 	private $table;
 	
-	function __construct() {
-		global $_CONFIGS;
-		
-		if (isset($_CONFIGS->db) == true) $this->db();
-	}
-	
-	function db($code='default',$prefix=null) {
+	function get($code='default',$prefix=null) {
 		global $_CONFIGS;
 		
 		if (is_object($code) == true) {
@@ -61,6 +57,8 @@ class DB {
 		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
 		$dbClass->setPrefix($prefix);
 		
+		$this->classes[$code] = $dbClass;
+		
 		return $dbClass;
 	}
 	
@@ -70,6 +68,12 @@ class DB {
 		if ($charset !== null) $code['charset'] = $charset;
 		
 		return Encoder(json_encode($code));
+	}
+	
+	function __destruct() {
+		foreach ($this->classes as $dbClass) {
+			$dbClass->disconnect();
+		}
 	}
 }
 ?>
