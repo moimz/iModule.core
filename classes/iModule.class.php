@@ -2008,8 +2008,8 @@ class iModule {
 		}
 
 		$link = new stdClass();
-		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
-		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).(isset($_SERVER['REDIRECT_URL']) == true ? $_SERVER['REDIRECT_URL'] : '') ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
+		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).(isset($_SERVER['REDIRECT_URL']) == true ? $_SERVER['REDIRECT_URL'] : '') ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
 		 * 사이트템플릿에 에러메세지 템플릿이 있을 경우, 사이트템플릿을 불러온다.
