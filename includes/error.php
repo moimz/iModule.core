@@ -37,7 +37,7 @@ if (defined('__IM__') == false) exit;
 			
 			<?php if (defined('__IM_CONTAINER_POPUP__') == true) { ?>
 			<button type="button" onclick="self.close();"><?php echo $this->getText('button/close'); ?></button>
-			<?php } else { ?>
+			<?php } elseif ($link != null) { ?>
 			<a href="<?php echo $link->url; ?>"><?php echo $link->text; ?></a>
 			<?php }} ?>
 		</div>

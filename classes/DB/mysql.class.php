@@ -46,7 +46,10 @@ class mysql {
 		if ($mysqli != null) {
 			$this->_mysqli = $mysqli;
 		} else {
-			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port) or $this->error('There was a problem connecting to the database');
+			ob_start();
+			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port);
+			ob_end_clean();
+			if ($this->_mysqli->connect_error) $this->error($this->_mysqli->connect_error);
 			$this->_mysqli->set_charset($this->db->charset);
 		}
 		

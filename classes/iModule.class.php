@@ -13,6 +13,11 @@
  */
 class iModule {
 	/**
+	 * iModule 실행모드
+	 */
+	private $mode = null;
+	
+	/**
 	 * DB 관련 변수정의
 	 *
 	 * @private DB $DB DB에 접속하고 데이터를 처리하기 위한 DB class (@see /classes/DB.class.php)
@@ -117,6 +122,8 @@ class iModule {
 	function __construct($mode=null) {
 		global $_CONFIGS;
 		
+		$this->mode = $mode;
+		
 		/**
 		 * 페이지 로딩시간을 구하기 위한 최초 마이크로타임을 기록한다.
 		 */
@@ -148,16 +155,16 @@ class iModule {
 				$this->Plugin = new Plugin($this);
 				$this->Module = new Module($this);
 			}
-			
-			/**
-			 * iModule core 에서 사용하는 DB 테이블 별칭 정의
-			 * @see package.json 의 databases 참고
-			 */
-			$this->table = new stdClass();
-			$this->table->site = 'site_table';
-			$this->table->sitemap = 'sitemap_table';
-			$this->table->article = 'article_table';
 		}
+		
+		/**
+		 * iModule core 에서 사용하는 DB 테이블 별칭 정의
+		 * @see package.json 의 databases 참고
+		 */
+		$this->table = new stdClass();
+		$this->table->site = 'site_table';
+		$this->table->sitemap = 'sitemap_table';
+		$this->table->article = 'article_table';
 		
 		/**
 		 * 타임존 설정
@@ -2083,16 +2090,6 @@ class iModule {
 			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 		}
 		
-		if ($this->language == null) {
-			$this->language = 'ko';
-		}
-		
-		$this->setSiteTitle('ERROR!');
-		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
-		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
-		
-		$this->loadFont();
-		
 		/**
 		 * 에러메세지를 구성한다.
 		 */
@@ -2107,9 +2104,23 @@ class iModule {
 			$type = $error->type;
 		}
 		
-		$link = new stdClass();
-		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
-		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
+		if ($this->language == null) {
+			$this->language = 'ko';
+		}
+		
+		$this->setSiteTitle('ERROR!');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/common.css');
+		$this->addHeadResource('style',__IM_DIR__.'/styles/error.css');
+		
+		$this->loadFont();
+		
+		if ($this->mode == 'SAFETY') {
+			$link = null;
+		} else {
+			$link = new stdClass();
+			$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
+			$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
+		}
 		
 		/**
 		 * 에러메세지 컨테이너를 설정한다.
@@ -2274,9 +2285,9 @@ class iModule {
 		 * 사이트맵에서 설정된 컨텍스트 헤더를 가져온다.
 		 */
 		if ($config->header->type == 'TEXT') {
-			$context.= '<div data-role="context-header">'.$this->getModule('wysiwyg')->decodeContent($config->header->text).'</div>'.PHP_EOL;
+			$context.= PHP_EOL.$this->getModule('wysiwyg')->decodeContent($config->header->text).PHP_EOL;
 		} elseif ($config->header->type == 'EXTERNAL') {
-			$context.= '<div data-role="context-header">'.$this->getSiteTemplet()->getExternal($config->header->external).'</div>'.PHP_EOL;
+			$context.= PHP_EOL.$this->getSiteTemplet()->getExternal($config->header->external).PHP_EOL;
 		}
 		
 		/**
@@ -2319,9 +2330,9 @@ class iModule {
 		 * 사이트맵에서 설정된 컨텍스트 푸터를 가져온다.
 		 */
 		if ($config->footer->type == 'TEXT') {
-			$context.= '<div data-role="context-footer">'.$this->getModule('wysiwyg')->decodeContent($config->footer->text).'</div>';
+			$context.= PHP_EOL.$this->getModule('wysiwyg')->decodeContent($config->footer->text).PHP_EOL;
 		} elseif ($config->footer->type == 'EXTERNAL') {
-			$context.= '<div data-role="context-context-">'.$this->getSiteTemplet()->getExternal($config->footer->external).'</div>';
+			$context.= PHP_EOL.$this->getSiteTemplet()->getExternal($config->footer->external).PHP_EOL;
 		}
 		
 		return $context;
@@ -2660,7 +2671,7 @@ class iModule {
 	 * @param object &$results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)
 	 */
 	function fireEvent($event,$target,$caller,&$values=null,&$results=null) {
-		if ($this->Event === null) return;
+		if ($this->mode == 'SAFETY' || $this->Event === null) return;
 		$this->Event->fireEvent($event,$target,$caller,$values,$results);
 	}
 }
