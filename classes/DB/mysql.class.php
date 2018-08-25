@@ -70,10 +70,6 @@ class mysql {
 		return $this->_mysqli;
 	}
 	
-	public function disconnect() {
-		if ($this->_mysqli) $this->_mysqli->close();
-	}
-	
 	public function db() {
 		return $this->db;
 	}

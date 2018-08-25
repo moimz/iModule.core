@@ -81,11 +81,5 @@ class DB {
 		
 		$this->class->setMode('SAFETY')->printError('DATABASE_ERROR',$msg.'<br>'.$query);
 	}
-	
-	function __destruct() {
-		foreach ($this->classes as $dbClass) {
-			$dbClass->disconnect();
-		}
-	}
 }
 ?>
