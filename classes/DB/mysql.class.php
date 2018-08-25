@@ -17,6 +17,7 @@ class mysql {
 	private $charset = null;
 	private $collation = null;
 	
+	private $_class = null;
 	private $_mysqli;
 	private $_prefix;
 	private $_query;
@@ -34,12 +35,14 @@ class mysql {
 	
 	public $count = 0;
 
-	public function __construct($db=null) {
+	public function __construct($db=null,$class=null) {
 		if ($db !== null) {
 			$this->db = $db;
 			if (isset($this->db->port) == false) $this->db->port = 3306;
 			if (isset($this->db->charset) == false) $this->db->charset = 'utf8';
 		}
+		
+		$this->_class = $class;
 	}
 	
 	public function connect($mysqli=null) {
@@ -97,9 +100,8 @@ class mysql {
 	
 	function error($msg,$query='') {
 		$this->reset();
-		
-		$IM = new iModule('SAFETY');
-		echo $IM->printError('DATABASE_ERROR',$msg.'<br>'.$query);
+		if ($this->_class == null) die('DATABASE_ERROR : '.$msg.'<br>'.$query);
+		else $this->_class->printError($msg,$query);
 	}
 	
 	private function reset() {

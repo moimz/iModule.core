@@ -187,6 +187,17 @@ class iModule {
 	}
 	
 	/**
+	 * iModule 실행모드를 변경한다.
+	 *
+	 * @param string $mode
+	 * @return iModule $this
+	 */
+	function setMode($mode) {
+		$this->mode = $mode;
+		return $this;
+	}
+	
+	/**
 	 * 인스톨과정에서 iModule core 클래스 정의가 필요할 경우 iModule core 를 정의한다.
 	 *
 	 * @return null
@@ -370,7 +381,7 @@ class iModule {
 	 * @return DB $DB
 	 */
 	function db($code='default',$prefix=null) {
-		if ($this->DB == null) $this->DB = new DB();
+		if ($this->DB == null) $this->DB = new DB($this);
 		
 		$prefix = $prefix === null ? __IM_DB_PREFIX__ : $prefix;
 		return $this->DB->get($code,$prefix);
@@ -1295,7 +1306,7 @@ class iModule {
 		$page = $this->page == null ? null : $this->getPages($this->menu,$this->page);
 		$image = 0;
 		if ($page != null && $page->image > 0) $image = $page->image;
-		if ($image == 0 && $menu->image > 0) $image = $menu->image;
+		if ($image == 0 && $menu != null && $menu->image > 0) $image = $menu->image;
 		
 		/**
 		 * 페이지 이미지가 설정되지 않은 경우, 사이트 이미지를 반환한다.
@@ -1929,10 +1940,12 @@ class iModule {
 		/**
 		 * 자바스크립트 언어셋 요청이 있을 경우 언어셋파일을 자바스크립트로 불러온다.
 		 */
-		if (count($this->javascriptLanguages) > 0) {
-			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language.'&languages='.implode(',',$this->javascriptLanguages));
-		} else {
-			$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language);
+		if ($this->mode != 'SAFETY') {
+			if (count($this->javascriptLanguages) > 0) {
+				$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language.'&languages='.implode(',',$this->javascriptLanguages));
+			} else {
+				$this->addHeadResource('script',__IM_DIR__.'/scripts/language.js.php?language='.$this->language);
+			}
 		}
 		
 		/**
@@ -1945,7 +1958,10 @@ class iModule {
 		} else {
 			$container = null;
 		}
-		$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.($this->menu != null && $this->menu != '#' ? '&menu='.$this->menu : '').($this->page != null && $this->page != '#' ? '&page='.$this->page : '').($this->view != null ? '&view='.$this->view : '').($container != null ? '&container='.$container : ''));
+		
+		if ($this->mode != 'SAFETY') {
+			$this->addHeadResource('script',__IM_DIR__.'/scripts/php2js.js.php?language='.$this->language.($this->menu != null && $this->menu != '#' ? '&menu='.$this->menu : '').($this->page != null && $this->page != '#' ? '&page='.$this->page : '').($this->view != null ? '&view='.$this->view : '').($container != null ? '&container='.$container : ''));
+		}
 		
 		/**
 		 * 웹폰트 요청이 있을 경우 웹폰트 스타일시트를 불러온다.

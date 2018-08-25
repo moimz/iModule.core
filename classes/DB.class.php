@@ -14,15 +14,21 @@ class DB {
 	/**
 	 * 데이터베이스 관련 변수설정
 	 *
+	 * @private $class DB클래스를 호출한 클래스
 	 * @private $connectors 데이터베이스 코드별 접속정보
 	 * @private $connections 데이터베이스 코드별 커넥션
 	 * @private $classes 최종 호출된 데이터베이스 클래스
 	 */
+	private $class = null;
 	private $connectors = array();
 	private $connections = array();
 	private $classes = array();
 	private $code;
 	private $table;
+	
+	function __construct($class=null) {
+		$this->class = $class;
+	}
 	
 	function get($code='default',$prefix=null) {
 		global $_CONFIGS;
@@ -47,7 +53,7 @@ class DB {
 			$this->connectors[$code] = $db;
 		}
 		
-		$dbClass = new $this->connectors[$code]->type($this->connectors[$code]);
+		$dbClass = new $this->connectors[$code]->type($this->connectors[$code],$this);
 		if (isset($this->connections[$code]) == false) {
 			$this->connections[$code] = $dbClass->connect();
 		} else {
@@ -68,6 +74,12 @@ class DB {
 		if ($charset !== null) $code['charset'] = $charset;
 		
 		return Encoder(json_encode($code));
+	}
+	
+	function printError($msg,$query='') {
+		if ($this->class == null) die('DATABASE_ERROR : '.$msg.'<br>'.$query);
+		
+		$this->class->setMode('SAFETY')->printError('DATABASE_ERROR',$msg.'<br>'.$query);
 	}
 	
 	function __destruct() {
