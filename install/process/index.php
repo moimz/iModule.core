@@ -88,7 +88,7 @@ if ($action == 'install') {
 	$errors = array();
 	if ($_CONFIGS->presets->key == true) {
 		if (Request('key') != $_CONFIGS->key) $errors['key'] = 'key_preset';
-	} elseif (file_exists(__IM_PATH__.'/configs/key.config.php') == true) {
+	} elseif (is_file(__IM_PATH__.'/configs/key.config.php') == true) {
 		$keyFile = explode("\n",file_get_contents(__IM_PATH__.'/configs/key.config.php'));
 		$key = $keyFile[1];
 		if (Request('key') != $key) $errors['key'] = 'key_exists';
@@ -102,7 +102,7 @@ if ($action == 'install') {
 	
 	if ($_CONFIGS->presets->key == true) {
 		$db = $_CONFIGS->db;
-	} elseif (file_exists(__IM_PATH__.'/configs/db.config.php') == true) {
+	} elseif (is_file(__IM_PATH__.'/configs/db.config.php') == true) {
 		$dbFile = explode("\n",file_get_contents(__IM_PATH__.'/configs/db.config.php'));
 		$db = json_decode(Decoder($dbFile[1],$key));
 	} else {
