@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 6. 21.
+ * @modified 2018. 8. 27.
  */
 class iModule {
 	/**
@@ -874,8 +874,6 @@ class iModule {
 	function getQueryString($query=array(),$queryString=null) {
 		$queryString = $queryString == null ? $_SERVER['QUERY_STRING'] : $queryString;
 		$query = array_merge(array('_menu'=>'','_page'=>'','_view'=>'','_idx'=>'','_module'=>'','_container'=>'','_language'=>''),$query);
-		
-		if (isset($_SERVER['REDIRECT_URL']) == true && preg_match('/\/module\/([^\/]+)/',$_SERVER['REDIRECT_URL']) == true) $query = array_merge(array('_container'=>'','_idx'=>'','_language'=>''),$query);
 		$querys = explode('&',$queryString);
 		
 		for ($i=0, $total=count($querys);$i<$total;$i++) {
@@ -1601,6 +1599,25 @@ class iModule {
 	}
 	
 	/**
+	 * 현재 요청주소를 가져온다.
+	 *
+	 * @param boolean $is_querystring GET 변수 포함여부
+	 * @param boolean $is_fullurl 전체 URL 여부
+	 * @return string
+	 */
+	function getRequestUri($is_querystring,$is_fullurl=false) {
+		if (isset($_SERVER['REQUEST_URI']) == true) {
+			$url = $_SERVER['REQUEST_URI'];
+		} else {
+			$url = __IM_DIR__ ? __IM_DIR__ : '/';
+		}
+		
+		if ($is_fullurl == true) $url = $this->getHost(false).$url;
+		
+		return $url;
+	}
+	
+	/**
 	 * 현재 설정된 언어셋을 반환한다.
 	 *
 	 * @return $langcode
@@ -2031,8 +2048,8 @@ class iModule {
 		}
 
 		$link = new stdClass();
-		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).(isset($_SERVER['REDIRECT_URL']) == true ? $_SERVER['REDIRECT_URL'] : '') ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
-		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).(isset($_SERVER['REDIRECT_URL']) == true ? $_SERVER['REDIRECT_URL'] : '') ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
+		$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getRequestUri(true,true) ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
+		$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getRequestUri(true,true) ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		
 		/**
 		 * 사이트템플릿에 에러메세지 템플릿이 있을 경우, 사이트템플릿을 불러온다.
@@ -2134,8 +2151,8 @@ class iModule {
 			$link = null;
 		} else {
 			$link = new stdClass();
-			$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
-			$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getHost(true).$_SERVER['REDIRECT_URL'] ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
+			$link->url = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getRequestUri(true,true) ? $this->getIndexUrl() : $_SERVER['HTTP_REFERER'];
+			$link->text = $type == 'MAIN' || isset($_SERVER['HTTP_REFERER']) == false || $_SERVER['HTTP_REFERER'] == $this->getRequestUri(true,true) ? $this->getText('button/back_to_main') : $this->getText('button/go_back');
 		}
 		
 		/**

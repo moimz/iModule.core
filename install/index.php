@@ -44,7 +44,7 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 <main data-start="license" data-id="<?php echo $package->id; ?>" data-version="<?php echo $package->version; ?>">
 	<section>
 		<article>
-			<h2><?php echo $package->title; ?> <small>v.<?php echo $package->version; ?></small></h2>
+			<h2 style="background-image:url(//www.moimz.com/modules/moimz/images/iModule.png);"><?php echo $package->title; ?> <small>v.<?php echo $package->version; ?></small></h2>
 			
 			<article data-step="license">
 				<p></p>
