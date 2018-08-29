@@ -704,14 +704,15 @@ function CreateDatabase($dbConnect,$schema) {
 				$insert = array();
 				foreach ($structure->columns as $column=>$type) {
 					if (isset($data[$i]->$column) == true) {
-						$insert[$column] = $data[$i]->$column;
+						if (isset($type->is_null) == false || $type->is_null == false || strlen($data[$i]->$column) > 0) {
+							$insert[$column] = $data[$i]->$column;
+						}
 					} else {
 						if (isset($type->default) == true) $insert[$column] = $type->default;
 						if (isset($type->value) == true) $insert[$column] = $type->value;
 						if (isset($type->origin) == true && isset($data[$i]->{$type->origin}) == true) $insert[$column] = $data[$i]->{$type->origin};
 					}
 				}
-				
 				$dbConnect->insert($table,$insert)->execute();
 			}
 			
