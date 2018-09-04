@@ -139,6 +139,7 @@
 				if ($value.length == 0) {
 					var $text = $("<span>").html("");
 				} else {
+					$button.attr("data-value",$value.attr("value"));
 					var $text = $("<span>").html($value.html());
 				}
 				
@@ -171,6 +172,7 @@
 						var $button = $("button",$parent);
 						var $item = $("option[value='"+$(this).val()+"']",$(this));
 						if ($item.length == 1) {
+							$button.attr("data-value",$item.attr("value"));
 							$("span",$button).html($item.html());
 						}
 					});
@@ -1669,12 +1671,11 @@
 				if (result.success == false && result.errors) $form.status("error",result.errors);
 				if (result.message) {
 					iModule.alert.show(result.success == true ? "success" : "error",result.message);
-					$form.status("default");
 				}
 				if (result.error) {
 					iModule.modal.error(result.error,result.url ? result.url : null);
-					$form.status("default");
 				}
+				if (result.success == false && !result.errors) $$form.status("default");
 			},
 			error:function() {
 				/**
@@ -1769,7 +1770,11 @@
 					if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
 					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
 					$(this).outerWidth($(this).outerWidth());
-					$(this).html('<i class="mi mi-loading"></i>');
+					if (message) {
+						$(this).html('<i class="mi mi-loading"></i>'+message);
+					} else {
+						$(this).html('<i class="icon mi mi-loading"></i>');
+					}
 					$(this).disable();
 				} else if (status == "default" || status == "success" || status == "error") {
 					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
