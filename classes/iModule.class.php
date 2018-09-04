@@ -105,6 +105,7 @@ class iModule {
 	private $siteDescription = null;
 	private $canonical = null;
 	private $robots = null;
+	private $viewport = 'user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width';
 	private $viewTitle = null;
 	private $viewDescription = null;
 	private $viewImage = null;
@@ -1404,6 +1405,24 @@ class iModule {
 	}
 	
 	/**
+	 * meta 태그의 viewport 값을 가져온다.
+	 *
+	 * @return string $viewport
+	 */
+	function getViewport() {
+		return $this->viewport;
+	}
+	
+	/**
+	 * meta 태그의 viewport 값을 설정한다.
+	 *
+	 * @param string $viewport
+	 */
+	function setViewport($viewport=null) {
+		$this->viewport = $viewport ? $viewport : 'user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width';
+	}
+	
+	/**
 	 * 현재 페이지의 검색로봇 규칙을 가져온다.
 	 * SEO를 위해 사용된다.
 	 *
@@ -1884,7 +1903,7 @@ class iModule {
 	 * @param string $type 리소스종류 (style, script, meta or etc)
 	 * @param string[] $value 리소스데이터 (style, script 의 경우 해당 파일의 경로 / 기타 태그의 경우 태그 attribute)
 	 */
-	function removeHeadResource($type,$value,$isFirst=false) {
+	function removeHeadResource($type,$value) {
 		$tag = null;
 		
 		switch ($type) {
