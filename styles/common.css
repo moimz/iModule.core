@@ -260,8 +260,8 @@ div[data-role=button] > button[type=submit], div[data-role=button] > .submit {ba
 div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:hover {background:#1e88e5; color:#fff;}
 div[data-role=button] > button[type=submit][disabled], div[data-role=button] > .submit[disabled] {background:#1e88e5; color:#fff;}
 div[data-role=button] > button:focus, div[data-role=button] > a:focus {border-color:rgba(0,0,0,0.5);}
-div[data-role=button] > button > i, div[data-role=button] > button > a > i {float:left; width:30px; height:38px; text-align:center; margin:0px 0px 0px -10px; padding:0; line-height:38px; vertical-align:middle;}
-div[data-role=button] > button > i.mi-loading {float:none; margin:0px;}
+div[data-role=button] > button > i, div[data-role=button] > a > i {float:left; width:30px; height:30px; text-align:center; margin:4px 0px 4px -10px; padding:0; line-height:30px; vertical-align:middle;}
+div[data-role=button] > button > i.mi-loading.icon {float:none; width:auto; height:auto; margin:0;}
 div[data-role=button] > .danger {background:#f44336; color:#fff;}
 div[data-role=button] > .danger:hover {background:#e53935; color:#fff;}
 div[data-role=button] > .danger[disabled] {background:#f44336; color:#fff;}
@@ -390,6 +390,8 @@ ul[data-role=form] > li > div > div[data-role=text] {display:table; padding:5px 
 ul[data-role=form] > li > div > div[data-role=text] > div {display:table-cell; vertical-align:middle; line-height:1.6;}
 ul[data-role=form] > li > div > div[data-role=button] {margin-top:0; text-align:left; padding:0px;}
 ul[data-role=form] > li > div > div[data-role=button] > button {height:40px; line-height:40px; padding:0px 15px; margin:0px;}
+ul[data-role=form] > li > div div[data-role=help] {margin-bottom:0;}
+ul[data-role=form] > li > div div[data-role=button] {text-align:left;}
 
 /**
  * 탭
@@ -484,4 +486,8 @@ div[data-role=context][data-type=html] > a.edit:hover {background:#1e88e5;}
 @media (min-width:768px) and (max-width:991px) {
 	ul[data-role=form] > li > label {width:130px; padding-left:15px;}
 	ul[data-role=form] > li > label.small {width:90px;}
+}
+
+@media print {
+	* {-webkit-print-color-adjust:exact; color-adjust:exact;}
 }
