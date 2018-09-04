@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 5. 27.
+ * @modified 2018. 9. 4.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
@@ -32,7 +32,6 @@ $IM->page = '#';
 
 if (strpos($container,'@') === 0) {
 	$container = preg_replace('/^@/','',$container);
-	$IM->removeTemplet();
 	define('__IM_CONTAINER_POPUP__',true);
 }
 $IM->setContainerMode($module,$container);
