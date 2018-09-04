@@ -28,39 +28,6 @@
 	"configs":["key","db"],
 	"preset":"iModule",
 	"databases":{
-		"article_table":{
-			"columns":{
-				"module":{
-					"type":"varchar",
-					"length":20
-				},
-				"type":{
-					"type":"varchar",
-					"length":20
-				},
-				"idx":{
-					"type":"int",
-					"length":11
-				},
-				"context":{
-					"type":"varchar",
-					"length":20
-				},
-				"reg_date":{
-					"type":"int",
-					"length":11,
-					"default":0
-				},
-				"update_date":{
-					"type":"int",
-					"length":11,
-					"default":0
-				}
-			},
-			"indexes":{
-				"module,type,idx":"primary_key"
-			}
-		},
 		"cron_table":{
 			"columns":{
 				"host":{
@@ -70,334 +37,405 @@
 				},
 				"module":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"자동화작업 대상 모듈"
 				},
 				"type":{
 					"type":"enum",
 					"length":"'DAILY','WEEKLY','MONTHLY'",
-					"default":"DAILY"
+					"default":"DAILY",
+					"comment":"반복일정"
 				},
 				"date":{
-					"type":"date"
+					"type":"date",
+					"comment":"최근 자동화작업 실행일자"
 				},
 				"result":{
-					"type":"longtext"
+					"type":"longtext",
+					"comment":"자동화작업 결과"
 				},
 				"start_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"최근 자동화작업 시작일시"
 				},
 				"end_date":{
 					"type":"int",
-					"length":11
+					"length":11,
+					"comment":"최근 자동화작업 종료일시"
 				},
 				"runtime":{
-					"type":"double"
+					"type":"double",
+					"comment":"최근 자동화작업 실행시간"
 				}
 			},
 			"indexes":{
 				"host,module,type,date":"primary_key"
 			},
-			"comment":"자동화를 위한 cron 정보 테이블"
+			"comment":"아이모듈 자동화작업 테이블"
 		},
 		"module_table":{
 			"columns":{
 				"module":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"모듈명"
 				},
 				"version":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"현재버전"
 				},
 				"hash":{
 					"type":"char",
-					"length":32
+					"length":32,
+					"comment":"패키지 고유값"
 				},
 				"database":{
 					"type":"varchar",
 					"length":20,
-					"default":"default"
+					"default":"default",
+					"comment":"모듈 데이터베이스 코드"
 				},
 				"db_size":{
 					"type":"bigint",
 					"length":15,
-					"default":0
+					"default":0,
+					"comment":"모듈이 사용중인 데이터베이스 용량"
 				},
 				"attachment_size":{
 					"type":"bigint",
 					"length":15,
-					"default":0
+					"default":0,
+					"comment":"모듈이 사용중인 첨부파일 용량"
 				},
 				"is_admin":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"관리자패널 사용여부"
 				},
 				"is_context":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"TRUE"
+					"default":"TRUE",
+					"comment":"컨텍스트 사용여부"
 				},
 				"is_global":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"광역모듈 여부"
 				},
 				"is_article":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"게시물관리 여부"
 				},
 				"is_widget":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"위젯기능 포함여부"
 				},
 				"is_templet":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"사이트템플릿 포함여부"
 				},
 				"is_external":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"외부파일 포함여부"
 				},
 				"is_sitemap":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"사이트맵구성 여부"
 				},
 				"is_cron":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"자동화작업 여부"
 				},
 				"configs":{
-					"type":"text"
+					"type":"text",
+					"comment":"모듈설정"
 				},
 				"targets":{
-					"type":"text"
+					"type":"text",
+					"comment":"이벤트리스너설정"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
 				"module":"primary_key"
-			}
+			},
+			"comment":"아이모듈 모듈관리 테이블"
 		},
 		"plugin_table":{
 			"columns":{
 				"plugin":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"플러그인명"
 				},
 				"version":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"현재버전"
 				},
 				"hash":{
 					"type":"char",
-					"length":32
+					"length":32,
+					"comment":"패키지 고유값"
 				},
 				"database":{
 					"type":"varchar",
 					"length":20,
-					"default":"default"
+					"default":"default",
+					"comment":"플러그인 데이터베이스 코드"
 				},
 				"db_size":{
 					"type":"bigint",
 					"length":15,
-					"default":0
+					"default":0,
+					"comment":"플러그인 데이터베이스 사용용량"
 				},
 				"is_admin":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"관리자패널 여부"
 				},
 				"is_active":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"TRUE"
+					"default":"TRUE",
+					"comment":"활성화 여부"
 				},
 				"configs":{
-					"type":"text"
+					"type":"text",
+					"comment":"플러그인설정"
 				},
 				"targets":{
-					"type":"text"
+					"type":"text",
+					"comment":"이벤트리스너설정"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
 				"plugin":"primary_key"
-			}
+			},
+			"comment":"아이모듈 플러그인관리 테이블"
 		},
 		"sitemap_table":{
 			"columns":{
 				"domain":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"도메인명"
 				},
 				"language":{
 					"type":"char",
-					"length":2
+					"length":2,
+					"comment":"언어셋"
 				},
 				"menu":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"메뉴코드"
 				},
 				"page":{
 					"type":"varchar",
 					"length":20,
-					"default":""
+					"default":"",
+					"comment":"페이지코드"
 				},
 				"title":{
 					"type":"varchar",
 					"length":100,
-					"default":""
+					"default":"",
+					"comment":"제목"
 				},
 				"icon":{
 					"type":"varchar",
 					"length":100,
-					"is_null":true
+					"is_null":true,
+					"comment":"아이콘"
 				},
 				"type":{
 					"type":"enum",
 					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','HTML','LINK','EMPTY'",
-					"default":"EMPTY"
+					"default":"EMPTY",
+					"comment":"종류"
 				},
 				"layout":{
 					"type":"varchar",
-					"length":20
+					"length":20,
+					"comment":"레이아웃명"
 				},
 				"description":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"페이지설명"
 				},
 				"image":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"대표이미지"
 				},
 				"header":{
 					"type":"longtext",
-					"is_null":true
+					"is_null":true,
+					"comment":"페이지 상단내용"
 				},
 				"footer":{
 					"type":"longtext",
-					"is_null":true
+					"is_null":true,
+					"comment":"페이지 하단내용"
 				},
 				"context":{
-					"type":"text"
+					"type":"text",
+					"comment":"컨텍스트 설정"
 				},
 				"is_footer":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"사이트하단메뉴 추가여부"
 				},
 				"is_hide":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"숨김메뉴여부"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
 				"domain,language,menu,page":"primary_key"
-			}
+			},
+			"comment":"아이모듈 사이트맵 관리 테이블"
 		},
 		"site_table":{
 			"columns":{
 				"domain":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"도메인명"
 				},
 				"language":{
 					"type":"char",
-					"length":2
+					"length":2,
+					"comment":"언어셋"
 				},
 				"title":{
 					"type":"varchar",
-					"length":100
+					"length":100,
+					"comment":"사이트명"
 				},
 				"alias":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"유사도메인"
 				},
 				"description":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"사이트설명"
 				},
 				"templet":{
 					"type":"varchar",
 					"length":20,
-					"default":"default"
+					"default":"default",
+					"comment":"템플릿명"
 				},
 				"templet_configs":{
 					"type":"text",
-					"is_null":true
+					"is_null":true,
+					"comment":"템플릿설정"
 				},
 				"image":{
 					"type":"int",
 					"length":11,
-					"default":-1
+					"default":-1,
+					"comment":"대표이미지"
 				},
 				"logo":{
 					"type":"varchar",
 					"length":150,
-					"default":"{\"default\":-1,\"footer\":-1}"
+					"default":"{\"default\":-1,\"footer\":-1}",
+					"comment":"로고이미지"
 				},
 				"emblem":{
 					"type":"int",
 					"length":11,
-					"default":-1
+					"default":-1,
+					"comment":"엠블럼이미지"
 				},
 				"favicon":{
 					"type":"int",
 					"length":11,
-					"default":-1
+					"default":-1,
+					"comment":"패비콘이미지"
 				},
 				"maskicon":{
 					"type":"varchar",
 					"length":50,
-					"default":"{\"icon\":-1,\"color\":\"#0578bf\"}"
+					"default":"{\"icon\":-1,\"color\":\"#0578bf\"}",
+					"comment":"마스크아이콘"
 				},
 				"member":{
 					"type":"enum",
 					"length":"'UNIQUE','UNIVERSAL'",
-					"default":"UNIVERSAL"
+					"default":"UNIVERSAL",
+					"comment":"회원관리방식"
 				},
 				"is_ssl":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"SSL접속여부"
 				},
 				"is_default":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
-					"default":"FALSE"
+					"default":"FALSE",
+					"comment":"기본언어사이트 여부"
 				},
 				"sort":{
 					"type":"int",
 					"length":11,
-					"default":0
+					"default":0,
+					"comment":"정렬"
 				}
 			},
 			"indexes":{
 				"domain,language":"primary_key"
-			}
+			},
+			"comment":"아이모듈 사이트 관리 테이블"
 		}
 	}
 }
