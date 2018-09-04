@@ -752,11 +752,11 @@ var iModule = {
 	 * @param string name 창이름
 	 */
 	openPopup:function(url,width,height,scroll,name) {
-		if (screen.width < width) width = screen.width - 50;
-		if (screen.height < height) height = screen.height - 50;
+		if (screen.availWidth < width) width = screen.availWidth - 50;
+		if (screen.availHeight < height) height = screen.availHeight - 50;
 		
-		var windowLeft = (screen.width - width) / 2;
-		var windowTop = (screen.height - height) / 2;
+		var windowLeft = (screen.availWidth - width) / 2;
+		var windowTop = (screen.availHeight - height) / 2;
 		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
 		var opener = window.open("", name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
 		
@@ -775,8 +775,8 @@ var iModule = {
 	 * @param string name 창이름
 	 */
 	resizePopup:function(popup,url,width,height) {
-		if (width > screen.width) width = screen.width;
-		if (height > screen.height) height = screen.height;
+		if (width > screen.availWidth) width = screen.availWidth;
+		if (height > screen.availHeight) height = screen.availHeight;
 		
 		var resizeWidth = width - $(popup.window).width();
 		var resizeHeight = height - $(popup.window).height();
@@ -796,8 +796,8 @@ var iModule = {
 		var resizeHeight = height === null ? 0 : height - $(window).height();
 		
 		if (center === true) {
-			var left = (screen.width - $(window).width() - resizeWidth) / 2;
-			var top = (screen.height - $(window).height() - resizeHeight) / 2;
+			var left = (screen.availWidth - $(window).width() - resizeWidth) / 2;
+			var top = (screen.availHeight - $(window).height() - resizeHeight) / 2;
 			
 			window.moveTo(left,top);
 		}
