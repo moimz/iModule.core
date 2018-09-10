@@ -1675,7 +1675,7 @@
 				if (result.error) {
 					iModule.modal.error(result.error,result.url ? result.url : null);
 				}
-				if (result.success == false && !result.errors) $$form.status("default");
+				if (result.success == false && !result.errors) $form.status("default");
 			},
 			error:function() {
 				/**
