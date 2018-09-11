@@ -127,12 +127,6 @@
 					"default":"FALSE",
 					"comment":"광역모듈 여부"
 				},
-				"is_article":{
-					"type":"enum",
-					"length":"'TRUE','FALSE'",
-					"default":"FALSE",
-					"comment":"게시물관리 여부"
-				},
 				"is_widget":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",

@@ -691,7 +691,6 @@ class Module {
 				'is_global'=>isset($package->global) == true && $package->global === true ? 'TRUE' : 'FALSE',
 				'is_admin'=>isset($package->admin) == true && $package->admin === true ? 'TRUE' : 'FALSE',
 				'is_context'=>isset($package->context) == true && $package->context === true ? 'TRUE' : 'FALSE',
-				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
 				'is_external'=>isset($package->external) == true && $package->external === true ? 'TRUE' : 'FALSE',
@@ -711,7 +710,6 @@ class Module {
 				'is_global'=>isset($package->global) == true && $package->global === true ? 'TRUE' : 'FALSE',
 				'is_admin'=>isset($package->admin) == true && $package->admin === true ? 'TRUE' : 'FALSE',
 				'is_context'=>isset($package->context) == true && $package->context === true ? 'TRUE' : 'FALSE',
-				'is_article'=>isset($package->article) == true && $package->article === true ? 'TRUE' : 'FALSE',
 				'is_widget'=>isset($package->widget) == true && $package->widget === true ? 'TRUE' : 'FALSE',
 				'is_templet'=>isset($package->templet) == true && $package->templet === true ? 'TRUE' : 'FALSE',
 				'is_external'=>isset($package->external) == true && $package->external === true ? 'TRUE' : 'FALSE',
@@ -784,13 +782,6 @@ class Module {
 	function loadLanguage($module) {
 		$package = $this->getPackage($module);
 		$this->IM->loadLanguage('module',$module,$package->language);
-	}
-	
-	function resetArticle() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_article','TRUE')->get();
-		for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-			$this->IM->getModule($modules[$i]->module)->resetArticle();
-		}
 	}
 }
 ?>
