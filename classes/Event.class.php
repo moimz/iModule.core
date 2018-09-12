@@ -175,10 +175,9 @@ class Event {
 		/**
 		 * 주소처리
 		 */
-		if ($event == 'afterGetUrl') {
+		if ($event == 'afterGetContextPage') {
 			$get = $caller;
-			unset($values->url);
-			$url = &$results;
+			$matches = &$results;
 		}
 		
 		/**
