@@ -452,7 +452,7 @@ div[data-role=context][data-type=html] > a.edit:hover {background:#1e88e5;}
 	 * 폼 테이블
 	 */
 	ul[data-role=form] > li {display:block;}
-	ul[data-role=form] > li > label {display:block; width:100%; height:auto; padding:10px 0px 0px 0px; background:transparent; line-height:1.6;}
+	ul[data-role=form] > li > label {display:block; width:100% !important; height:auto; padding:10px 0px 0px 0px; background:transparent; line-height:1.6;}
 	ul[data-role=form] > li > label:after {content:" :";}
 	ul[data-role=form] > li > div {display:block; padding:5px 0px; min-height:auto; line-height:1;}
 	ul[data-role=form] > li > label + div {padding-left:0px;}
