@@ -27,6 +27,8 @@ if (isset($headers['Authorization']) == true || isset($headers['authorization'])
 	$IM->getModule('member')->authorizationToken(isset($headers['Authorization']) == true ? $headers['Authorization'] : $headers['authorization']);
 }
 
+$site = $IM->getSite();
+
 $results = new stdClass();
 $_module = Request('_module');
 if ($_module != null && $IM->Module->isInstalled($_module) == true) {
