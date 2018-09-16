@@ -1650,19 +1650,13 @@ class iModule {
 	 */
 	function getView($baseUrl=null) {
 		if ($baseUrl != null) {
-			$baseUrl = explode('/',str_replace($this->getUrl(false),'',$baseUrl));
-			$baseView = count($baseUrl) > 3 ? $baseUrl[3] : null;
-			$baseIdx = count($baseUrl) > 4 ? implode('/',array_slice($baseUrl,4)) : null;
-		} else {
-			$baseView = $baseIdx = null;
+			$url = $this->getUrl(null,null,null,null);
+			$url = str_replace($baseUrl,'',$url);
+			$baseUrl = explode('/',$url);
+			return count($baseUrl) > 1 ? $baseUrl[1] : null;
 		}
 		
-		if ($baseView == null) return $this->view;
-		
-		$idx = $baseIdx == null ? $this->idx : str_replace($baseIdx,'',$this->idx);
-		$idx = $idx ? explode('/',$idx) : array();
-		
-		return count($idx) > 0 ? $idx[0] : null;
+		return $this->view;
 	}
 	
 	/**
@@ -1674,17 +1668,13 @@ class iModule {
 	 */
 	function getIdx($baseUrl=null) {
 		if ($baseUrl != null) {
-			$baseUrl = explode('/',str_replace($this->getUrl(false),'',$baseUrl));
-			$baseView = count($baseUrl) > 3 ? $baseUrl[3] : null;
-			$baseIdx = count($baseUrl) > 4 ? implode('/',array_slice($baseUrl,4)) : null;
-		} else {
-			$baseView = $baseIdx = null;
+			$url = $this->getUrl(null,null,null,null);
+			$url = str_replace($baseUrl,'',$url);
+			$baseUrl = explode('/',$url);
+			return count($baseUrl) > 2 ? implode('/',array_slice($baseUrl,2)) : null;
 		}
 		
-		if ($baseUrl == null || $baseView == null) return $this->idx;
-		$idx = $baseIdx == null ? explode('/',$this->idx) : explode('/',str_replace($baseIdx,'',$this->idx));
-		
-		return count($idx) > 1 ? implode('/',array_splice($idx,1)) : null;
+		return $this->idx;
 	}
 	
 	/**
