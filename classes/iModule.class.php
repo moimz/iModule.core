@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 8. 27.
+ * @modified 2018. 9. 17.
  */
 class iModule {
 	/**
@@ -796,8 +796,26 @@ class iModule {
 		if (count($matches) == 0) return null;
 		
 		/**
-		 * 설정과 일치하는 페이지가 유일할 경우 해당 페이지를 반환한다.
+		 * 반드시 일치해야하는 설정값을 가진 페이지를 탐색한다.
 		 */
+		$filters = array();
+		foreach ($matches as $match) {
+			$is_matched = true;
+			foreach ($exacts as $key=>$value) {
+				if (isset($match->context->configs->$key) == false || $match->context->configs->$key != $value) {
+					$is_matched = false;
+					break;
+				}
+			}
+			
+			if ($is_matched == true) $filters[] = $match;
+		}
+		$matches = $filters;
+		
+		/**
+		 * 일치하는 페이지가 없을 경우 NULL 을 반환하고, 설정과 일치하는 페이지가 유일할 경우 해당 페이지를 반환한다.
+		 */
+		if (count($matches) == 0) return null;
 		if (count($matches) == 1) return $this->getUrl(false,false,false,false,false,$matches[0]->domain,$matches[0]->language).'/'.$matches[0]->url;
 		
 		/**
@@ -837,7 +855,7 @@ class iModule {
 			 */
 			$match->matchCount = 0;
 			foreach ($options as $key=>$value) {
-				if ($match->context->configs->$key == $value) $match->matchCount++;
+				if (isset($match->context->configs->$key) == true && $match->context->configs->$key == $value) $match->matchCount++;
 			}
 			
 			if ($page == null || $page->matchCount < $match->matchCount) $page = $match;
