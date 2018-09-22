@@ -173,6 +173,16 @@ class Event {
 		}
 		
 		/**
+		 * 문자열파싱처리
+		 */
+		if ($event == 'afterParseString') {
+			$code = $caller;
+			$string = &$values;
+
+			unset($caller);
+		}
+		
+		/**
 		 * 주소처리
 		 */
 		if ($event == 'afterGetContextPage') {

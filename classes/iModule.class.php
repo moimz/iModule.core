@@ -2526,7 +2526,6 @@ class iModule {
 		$member = $this->getModule('member')->getMember();
 		if ($member->type == 'ADMINISTRATOR') return true;
 		
-		// replace code
 		if ($member->idx == 0) {
 			$permissionString = str_replace('{$member.level}','0',$permissionString);
 			$permissionString = str_replace('{$member.type}',"'GUEST'",$permissionString);
@@ -2534,8 +2533,8 @@ class iModule {
 			$permissionString = str_replace('{$member.label}',"''",$permissionString);
 		} else {
 			$permissionString = str_replace('{$member.level}',$member->level->level,$permissionString);
-			$permissionString = str_replace('{$member.type}',$member->type,$permissionString);
-			$permissionString = str_replace('{$member.email}',$member->email,$permissionString);
+			$permissionString = str_replace('{$member.type}',"'".$member->type."'",$permissionString);
+			$permissionString = str_replace('{$member.email}',"'".$member->email."'",$permissionString);
 			
 			if (preg_match_all('/\{\$member\.label\}(.*?)(==|!=)(.*?)\'(.*?)\'/',$permissionString,$match,PREG_SET_ORDER) == true) {
 				for ($i=0, $loop=count($match);$i<$loop;$i++) {
@@ -2545,18 +2544,13 @@ class iModule {
 			}
 		}
 		
+		/**
+		 * 이벤트를 발생시켜 권한코드의 변수를 타 모듈에서 치환할 수 있도록 한다.
+		 */
+		$this->fireEvent('afterParseString','core','permission',$permissionString);
+		
 		if (@eval('return '.$permissionString.';') == true) return true;
 		else return false;
-	}
-	
-	/**
-	 * 웹브라우져의 캐싱기능을 막는다.
-	 */
-	function preventCache() {
-		header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
-		header('Cache-Control: no-store, no-cache, must-revalidate');
-		header('Cache-Control: post-check=0, pre-check=0', FALSE);
-		header('Pragma: no-cache');
 	}
 	
 	/**
@@ -2567,32 +2561,51 @@ class iModule {
 	 * @return boolean/string $success or $errorString
 	 */
 	function checkPermissionString($permissionString) {
-		// replace code
 		$permissionString = str_replace('{$member.level}',"0",$permissionString);
 		$permissionString = str_replace('{$member.type}',"'MEMBER'",$permissionString);
 		$permissionString = str_replace('{$member.label}',"'default'",$permissionString);
 		$permissionString = str_replace('{$member.email}',"'email@email.com'",$permissionString);
 		
-		// check unknown code
+		/**
+		 * 이벤트를 발생시켜 권한코드의 변수를 타 모듈에서 치환할 수 있도록 한다.
+		 */
+		$this->fireEvent('afterParseString','core','permission',$permissionString);
+		
+		/**
+		 * 치환되지 않은 변수가 있는지 확인한다.
+		 */
 		if (preg_match('/\{(.*?)\}/',$permissionString,$match) == true) {
 			return str_replace('{code}',$match[0],$this->getErrorText('UNKNWON_CODE_IN_PERMISSION_STRING',$match[0]));
 		}
 		
-		// check doubleQuotation
+		/**
+		 * " 가 있는지 확인한다.
+		 */
 		if (preg_match('/"/',$permissionString) == true) {
 			return $this->getErrorText('NOT_ALLOWED_DOUBLE_QUOTATION_IN_PERMISSION_STRING');
 		}
 		
-		// eval check
+		/**
+		 * 실제로 eval 함수를 동작시켜 결과값에 문제가 없는지 확인한다.
+		 */
 		ob_start();
 		$check = eval("return {$permissionString};");
-		$content = ob_get_contents();
-		ob_end_clean();
+		$content = ob_get_clean();
 		
 		if ($content) return $this->getErrorText('PERMISSION_STRING_PARSING_FAILED');
 		if (is_bool($check) == false) return $this->getText('NOT_BOOLEAN_PERMISSION_STRING_RESULT');
 		
 		return true;
+	}
+	
+	/**
+	 * 웹브라우져의 캐싱기능을 막는다.
+	 */
+	function preventCache() {
+		header('Expires: Sun, 01 Jan 2014 00:00:00 GMT');
+		header('Cache-Control: no-store, no-cache, must-revalidate');
+		header('Cache-Control: post-check=0, pre-check=0', FALSE);
+		header('Pragma: no-cache');
 	}
 	
 	/**
