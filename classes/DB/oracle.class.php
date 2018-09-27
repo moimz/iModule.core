@@ -7,12 +7,14 @@
  * @file oracle.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.1.0
+ * @version 1.2.0
  * @modified 2018. 7. 28.
  * @todo SELECT 관련된 쿼리 이외 다른부분은 아직 작업되지 않음
  */
 class oracle {
 	private $db;
+	
+	private $_class = null;
 	private $_oci;
 	private $_prefix;
 	private $_query;
@@ -25,16 +27,16 @@ class oracle {
 	private $_bindParams = array('');
 	private $_tableDatas = array();
 	private $_stmtError;
-	private $isSubQuery = false;
 	public $count = 0;
 
-	public function __construct($db=null,$isSubQuery=false) {
+	public function __construct($db=null,$class=null) {
 		if ($db !== null) {
 			$this->db = $db;
 			if (isset($this->db->port) == false) $this->db->port = 1521;
 			if (isset($this->db->charset) == false) $this->db->charset = 'AL32UTF8';
-			$this->isSubQuery = $isSubQuery;
 		}
+		
+		$this->_class = $class;
 	}
 	
 	function connect($oci=null) {
@@ -44,6 +46,14 @@ class oracle {
 			$this->_oci = oci_connect($this->db->username,$this->db->password,isset($this->db->sid) == true ? $this->db->sid : $this->db->host.':'.$this->db->port.'/'.$this->db->database,$this->db->charset) or $this->error('There was a problem connecting to the database');
 		}
 		
+		return $this->_oci;
+	}
+	
+	public function db() {
+		return $this->db;
+	}
+	
+	public function oci() {
 		return $this->_oci;
 	}
 	
@@ -58,8 +68,14 @@ class oracle {
 		return $this;
 	}
 	
+	function getTable($table) {
+		return $this->_prefix.$table;
+	}
+	
 	function error($msg,$query='') {
-		die($msg.'<br>'.$query);
+		$this->reset();
+		if ($this->_class == null) die('DATABASE_ERROR : '.$msg.'<br>'.$query);
+		else $this->_class->printError($msg,$query);
 	}
 	
 	private function reset() {
@@ -300,7 +316,6 @@ class oracle {
 	
 	public function get() {
 		$stmt = $this->_buildQuery();
-		if ($this->isSubQuery == true) return $this;
 		
 		oci_execute($stmt);
 		
@@ -324,8 +339,6 @@ class oracle {
 	}
 	
 	public function insert($table,$data) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'INSERT into '.$this->_prefix.$table;
 		$this->_tableDatas = $data;
 		
@@ -333,8 +346,6 @@ class oracle {
 	}
 	
 	public function update($table,$data) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'UPDATE '.$this->_prefix.$table.' SET ';
 		$this->_tableDatas = $data;
 		
@@ -342,16 +353,12 @@ class oracle {
 	}
 	
 	public function delete($table) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'DELETE FROM '.$this->_prefix.$table;
 		
 		return $this;
 	}
 	
 	public function truncate($table) {
-		if ($this->isSubQuery == true) return;
-		
 		$this->_query = 'TRUNCATE TABLE '.$this->_prefix.$table;
 		
 		return $this;
@@ -454,13 +461,9 @@ class oracle {
 	}
 	
 	private function _buildPair($operator,$value) {
-		if (is_object($value) == false) {
-			$this->_bindParam($value);
-			return ' '.$operator.' ? ';
-		}
-		$subQuery = $value->getSubQuery();
-		$this->_bindParams($subQuery['params']);
-		return ' '.$operator.' ('.$subQuery['query'].') '.$subQuery['alias'];
+		if (is_object($value) == true) return $this->error('OBJECT_PAIR');
+		$this->_bindParam($value);
+		return ' '.$operator.' ? ';
 	}
 	
 	private function _buildQuery() {
@@ -472,8 +475,6 @@ class oracle {
 		$this->_buildLimit();
 		$this->_lastQuery = $this->replacePlaceHolders($this->_query,$this->_bindParams);
 		
-		if ($this->isSubQuery == true) return;
-
 		if (count($this->_bindParams) > 1) {
 			$this->_query = $this->replaceQuery($this->_query);
 			$stmt = $this->_prepareQuery();
@@ -726,15 +727,6 @@ class oracle {
 		return trim($this->_stmtError.' '.$this->_oci->error);
 	}
 	
-	public function getSubQuery() {
-		if (!$this->isSubQuery) return null;
-		
-		array_shift($this->_bindParams);
-		$val = array('query'=>$this->_query,'params'=>$this->_bindParams,'alias'=>$this->host);
-		$this->reset();
-		return $val;
-	}
-	
 	public function interval($diff,$func='NOW()') {
 		$types = array('s'=>'second','m'=>'minute','h'=>'hour','d'=>'day','M'=>'month','Y'=>'year');
 		$incr = '+';
@@ -802,11 +794,6 @@ class oracle {
 	public function _transaction_status_check() {
 		if (!$this->_transaction_in_progress) return;
 		$this->rollback();
-	}
-	
-	public function __destruct() {
-		if ($this->isSubQuery == false) return;
-		if ($this->_oci) $this->_oci->close();
 	}
 }
 ?>

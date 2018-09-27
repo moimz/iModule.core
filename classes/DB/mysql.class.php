@@ -30,9 +30,7 @@ class mysql {
 	private $_bindParams = array('');
 	private $_tableDatas = array();
 	private $_stmtError;
-	
 	private $_tableLockMethod = 'READ';
-	
 	public $count = 0;
 
 	public function __construct($db=null,$class=null) {
@@ -552,10 +550,9 @@ class mysql {
 	}
 	
 	private function _buildPair($operator,$value) {
-		if (is_object($value) == false) {
-			$this->_bindParam($value);
-			return ' '.$operator.' ? ';
-		}
+		if (is_object($value) == true) return $this->error('OBJECT_PAIR');
+		$this->_bindParam($value);
+		return ' '.$operator.' ? ';
 	}
 	
 	private function _buildQuery() {
