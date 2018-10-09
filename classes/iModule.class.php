@@ -538,10 +538,29 @@ class iModule {
 	 *
 	 * @param string $module(옵션) 모듈이름 (/modules 내부의 해당모듈의 폴더명)
 	 * @param boolean $isForceLoad(옵션) 설치가 되지 않은 모듈이라도 강제로 모듈클래스를 호출할지 여부
+	 * @param boolean $isClone(옵션) 메모리상에 있는 모듈클래스가 아닌 새로운 모듈클래스를 호출할지 여부
 	 * @return object $module 모듈클래스
 	 */
-	function getModule($module=null,$isForceLoad=false) {
+	function getModule($module=null,$isForceLoad=false,$isClone=false) {
 		if ($module == null) return $this->Module;
+		
+		/**
+		 * 항상 새로운 모듈 클래스를 반환할 경우
+		 */
+		if ($isClone == true) {
+			/**
+			 * 모듈코어 클래스를 새로 선언하고, 모듈코어 클래스에서 모듈 클래스를 불러온다.
+			 */
+			$class = new Module($this);
+			$mModule = $class->load($module,$isForceLoad);
+			
+			/**
+			 * 모듈클래스를 호출하지 못했을 경우, 에러메세지를 출력한다.
+			 */
+			if ($mModule === false) $this->printError('LOAD_MODULE_FAIL : '.$module);
+			
+			return $mModule;
+		}
 		
 		/**
 		 * 선언되어 있는 해당 모듈 클래스가 없을 경우, 새로 선언한다.
@@ -1653,6 +1672,7 @@ class iModule {
 			$url = $this->getUrl(null,null,null,null);
 			$url = str_replace($baseUrl,'',$url);
 			$baseUrl = explode('/',$url);
+			
 			return count($baseUrl) > 1 ? $baseUrl[1] : null;
 		}
 		
