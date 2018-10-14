@@ -70,6 +70,12 @@ body.disabled.mobile > div[data-role=disabled] > div[data-role=box] {padding:5px
 
 
 /**
+ * 박스
+ */
+div[data-role=box] {padding:10px; line-height:1.6; font-size:14px; border:1px solid transparent; color:#222;}
+div[data-role=box].yellow {background:#FFF8E1; border-color:#FFECB3;}
+
+/**
  * 모달창
  */
 div[data-role=modal] {display:block; width:95%; max-width:500px; background:#fff; box-shadow:0px 1px 70px rgba(0,0,0,0.5); margin:0px auto;}
