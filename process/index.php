@@ -50,7 +50,7 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 	header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 	header('Cache-Control:post-check=0, pre-check=0', false);
 	header('Pragma:no-cache');
-	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
+	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 } else {
 	if ($_module != null) {
 		$results = $IM->getModule($_module,true)->doProcess($_action);
@@ -60,7 +60,7 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 			header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 			header('Cache-Control:post-check=0, pre-check=0', false);
 			header('Pragma:no-cache');
-			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT));
+			exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 		}
 	}
 }

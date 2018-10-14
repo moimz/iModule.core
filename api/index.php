@@ -62,5 +62,5 @@ if ($_module != null && $IM->Module->isInstalled($_module) == true) {
 }
 
 header("Content-type: text/json; charset=utf-8",true);
-exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+exit(json_encode($results,JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 ?>
