@@ -54,9 +54,9 @@ body > div[data-role=alert] .progress span {display:block; width:100%; height:10
 body.disabled {overflow:hidden;}
 body.disabled > div[data-role=wrapper] {filter:blur(5px);}
 body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); color:#fff; font-size:50px;}
-body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch;}
+body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch; padding:0;}
 body.disabled > div[data-role=disabled].loading {display:table;}
-body.disabled > div[data-role=disabled].loading > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:20px;}
+body.disabled > div[data-role=disabled].loading > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:20px; padding:0;}
 /*
 
 body.disabled > div[data-role=disabled].modal {display:table;}
@@ -81,7 +81,7 @@ div[data-role=box].yellow {background:#FFF8E1; border-color:#FFECB3;}
 div[data-role=modal] {display:block; width:95%; max-width:500px; background:#fff; box-shadow:0px 1px 70px rgba(0,0,0,0.5); margin:0px auto;}
 div[data-role=modal] > form {margin:0; padding:0;}
 div[data-role=modal] > form > header {height:80px; padding:0; margin:0; position:relative; text-align:left; background:transparent; display:block; box-shadow:none;}
-div[data-role=modal] > form > header > h1 {font-size:18px; display:block; height:80px; line-height:80px; padding:0px 20px; color:#333;}
+div[data-role=modal] > form > header > h1 {font-size:18px; display:block; width:100%; height:80px; line-height:80px; padding:0px 60px 0px 20px; color:#333; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
 div[data-role=modal] > form > header > button {position:absolute; top:20px; right:10px; width:40px; height:40px; font-size:20px; background:transparent; border:0px; cursor:pointer; color:#666;}
 div[data-role=modal] > form > header > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
 div[data-role=modal] > form > header > button:hover {color:#333;}
