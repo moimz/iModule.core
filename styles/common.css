@@ -11,7 +11,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 24.
+ * @modified 2018. 10. 22.
  */
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#222;}
@@ -443,7 +443,7 @@ div[data-role=wysiwyg-content] .fr-file > i.size {display:inline-block; padding-
 div[data-role=wysiwyg-content] table {border-collapse:collapse; margin:10px 0px;}
 div[data-role=wysiwyg-content] table td {border:1px solid #ddd; padding:5px;}
 
-div[data-role=wysiwyg-content] img {max-width:100%;}
+div[data-role=wysiwyg-content] img {max-width:100%; height:auto;}
 div[data-role=wysiwyg-content] ul:not([data-role]) {list-style-position:outside; list-style-type:disc; margin-left:25px;}
 div[data-role=wysiwyg-content] ol:not([data-role]) {list-style-position:outside; margin-left:25px;}
 
