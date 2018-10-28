@@ -775,13 +775,15 @@ var iModule = {
 	 * @param string name 창이름
 	 */
 	resizePopup:function(popup,url,width,height) {
-		if (width > screen.availWidth) width = screen.availWidth;
-		if (height > screen.availHeight) height = screen.availHeight;
-		
-		var resizeWidth = width - $(popup.window).width();
-		var resizeHeight = height - $(popup.window).height();
-		
-		popup.window.resizeBy(resizeWidth,resizeHeight);
+		try {
+			if (width > screen.availWidth) width = screen.availWidth;
+			if (height > screen.availHeight) height = screen.availHeight;
+			
+			var resizeWidth = width - $(popup.window).width();
+			var resizeHeight = height - $(popup.window).height();
+			
+			popup.window.resizeBy(resizeWidth,resizeHeight);
+		} catch(e) {}
 		
 		popup.location.replace(url);
 	},
