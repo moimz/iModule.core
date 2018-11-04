@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 18.
+ * @modified 2018. 11. 4.
  */
 class Event {
 	/**
@@ -89,7 +89,7 @@ class Event {
 			}
 		}
 		
-		if ($caller == null || empty($this->listeners[$target][$event][$caller]) == true) return true;
+		if ($caller == null || is_string($caller) == false || isset($this->listeners[$target][$event][$caller]) == false) return true;
 		
 		for ($i=0, $loop=count($this->listeners[$target][$event][$caller]);$i<$loop;$i++) {
 			if ($caller == '*') continue;
