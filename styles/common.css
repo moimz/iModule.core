@@ -148,11 +148,11 @@ div[data-role=input][data-type=button] > button {white-space:nowrap; height:40px
 div[data-role=input][data-type=button] > button.icon {padding:0px;}
 div[data-role=input][data-type=button] > button.icon > i {display:inline-block; width:40px; height:40px; line-height:38px; vertical-align:top; text-align:center; font-size:16px; margin-top:0px;}
 div[data-role=input][data-type=button] > button.icon > span {display:inline-block; padding-right:15px; height:38px; line-height:38px;}
-div[data-role=input][data-type=button] > button:hover {background:#828595; color:#fff;}
+div[data-role=input][data-type=button] > button:not([disabled]):hover {background:#828595; color:#fff;}
 div[data-role=input][data-type=button] > button.submit {background:#2196f3; color:#fff;}
-div[data-role=input][data-type=button] > button.submit:hover {background:#1e88e5;}
+div[data-role=input][data-type=button] > button.submit:not([disabled]):hover {background:#1e88e5;}
 div[data-role=input][data-type=button] > button.danger {background:#f44336; color:#fff;}
-div[data-role=input][data-type=button] > button.danger:hover {background:#e53935;}
+div[data-role=input][data-type=button] > button.danger:not([disabled]):hover {background:#e53935;}
 
 div[data-role=input][data-type=select] > button {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; line-height:1; cursor:pointer; color:#666;}
 div[data-role=input][data-type=select] > button > span {display:inline-block; width:calc(100% - 30px); height:38px; line-height:38px; vertical-align:middle; text-align:left; box-sizing:border-box; padding:0px 10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
@@ -260,17 +260,15 @@ div[data-role=wysiwyg] .fr-view table {border-color:#000;}
  */
 div[data-role=button] {font-size:0; text-align:center; padding-left:5px;}
 div[data-role=button] > button, div[data-role=button] > a {display:inline-block; height:40px; line-height:38px; padding:0px 15px; box-sizing:border-box; border:1px solid rgba(0,0,0,0.1); color:#222; background:#fff; vertical-align:middle; margin-right:5px; text-decoration:none; cursor:pointer; font-size:1rem;}
-div[data-role=button] > button:hover, div[data-role=button] > a:hover {background:#f4f4f4;}
+div[data-role=button] > button:not([disabled]):hover, div[data-role=button] > a:hover {background:#f4f4f4;}
 div[data-role=button] > button[disabled] {background:#f4f4f4; color:#222; opacity:0.5; cursor:not-allowed;}
 div[data-role=button] > button[type=submit], div[data-role=button] > .submit {background:#2196f3; color:#fff;}
-div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:hover {background:#1e88e5; color:#fff;}
-div[data-role=button] > button[type=submit][disabled], div[data-role=button] > .submit[disabled] {background:#1e88e5; color:#fff;}
+div[data-role=button] > button[type=submit]:hover, div[data-role=button] > .submit:not([disabled]):hover {background:#1e88e5; color:#fff;}
 div[data-role=button] > button:focus, div[data-role=button] > a:focus {border-color:rgba(0,0,0,0.5);}
 div[data-role=button] > button > i, div[data-role=button] > a > i {float:left; width:30px; height:30px; text-align:center; margin:4px 0px 4px -10px; padding:0; line-height:30px; vertical-align:middle;}
 div[data-role=button] > button > i.mi-loading.icon {float:none; width:auto; height:auto; margin:0;}
 div[data-role=button] > .danger {background:#f44336; color:#fff;}
-div[data-role=button] > .danger:hover {background:#e53935; color:#fff;}
-div[data-role=button] > .danger[disabled] {background:#f44336; color:#fff;}
+div[data-role=button] > .danger:not([disabled]):hover {background:#e53935; color:#fff;}
 
 div[data-role=input] + div[data-role=button], div[data-role=inputset] + div[data-role=button] {margin-top:5px;}
 ul[data-role=table] + div[data-role=button] {margin-top:20px;}
