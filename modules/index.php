@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 9. 4.
+ * @modified 2018. 11. 9.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 

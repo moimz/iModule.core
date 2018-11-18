@@ -1134,7 +1134,6 @@ class iModule {
 		$this->site = clone $current;
 		
 		$this->site->logo = json_decode($this->site->logo);
-		$this->site->maskicon = json_decode($this->site->maskicon);
 		$this->site->description = $this->site->description ? $this->site->description : null;
 		
 		return $this->site;
@@ -1326,38 +1325,6 @@ class iModule {
 		if ($this->site->emblem == 0) return null;
 		
 		return ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->favicon.'/favicon.ico';
-	}
-	
-	/**
-	 * 사이트의 mask 아이콘을 가져온다.
-	 * mask 아이콘은 safari 웹브라우져의 고정탭 아이콘으로 사용되는 svg 이미지 파일이며, svg 이미지파일 경로 및 이미지파일 색상을 반환한다.
-	 * 사이트 mask 아이콘이 지정되지 않은 경우 iModule 의 기본 mask 아이콘을 반환하고, 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
-	 *
-	 * @param boolean $isFullUrl true : 도메인을 포함한 전체 URL / false : 도메인을 포함하지 않은 URL(기본)
-	 * @return object $maskIcon mask 아이콘 설정 {url:mask 아이콘 url, color : mask 아이콘 색상}
-	 */
-	function getSiteMaskIcon($isFullUrl=false) {
-		/**
-		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
-		 */
-		if ($this->site == null) return null;
-		
-		$maskIcon = new stdClass();
-		
-		/**
-		 * mask 아이콘설정이 없는 경우 iModule 의 기본 mask 아이콘을 사용한다.
-		 */
-		if ($this->site->maskicon->icon == -1) $maskIcon->url = ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/images/logo/maskicon.svg';
-		
-		/**
-		 * mask 아이콘을 사용하지 않는다고 설정한 경우 NULL 을 반환한다.
-		 */
-		elseif ($this->site->maskicon->icon == 0) return null;
-		else $maskIcon->url = ($isFullUrl == true ? $this->getHost(true) : __IM_DIR__).'/attachment/view/'.$this->site->maskicon->icon.'/maskicon.svg';
-		
-		$maskIcon->color = $this->site->maskicon->color;
-		
-		return $maskIcon;
 	}
 	
 	/**
@@ -2281,13 +2248,6 @@ class iModule {
 		 */
 		if ($this->getSiteFavicon() !== null) {
 			$this->addHeadResource('link',array('rel'=>'shortcut icon','type'=>'image/x-icon','href'=>$this->getSiteFavicon(true)));
-		}
-		
-		/**
-		 * Safari 브라우저를 위한 Mask아이콘 태그를 정의한다.
-		 */
-		if ($this->getSiteMaskIcon() !== null) {
-			$this->addHeadResource('link',array('rel'=>'mask-icon','href'=>$this->getSiteMaskIcon()->url,'color'=>$this->getSiteMaskIcon()->color));
 		}
 		
 		/**

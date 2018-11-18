@@ -395,12 +395,6 @@
 					"default":-1,
 					"comment":"패비콘이미지"
 				},
-				"maskicon":{
-					"type":"varchar",
-					"length":50,
-					"default":"{\"icon\":-1,\"color\":\"#0578bf\"}",
-					"comment":"마스크아이콘"
-				},
 				"member":{
 					"type":"enum",
 					"length":"'UNIQUE','UNIVERSAL'",
