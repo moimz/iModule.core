@@ -19,6 +19,11 @@ var iModule = {
 		var $container = container ? $(document) : container;
 		
 		/**
+		 * 툴틉 객체 초기화
+		 */
+		$("*[data-tooltip]",$container).inits();
+		
+		/**
 		 * input 객체 초기화
 		 */
 		$("div[data-role=input]",$container).inits();
@@ -26,12 +31,12 @@ var iModule = {
 		/**
 		 * 태그입력기 객체 초기화
 		 */
-		$("div[data-role=tags]").inits();
+		$("div[data-role=tags]",$container).inits();
 		 
 		/**
 		 * form 상태 초기화
 		 */
-		$("form").status("default");
+		$("form",$container).status("default");
 		
 		/**
 		 * tab 객체 초기화
@@ -375,6 +380,39 @@ var iModule = {
 			$box.append($("<i>").addClass("mi mi-loading"));
 		} else {
 			$disabled.removeClass("loading");
+		}
+	},
+	/**
+	 * 툴팁관련
+	 */
+	tooltip:{
+		show:function($object,html,width) {
+			iModule.tooltip.hide();
+			
+			var $tooltip = $("<div>").attr("data-role","tooltip");
+			var html = html ? html : $object.attr("data-tooltip");
+			var maxWidth = width ? width : $object.attr("data-tooltip-width");
+			
+			if (maxWidth) {
+				$tooltip.css("maxWidth",maxWidth+"px");
+			}
+			$tooltip.css("opacity",0).append($("<div>").html(html));
+			$("div[data-role=wrapper]").append($tooltip);
+			
+			if ($(window).height() > $object.offset().top + $object.outerHeight() + $tooltip.outerHeight() + 10) {
+				$tooltip.addClass("top").css("top",$object.offset().top + $object.outerHeight());
+			} else {
+				$tooltip.addClass("bottom").css("top",$object.offset().top - $tooltip.outerHeight());
+			}
+			$tooltip.css("left",$object.offset().left).css("opacity",1);
+		},
+		hide:function(timer) {
+			if (timer) {
+				setTimeout(iModule.tooltip.hide,timer * 1000);
+				return;
+			}
+			
+			$("div[data-role=wrapper] > div[data-role=tooltip]").remove();
 		}
 	},
 	/**

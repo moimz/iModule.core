@@ -78,6 +78,24 @@
 		is_reset = is_reset == true && this.data("isInit") === true;
 		
 		/**
+		 * 객체가 툴팁을 사용할 경우
+		 */
+		if (this.attr("data-tooltip") !== undefined) {
+			if (this.attr("data-tooltip-type") == "click") {
+				this.on("click",function(e) {
+					iModule.tooltip.show($(this));
+					e.stopPropagation();
+				});
+			} else {
+				this.hover(function() {
+					iModule.tooltip.show($(this));
+				},function() {
+					iModule.tooltip.hide(2);
+				});
+			}
+		}
+		
+		/**
 		 * 객체가 form 일 경우, submit 함수를 받아 form 을 초기화한다.
 		 */
 		if (this.is("form") == true) {
@@ -1797,7 +1815,8 @@
 				if (status == "loading") {
 					if (is_indicator == true) {
 						if ($(this).data("defaultHtml") === undefined) $(this).data("defaultHtml",$(this).html());
-						$(this).html('<i class="mi mi-loading"></i>');
+						$(this).outerWidth($(this).outerWidth());
+						$(this).html('<i class="icon mi mi-loading"></i>');
 					}
 					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
 					$(this).disable();
@@ -2134,6 +2153,7 @@
 		$(document).on("click",function(e) {
 			$("div[data-role=input]").removeClass("extend");
 			$("div[data-role=picker]").remove();
+			iModule.tooltip.hide();
 		});
 		
 		$(window).on("resize",function() {
