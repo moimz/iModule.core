@@ -1074,6 +1074,8 @@ class Templet {
 		INCLUDE __IM_PATH__.$file;
 		$html = ob_get_clean();
 		
+		$html = $header.$html.$footer;
+		
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
