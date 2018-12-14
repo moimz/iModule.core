@@ -854,6 +854,10 @@ class Templet {
 		 */
 		$IM = $this->IM;
 		
+		if ($this->callerType == 'iModule' && strpos($this->getName(),'#') === 0) {
+			$me = $this->IM->getModule(explode('.',substr($this->getName(),1))[0]);
+		}
+		
 		if ($this->callerType == 'Module') {
 			$Module = $this->caller;
 			$me = $this->caller->getClass();
