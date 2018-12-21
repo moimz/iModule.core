@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 사이트에 영향을 받지 않고 모듈의 외부컨테이너를 호출한다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 11. 9.
+ * @modified 2018. 12. 21.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
