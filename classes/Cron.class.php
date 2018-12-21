@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * iModule 에서 주기적으로 처리해야하는 데이터를 crontab 으로 실행한다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 18.
+ * @modified 2018. 12. 21.
  */
 class Cron {
 	/**

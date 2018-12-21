@@ -1,14 +1,14 @@
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 반응형 웹페이지를 만들기 위한 요소로 Bootstrap v2.0 규약을 따른다.
  * 
  * @file /styles/responsive.css
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160906
+ * @version 3.0.0
+ * @modified 2018. 12. 21.
  */
-
 .container {padding-right:10px; padding-left:10px; margin-right:auto; margin-left:auto;}
 .container-fluid {padding-right:10px; padding-left:10px; margin:0 auto; max-width:1100px;}
 .container:before, .container:after {clear:both; content:" "; display:block;}

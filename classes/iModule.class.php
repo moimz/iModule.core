@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 9. 17.
+ * @modified 2018. 12. 21.
  */
 class iModule {
 	/**

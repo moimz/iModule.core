@@ -278,6 +278,9 @@ class Event {
 			unset($values);
 		}
 		
+		/**
+		 * 모듈에 포함된 컨텍스트 목록을 불러올 때
+		 */
 		if ($event == 'afterGetContextList') {
 			$action = $caller;
 			$site = $values;
@@ -285,6 +288,9 @@ class Event {
 			unset($values);
 		}
 		
+		/**
+		 * 모듈에 포함된 컨텍스트의 설정항목을 불러올 때
+		 */
 		if ($event == 'afterGetContextConfigs') {
 			$context = $caller;
 			$site = $values;
@@ -294,17 +300,26 @@ class Event {
 			unset($results);
 		}
 		
+		/**
+		 * API 가 호출될 때
+		 */
 		if ($event == 'beforeGetApi' || $event == 'afterGetApi') {
 			$api = $caller;
 			$data = $results;
 			unset($caller,$results);
 		}
 		
+		/**
+		 * 관리자 패널을 가져올 때
+		 */
 		if ($event == 'afterGetAdminPanel') {
 			unset($values,$results,$caller);
 			$panel = &$context;
 		}
 		
+		/**
+		 * 권한을 확인할 때
+		 */
 		if ($event == 'checkPermission' || $event == 'checkProcessPermission') {
 			$action = $values;
 			$permission = &$results;

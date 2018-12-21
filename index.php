@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 사이트 최초 접속시 실행되는 파일로 기본설정을 불러오고 iModule core 클래스를 선언하여 사이트 레이아웃을 불러온다.
  * 사이트 메뉴는 .htaccess 에 의해 설정된 방식인 domain.com/[언어]/[menu]/[view]/[idx] 형태의 주소로 동작한다.
@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 4. 20.
+ * @modified 2018. 12. 21.
  */
 define('__IM_SITE__',true);
 

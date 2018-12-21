@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 템플릿 클래스로 iModule 의 모든 템플릿을 처리한다.
  * 이 클래스는 각 템플릿 파일에서 $Templet 변수로 접근할 수 있다.
@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 8. 23.
+ * @modified 2018. 12. 21.
  */
 class Templet {
 	/**

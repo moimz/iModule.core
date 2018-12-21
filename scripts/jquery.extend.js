@@ -1,5 +1,5 @@
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * jQuery 의 기능을 확장하기 위한 클래스로 iModule 전반에 걸쳐 사용된다.
  * 기본적인 객체에 대한 초기화 및 UI 이벤트에 대한 부분을 처리한다.
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 3. 20.
+ * @modified 2018. 12. 21.
  */
 (function($) {
 	$.propHooks.disabled = {

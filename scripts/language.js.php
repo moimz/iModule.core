@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 자바스크립트내에서 언어셋을 사용하기 위한 함수를 정의한다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 5. 27.
+ * @modified 2018. 12. 21.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',__DIR__).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');

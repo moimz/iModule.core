@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * iModule 에서 사용되는 기본 상수를 정의하고, 환경설정을 불러온다.
  * index.php 파일에서 기본적으로 불러온다.
@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 5. 11.
+ * @modified 2018. 12. 21.
  */
 
 /**

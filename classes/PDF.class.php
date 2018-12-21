@@ -1,13 +1,14 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * TCPDF 라이브러리를 확장하여 PDF 파일을 생성한다.
  * 
  * @file /classes/PDF.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160905
+ * @version 3.0.0
+ * @modified 2018. 12. 21.
  */
 
 global $IM;

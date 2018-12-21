@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 모듈에서 작업을 처리하기 위해 모든 작업요청을 받는다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 5. 27.
+ * @modified 2018. 12. 21.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 

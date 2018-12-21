@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 모듈 코어클래스로 iModule 의 모든 모듈을 관리한다.
  * 이 클래스는 iModule 코어나, Admin 모듈에서 호출되는 경우를 제외하고 각 모듈클래스에서 호출되는 경우 대부분의 $module 파라매터를 사용하지 않아도 된다.
@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 6. 21.
+ * @modified 2018. 12. 21.
  */
 class Module {
 	/**

@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * PHP에서 사용중인 변수를 자바스크립트에 등록한다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 5. 27.
+ * @modified 2018. 12. 21.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'scripts','',__DIR__).'/configs/init.config.php';
 header('Content-Type: application/x-javascript; charset=utf-8');
