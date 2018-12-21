@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * iModule 내부에서 발생하는 모든 이벤트를 관리한다.
  * 
@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 11. 4.
+ * @modified 2018. 12. 21.
  */
 class Event {
 	/**
@@ -115,8 +115,8 @@ class Event {
 		
 		/**
 		 * 이벤트리스너를 분류한다.
-		 * @listenerType 이벤트리스너를 추가한 대상의 타입 (module 또는 addon)
-		 * @listenerName 이벤트리스너를 추가한 대상의 이름 (모듈명 또는 에드온명)
+		 * @listenerType 이벤트리스너를 추가한 대상의 타입 (module, plugin, widget)
+		 * @listenerName 이벤트리스너를 추가한 대상의 이름 (모듈명, 플러그인명, 위젯명)
 		 */
 		$temp = explode('/',$listener);
 		$listenerType = array_shift($temp);
@@ -134,6 +134,13 @@ class Event {
 		 */ 
 		if ($listenerType == 'plugin') {
 			$me = $this->IM->getPlugin($listenerName);
+		}
+		
+		/**
+		 * 이벤트리스너를 추가한 대상이 위젯인 경우, 해당 플러그인 객체를 호출한다.
+		 */ 
+		if ($listenerType == 'widget') {
+			$me = $this->IM->getWidget($listenerName);
 		}
 		
 		/**
@@ -254,10 +261,21 @@ class Event {
 		}
 		
 		/**
-		 * 사이트를 구성할 때
+		 * 사이트내용을 출력할 때
 		 */
 		if ($event == 'afterDoLayout') {
 			$html = &$results;
+		}
+		
+		/**
+		 * 위젯을 출력할 때
+		 */
+		if ($event == 'afterDoWidgetLayout') {
+			$widget = $caller;
+			$templet = $values->templet;
+			$html = &$results;
+			unset($caller);
+			unset($values);
 		}
 		
 		if ($event == 'afterGetContextList') {

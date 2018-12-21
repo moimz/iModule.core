@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * iModule core class 로 모든 사이트 레이아웃 및 모듈, 위젯, 애드온은 이 class 를 통해 호출된다.
  * 이 class 는 index.php 파일에 의해 선언되며 iModule과 관련된 모든 파일에서 $IM 변수로 접근할 수 있다.
@@ -2694,11 +2694,11 @@ class iModule {
 	
 	/**
 	 * 특정 시점에서 이벤트를 발생시킨다.
-	 * 발생된 이벤트는 모듈이나 에드온 등에서 정의된 이벤트리스너를 호출하게 되고, 이벤트 리스너 내부에서 전달된 값들을 수정하여 최정결과값에 반영할 수 있다.
+	 * 발생된 이벤트는 모듈 또는 플러그인 및 위젯 등에서 정의된 이벤트리스너를 호출하게 되고, 이벤트 리스너 내부에서 전달된 값들을 수정하여 최정결과값에 반영할 수 있다.
 	 * 이벤트 발생 및 이벤트 처리는 Event 클래스에서 관여한다.
 	 *
 	 * @param string $event 이벤트 타입 (afterInitContext or afterDoProcess ... etc.)
-	 * @param string $target 이벤트를 발생시킨 대상 (core 또는 모듈명)
+	 * @param string $target 이벤트를 발생시킨 대상 (core, plugin, widget 또는 모듈명)
 	 * @param string $caller 이벤트를 발생시킨 지점 (보통 이벤트를 발생시킨 함수명)
 	 * @param object &$values 이벤트 리스너에게 전달시켜줄 데이터
 	 * @param object &$results 일부 이벤트종류는 결과값을 가진다. (대표적으로 doProcess 에 관련된 이벤트)

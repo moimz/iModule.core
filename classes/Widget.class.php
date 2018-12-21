@@ -1,6 +1,6 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodule.kr)
+ * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
  *
  * 위젯코어 클래스는 서버에 설치된 모든 위젯을 관리하고 화면상에 출력한다.
  * 이 클래스는 모든 위젯의 index.php 파일이나, 위젯 템플릿에서 $Widget 변수로 접근할 수 있다.
@@ -8,7 +8,8 @@
  * @file /classes/Widget.class.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0.160831
+ * @version 3.0.0
+ * @modified 2018. 12. 21.
  */
 class Widget {
 	/**
@@ -31,6 +32,7 @@ class Widget {
 	 *
 	 * @private string $widgetPath 위젯 절대경로
 	 * @private string $widgetDir 위젯 상대경로
+	 * @private string $widgetName 위젯명
 	 * @private string $widgetPackage 위젯 package.json 정보
 	 * @private object $templet 위젯 템플릿 정보 (false 일 경우 템플릿이 존재하지 않음)
 	 * @private object $values 위젯에서 사용되는 변수정보
@@ -38,6 +40,7 @@ class Widget {
 	 */
 	private $widgetPath;
 	private $widgetDir;
+	private $widgetName;
 	private $widgetPackage = null;
 	private $templet = null;
 	private $values = null;
@@ -144,9 +147,11 @@ class Widget {
 		if (count($temp) == 1) {
 			$this->widgetPath = __IM_PATH__.'/widgets/'.$widget;
 			$this->widgetDir = __IM_DIR__.'/widgets/'.$widget;
+			$this->widgetName = $widget;
 		} else {
 			$this->widgetPath = __IM_PATH__.'/modules/'.$temp[0].'/widgets/'.$temp[1];
 			$this->widgetDir = __IM_DIR__.'/modules/'.$temp[0].'/widgets/'.$temp[1];
+			$this->widgetName = $temp[1];
 			$this->caller = $this->IM->getModule($temp[0]);
 		}
 		
@@ -379,6 +384,9 @@ class Widget {
 		return INCLUDE $this->getPath().'/index.php';
 	}
 	
+	/**
+	 * 위젯을 출력한다.
+	 */
 	function doLayout() {
 		/**
 		 * 위젯이 로드되지 않았을 경우 에러메세지를 출력한다.
@@ -445,6 +453,13 @@ class Widget {
 		
 		$html.= PHP_EOL.'</div>'.PHP_EOL;
 		$html.= '<!--// WIDGET : '.$this->loaded.' -->'.PHP_EOL;
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
+		$values = new stdClass();
+		$values->templet = $this->getTemplet()->getName(true);
+		$this->IM->fireEvent('afterDoWidgetLayout',$this->getClass() === null ? 'core' : $this->getClass()->getModule()->getName(),$this->widgetName,$values,$html);
 		
 		echo $html;
 	}
