@@ -623,8 +623,8 @@ class Module {
 		 * 모듈의 package.json 파일을 확인하고, 설치조건을 확인한다.
 		 */
 		$package = $this->getPackage($module);
-		if ($package == null) return 'NOT_FOUND';
-		if ($this->checkDependencies($module) == false) return 'DEPENDENCY_ERROR';
+		if ($package == null) return $this->IM->getErrorText('NOT_FOUND');
+		if ($this->checkDependencies($module) == false) return $this->IM->getErrorText('DEPENDENCY_ERROR',$module);
 		
 		/**
 		 * 모듈에서 사용하는 attachment 폴더를 생성한다.
