@@ -35,7 +35,7 @@
 		"worked":"성공적으로 처리하였습니다."
 	},
 	"error":{
-		"DEPENDENCY_ERROR":"요구조건이 일치하지 않습니다.",
+		"DEPENDENCY_ERROR":"요구조건이 만족하지 않습니다.",
 		"MISSING_PARAMETER":"필수값이 누락되었습니다.",
 		"INCORRENT_PASSWORD":"패스워드가 일치하지 않습니다.",
 		"DISCONNECT_ERROR":"작업도중 서버와의 연결이 해제되었습니다. 잠시후 다시시도하여 주십시오.",
