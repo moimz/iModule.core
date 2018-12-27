@@ -77,6 +77,15 @@ try {
 if ($_CONFIGS->db === null || $_CONFIGS->db === false) $_CONFIGS->installed = false;
 
 /**
+ * XSS 공격대비를 위한 GET 변수확인
+ */
+foreach ($_GET as $key=>$value) {
+	if ($key != 'keyword') {
+		$_GET[$key] = $_REQUEST[$key] = GetString($value,'replace');
+	}
+}
+
+/**
  * session 기본 설정
  */
 $session_name = session_name('IMSESSID');
