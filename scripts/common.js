@@ -118,6 +118,22 @@ var iModule = {
 			targetObject._LANG = lang;
 			targetObject._OLANG = oLang;
 			
+			targetObject.addText = function(code,text) {
+				var temp = code.split("/");
+				
+				var string = this._LANG;
+				for (var i=0, loop=temp.length-1;i<loop;i++) {
+					if (string[temp[i]]) {
+						string = string[temp[i]];
+					} else {
+						string[temp[i]] = {};
+						string = string[temp[i]];
+					}
+				}
+				
+				string[temp.pop()] = text;
+			};
+			
 			targetObject.getText = function(code,replacement) {
 				var replacement = replacement ? replacement : null;
 				var returnString = null;
