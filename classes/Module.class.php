@@ -390,12 +390,15 @@ class Module {
 		 */
 		if (method_exists($mModule,'getAdminPanel') == false) return null;
 		
+		$panel = $mModule->getAdminPanel();
+		
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		$this->IM->fireEvent('afterGetAdminPanel',$module,'admin');
+		$values = null;
+		$this->IM->fireEvent('afterGetAdminPanel',$module,'admin',$values,$panel);
 		
-		return $mModule->getAdminPanel();
+		return $panel;
 	}
 	
 	/**

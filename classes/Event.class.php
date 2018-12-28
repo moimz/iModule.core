@@ -157,7 +157,7 @@ class Event {
 		 */
 		if ($event == 'init') {
 			$init = $caller;
-			unset($caller,$context,$results);
+			unset($caller,$results);
 		}
 		
 		/**
@@ -166,7 +166,7 @@ class Event {
 		if ($event == 'authorization') {
 			$type = $caller;
 			$token = $values;
-			unset($caller,$context,$results,$values);
+			unset($caller,$results,$values);
 		}
 		
 		/**
@@ -202,7 +202,7 @@ class Event {
 		 */
 		if ($event == 'beforeGetData' || $event == 'afterGetData') {
 			$get = $caller;
-			unset($caller,$context,$results);
+			unset($caller,$results);
 		}
 		
 		/**
@@ -313,8 +313,8 @@ class Event {
 		 * 관리자 패널을 가져올 때
 		 */
 		if ($event == 'afterGetAdminPanel') {
+			$panel = &$results;
 			unset($values,$results,$caller);
-			$panel = &$context;
 		}
 		
 		/**
