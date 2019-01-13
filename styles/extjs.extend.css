@@ -59,7 +59,8 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-grid-cell-inner i.xi, .x-grid-cell-inner i.xi2, .x-grid-cell-inner i.fa, .x-grid-cell-inner i.mi {margin:-2px 0px; height:20px; line-height:19px; vertical-align:middle;}
 
 .x-grid-group-hd {border-bottom:2px solid #222; padding-top:20px;}
-.x-grid-item:first-child .x-grid-group-hd {padding-top:8px;}
+.x-grid-item-container > table:not([class]) + .x-grid-item .x-grid-group-hd {padding-top:10px !important;}
+.x-grid-item:first-child .x-grid-group-hd {padding-top:10px !important;}
 
 .x-grid-group-title {font-size:13px; font-weight:bold; color:#000;}
 .x-grid-group-title > i {margin-right:8px;}
