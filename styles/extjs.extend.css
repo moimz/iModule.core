@@ -7,13 +7,13 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 1. 13.
  */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
-.x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:20px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin-right:5px; vertical-align:middle;}
+.x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:20px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin-right:5px; vertical-align:middle; text-overflow: clip}
 
 .x-grid-button {height:100% !important; vertical-align:middle !important;}
 .x-grid-button .x-grid-cell-inner {padding:2px !important;}
@@ -46,11 +46,13 @@
 .x-column-header-align-right {text-align:left !important;}
 .x-column-header-align-right .x-column-header-text {margin-right:0px !important;}
 tr.x-grid-row-summary:first-child {display:none;}
-.x-grid-row-summary .x-grid-cell {background-color:#e9e9e9 !important; color:#222; font-weight:700;}
+.x-grid-row-summary .x-grid-cell {background-color:#e9e9e9 !important; color:#222; border-color:#ddd !important; font-weight:700;}
+.x-grid-row-summary + .x-grid-row-summary .x-grid-cell {background-color:#ddd !important; color:#222; font-weight:700; border-color:#ccc !important;}
 .x-toolbar-default {background:#fcfcfc;}
 .x-column-header {background:#f4f4f4;}
 .x-column-header-checkbox {border-color:#d1d1d0;}
 .x-grid-cell-inner a {color:#5070be; text-decoration:none;}
+.x-grid-cell-inner.x-grid-cell-inner-checkcolumn {text-overflow:clip !important;}
 .x-grid-cell-row-checker {vertical-align:top !important;}
 .x-grid-cell-row-checker .x-grid-cell-inner {padding:0px; width:100%; height:100%;}
 .x-grid-cell-row-checker .x-grid-cell-inner .x-grid-row-checker {width:100%; height:100%; padding:7px 4px 7px 7px;}
