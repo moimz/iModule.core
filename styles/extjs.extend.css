@@ -96,8 +96,16 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-tool-restore {font-size:14px; line-height:16px;}
 .x-tool-restore:before {content:"\f2d2";}
 
-
 .x-fieldset {overflow:visible;}
+
+.x-stepbar {font-size:0;}
+.x-stepbar > div {display:inline-block; height:30px; margin:1px 0px; vertical-align:middle; font-size:12px; line-height:30px; padding-left:10px;}
+.x-stepbar > div:before {font-family:FontAwesome; content:"\f0da";}
+.x-stepbar > div > span {display:inline-block; height:30px; line-height:30px; padding:0px 8px; background:#fff; opacity:0.7; margin-left:10px; border-radius:3px; color:#666;}
+.x-stepbar > div:first-child {padding-left:0;}
+.x-stepbar > div:first-child > span {margin-left:0;}
+.x-stepbar > div:first-child:before {content:"";}
+.x-stepbar > div.selected > span {opacity:1; background:#5fa2dd; color:#fff; font-weight:bold;}
 
 /*
 .x-form-wysiwyg {height:345px !important; table-layout:fixed;}
