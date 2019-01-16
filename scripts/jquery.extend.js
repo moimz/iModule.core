@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 1. 16.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1063,6 +1063,7 @@
 								$item.on("click",function() {
 									$input.data("last",$(this).data("keyword"));
 									$input.val($(this).data("keyword"));
+									$("ul",$parent).remove();
 									$input.focus();
 								});
 								$list.append($item);
