@@ -26,24 +26,26 @@ Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorF
 	if (invalid.items.length > 0) {
 		var topField = invalid.items.shift();
 		if (form.owner.getScrollable() != null) {
-			var position = topField.getPosition()[1];
+			var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+			var scroll = form.owner.getScrollable().getPosition().y;
 			
-			if (position - 80 < form.owner.getScrollable().getPosition().y) {
-				form.owner.scrollBy(0,position - 80,true);
+			if (position < 50) {
+				form.owner.scrollTo(0,scroll - (50 - position),true);
 			}
 			
-			if (position + 50 > form.owner.getScrollable().getPosition().y + form.owner.getScrollable().getElement().getBox().height) {
-				form.owner.scrollTo(0,position - form.owner.getScrollable().getElement().getBox().height + 50,true);
+			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
+				form.owner.scrollTo(0,position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50,true);
 			}
 		} else if (form.owner.ownerCt.scrollable != null) {
-			var position = topField.getPosition()[1] - form.owner.getPosition()[1];
+			var position = topField.getPosition()[1] - form.owner.ownerCt.getPosition()[1];
+			var scroll = form.owner.ownerCt.getScrollable().getPosition().y;
 			
-			if (position - 80 < form.owner.ownerCt.getScrollable().getPosition().y) {
-				form.owner.ownerCt.scrollTo(0,position - 80,true);
+			if (position < 50) {
+				form.owner.ownerCt.scrollTo(0,scroll - (50 - position),true);
 			}
 			
-			if (position + 50 > form.owner.ownerCt.getScrollable().getPosition().y + form.owner.ownerCt.getScrollable().getElement().getBox().height) {
-				form.owner.ownerCt.scrollTo(0,position - form.owner.ownerCt.getScrollable().getElement().getBox().height + 50,true);
+			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
+				form.owner.ownerCt.scrollTo(0,position + scroll - form.owner.ownerCt.getScrollable().getElement().getBox().height + topField.getBox().height + 50,true);
 			}
 		}
 	}

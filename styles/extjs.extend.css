@@ -37,6 +37,8 @@
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
 .x-form-display-field-default {margin-top:0px; padding-top:8px;}
 .x-form-checkboxgroup-body {padding:0px !important;}
+.x-form-radio-default:before {content:"\f1db";}
+.x-form-item-label-default.required > span:before {content:"*"; color:red; display:inline-block; height:14px; padding-top:3px; padding-right:3px; line-height:0; vertical-align:top;}
 
 .x-legend-panel .x-panel-body-default {border-color:#fff !important;}
 .x-small-header .x-panel-header {padding:6px 8px !important;}
