@@ -306,7 +306,8 @@ class iModule {
 		 */
 		if (defined('__IM_SITE__') == true) {
 			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
-				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__.'/'.$this->language.'/';
+				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__;
+				if ($this->language != $site->language || $this->menu != 'index' || $this->page != null) $redirectUrl.= '/'.$this->language.'/';
 				if ($this->menu != 'index' || $this->page != null) {
 					$redirectUrl.= $this->menu ? $this->menu : '';
 					$redirectUrl.= $this->page ? '/'.$this->page : '';
