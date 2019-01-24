@@ -30,22 +30,26 @@ Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorF
 			var scroll = form.owner.getScrollable().getPosition().y;
 			
 			if (position < 50) {
-				form.owner.scrollTo(0,scroll - (50 - position),true);
+				var scrollTo = Math.max(0,scroll - (50 - position));
+				form.owner.scrollTo(0,scrollTo,true);
 			}
 			
 			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
-				form.owner.scrollTo(0,position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50,true);
+				var scrollTo = position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
+				form.owner.scrollTo(0,scrollTo,true);
 			}
 		} else if (form.owner.ownerCt.scrollable != null) {
 			var position = topField.getPosition()[1] - form.owner.ownerCt.getPosition()[1];
 			var scroll = form.owner.ownerCt.getScrollable().getPosition().y;
 			
 			if (position < 50) {
-				form.owner.ownerCt.scrollTo(0,scroll - (50 - position),true);
+				var scrollTo = Math.max(0,scroll - (50 - position));
+				form.owner.ownerCt.scrollTo(0,scrollTo,true);
 			}
 			
 			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
-				form.owner.ownerCt.scrollTo(0,position + scroll - form.owner.ownerCt.getScrollable().getElement().getBox().height + topField.getBox().height + 50,true);
+				var scrollTo = position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
+				form.owner.ownerCt.scrollTo(0,scrollTo,true);
 			}
 		}
 	}
