@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 1. 16.
+ * @modified 2019. 1. 29.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1670,7 +1670,7 @@
 		
 		$("input, select, textarea",$form).each(function() {
 			if ($(this).attr("type") == "checkbox") {
-				if ($(this).data("submitValue",$(this).is(":checked")));
+				$(this).data("submitValue",$(this).is(":checked"));
 			} else {
 				$(this).attr("submitValue",$(this).val());
 			}
