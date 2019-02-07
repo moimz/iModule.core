@@ -795,7 +795,7 @@ function GetHexToRgb($hex,$opacity=null) {
 	}
 	$rgb = array($r,$g,$b);
 	
-	if ($opacity != null) {
+	if ($opacity !== null) {
 		return $opacity === 1 || $opacity === true ? 'rgb('.$r.','.$g.','.$b.')' : 'rgba('.$r.','.$g.','.$b.','.$opacity.')';
 	} else {
 		return $rgb;
