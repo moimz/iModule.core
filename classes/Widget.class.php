@@ -446,7 +446,7 @@ class Widget {
 		
 		$html = PHP_EOL.'<!-- WIDGET : '.$this->loaded.' -->'.PHP_EOL;
 		$html.= '<div data-role="widget" data-widget="'.str_replace('.','-',$this->loaded).'" data-templet="'.$this->getTemplet()->getName(true).'"'.$this->getTemplet()->getContainerName();
-		foreach ($this->attributes as $key=>$value) $html.= ' '.$key.'='.$value;
+		foreach ($this->attributes as $key=>$value) $html.= ' '.$key.'="'.$value.'"';
 		$html.= '>'.PHP_EOL;
 		
 		$html.= $widget;
