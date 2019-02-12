@@ -61,6 +61,8 @@ class Crawler {
 		
 		if ($success == true) {
 			$this->cookie = $cookie;
+		} else {
+			$this->cookie = null;
 		}
 		
 		return $success;
@@ -184,6 +186,13 @@ class Crawler {
 		
 		if ($originEncode == 'UTF-8' || $originEncode == '') return $origin;
 		else return @iconv($originEncode,'UTF-8//IGNORE',$origin);
+	}
+	
+	/**
+	 * 클래스가 해제될때, 쿠키파일을 삭제한다.
+	 */
+	function __destruct() {
+		if ($this->cookie != null) @unlink($this->cookie);
 	}
 }
 ?>
