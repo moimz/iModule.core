@@ -51,8 +51,9 @@ class Crawler {
 		curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
 		curl_setopt($ch,CURLOPT_REFERER,$url);
 		curl_setopt($ch,CURLOPT_TIMEOUT,$this->timeout);
+		curl_setopt($ch,CURLOPT_FOLLOWLOCATION,true);
 		curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
 		$buffer = curl_exec($ch);
 		$cinfo = curl_getinfo($ch);
 		curl_close($ch);
