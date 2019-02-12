@@ -43,7 +43,7 @@ class Crawler {
 	 * @param string[] $params 로그인에 필요한 변수 (예 : array('user_id'=>'아이디','password'=>'패스워드')
 	 * @return boolean $success
 	 */
-	function Login($url,$cookie,$params=array()) {
+	function login($url,$cookie,$params=array()) {
 		$ch = curl_init();
 		curl_setopt($ch,CURLOPT_URL,$url);
 		curl_setopt($ch,CURLOPT_POST,true);
