@@ -7,8 +7,8 @@
  * @file /classes/Crawler.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.0.0
- * @modified 2018. 4. 18.
+ * @version 1.1.0
+ * @modified 2019. 2. 12.
  */
 class Crawler {
 	/**
@@ -36,6 +36,37 @@ class Crawler {
 	}
 	
 	/**
+	 * 로그인을 처리한다.
+	 *
+	 * @param string $url 로그인이 처리되는 주소 (예 : http://domain.com/login.php)
+	 * @param string $cookie 쿠키파일을 저장할 경로 (예 : /tmp/login.txt)
+	 * @param string[] $params 로그인에 필요한 변수 (예 : array('user_id'=>'아이디','password'=>'패스워드')
+	 * @return boolean $success
+	 */
+	function Login($url,$cookie,$params=array()) {
+		$ch = curl_init();
+		curl_setopt($ch,CURLOPT_URL,$url);
+		curl_setopt($ch,CURLOPT_POST,true);
+		curl_setopt($ch,CURLOPT_USERAGENT,$this->agent);
+		curl_setopt($ch,CURLOPT_POSTFIELDS,$params);
+		curl_setopt($ch,CURLOPT_REFERER,$url);
+		curl_setopt($ch,CURLOPT_TIMEOUT,$this->timeout);
+		curl_setopt($ch,CURLOPT_COOKIEJAR,$cookie);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+		$buffer = curl_exec($ch);
+		$cinfo = curl_getinfo($ch);
+		curl_close($ch);
+		
+		$success = $cinfo['http_code'] == 200;
+		
+		if ($success == true) {
+			$this->cookie = $cookie;
+		}
+		
+		return $success;
+	}
+	
+	/**
 	 * URL 의 컨텐츠를 가져온다. (GET 방식)
 	 *
 	 * @param string $url 컨텐츠를 가져올 URL 주소
@@ -43,7 +74,6 @@ class Crawler {
 	 */
 	function getUrl($url) {
 		$ch = curl_init();
-//		if (empty($_SERVER['HTTP_HOST'])) echo $this->cookie;
 		curl_setopt($ch,CURLOPT_URL,$url);
 		curl_setopt($ch,CURLOPT_POST,false);
 		curl_setopt($ch,CURLOPT_USERAGENT,$this->agent);
@@ -70,7 +100,6 @@ class Crawler {
 	 */
 	function postUrl($url,$data=array()) {
 		$ch = curl_init();
-//		if (empty($_SERVER['HTTP_HOST'])) echo $this->cookie;
 		curl_setopt($ch,CURLOPT_URL,$url);
 		curl_setopt($ch,CURLOPT_POST,true);
 		curl_setopt($ch,CURLOPT_POSTFIELDS,http_build_query($data));
