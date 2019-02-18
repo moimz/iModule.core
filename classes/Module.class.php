@@ -578,6 +578,16 @@ class Module {
 	}
 	
 	/**
+	 * 설치되어 있는 모든 모듈목록을 가져온다.
+	 *
+	 * @return object[] $modules
+	 */
+	function getModules() {
+		$modules = $this->IM->db()->select($this->table->module)->orderBy('sort','asc')->get();
+		return $modules;
+	}
+	
+	/**
 	 * 사이트관리자 기능을 사용하는 모듈목록을 가져온다.
 	 *
 	 * @return object[] $modules
