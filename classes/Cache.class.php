@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 2. 27.
  */
 class Cache {
 	/**
@@ -62,7 +62,7 @@ class Cache {
 	function check($controller,$component,$code) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return 0;
 		
-		if (file_exists($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
+		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
 			return filemtime($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
 		} else {
 			return 0;
@@ -80,7 +80,7 @@ class Cache {
 	function get($controller,$component,$code) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return null;
 		
-		if (file_exists($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
+		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
 			return file_get_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
 		} else {
 			return null;
