@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 3. 3.
  */
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
@@ -460,6 +460,8 @@ var iModule = {
 				} else {
 					$("input",$input).focus();
 				}
+			} else if ($("button[type=submit]",$modal).length > 0) {
+				$("button[type=submit]",$modal).last().focus();
 			}
 			
 			$("button[data-action]",$modal).on("click",function() {
