@@ -36,6 +36,14 @@ header("Pragma: no-cache");
 define('__IM__',true);
 define('__IM_VERSION__','3.0.0');
 define('__IM_DB_PREFIX__','im_');
+
+/**
+ * 특정상황에서 아이모듈이 설치된 경로를 정의해야할 경우를 위한 설정파일을 불러온다.
+ */
+if (is_file(__DIR__.'/path.config.php') == true) {
+	REQUIRE_ONCE __DIR__.'/path.config.php';
+}
+
 if (defined('__IM_PATH__') == false) define('__IM_PATH__',str_replace(DIRECTORY_SEPARATOR.'configs','',__DIR__));
 if (defined('__IM_DIR__') == false) define('__IM_DIR__',str_replace($_SERVER['DOCUMENT_ROOT'],'',__IM_PATH__));
 
