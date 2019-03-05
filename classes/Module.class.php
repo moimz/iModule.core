@@ -567,10 +567,10 @@ class Module {
 		
 		foreach ($package->dependencies as $dependency=>$version) {
 			if ($dependency == 'core') {
-				if (version_compare($version,__IM_VERSION__,'>') == true) return false;
+				if (version_compare($version,__IM_VERSION__,'>') == true) return 'iModule v'.$version;
 			} else {
-				if ($this->isInstalled($dependency) == false) return false;
-				if (version_compare($version,$this->getInstalled($dependency)->version,'>') == true) return false;
+				if ($this->isInstalled($dependency) == false) return $dependency.' v'.$version;
+				if (version_compare($version,$this->getInstalled($dependency)->version,'>') == true) return $dependency.' v'.$version;
 			}
 		}
 		
@@ -637,7 +637,7 @@ class Module {
 		 */
 		$package = $this->getPackage($module);
 		if ($package == null) return $this->IM->getErrorText('NOT_FOUND');
-		if ($this->checkDependencies($module) == false) return $this->IM->getErrorText('DEPENDENCY_ERROR',$module);
+		if ($this->checkDependencies($module) !== true) return $this->IM->getErrorText('DEPENDENCY_ERROR',$this->checkDependencies($module));
 		
 		/**
 		 * 모듈에서 사용하는 attachment 폴더를 생성한다.
