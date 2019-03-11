@@ -500,6 +500,7 @@ class mysql {
 	}
 	
 	public function limit($start,$limit=null) {
+		$start = is_numeric($start) == false || $start < 0 ? 0 : $start;
 		if ($limit != null) {
 			$this->_limit = array($start,$limit);
 		} else {

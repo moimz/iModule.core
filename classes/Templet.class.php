@@ -1099,6 +1099,7 @@ class Templet {
 	 * @return string $html
 	 */
 	function getPagination($p,$total,$pagenum,$link,$mode='FIXED',$file=null) {
+		$p = is_numeric($p) == true && $p > 0 ? $p : 1;
 		$link = $link;
 		if (strpos($link,'#') !== 0) $link.= $this->IM->getQueryString();
 		
