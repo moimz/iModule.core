@@ -1,0 +1,115 @@
+/**
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * 게시물 / 기사와 관련된 아이콘을 웹폰트 형태로 제공한다.
+ *
+ * @file /styles/fonts/post.css
+ * @author Arzz
+ * @license MIT License
+ * @version 1.0.0
+ * @modified 2019. 3. 14.
+ */
+@font-face {font-family:"post"; src:url("../fonts/post.woff2") format("woff2"), url("../fonts/post.woff") format("woff"), url("../fonts/post.ttf") format("truetype"), url("../fonts/post.svg") format("svg"); font-weight:normal; font-style:normal;}
+
+.pi {display:inline-block; font-style:normal; font-family:post; font-size:inherit; text-rendering:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+ 
+.pi-image-add:before {content:"\e800";}
+.pi-visible:before {content:"\e801";}
+.pi-visible-none:before {content:"\e802";}
+.pi-play:before {content:"\e803";}
+.pi-play-circle:before {content:"\e804";}
+.pi-pause:before {content:"\e805";}
+.pi-pause-circle:before {content:"\e806";}
+.pi-pause-circle-outline:before {content:"\e807";}
+.pi-folder:before {content:"\e808";}
+.pi-crop:before {content:"\e809";}
+.pi-image-search:before {content:"\e80a";}
+.pi-video-player:before {content:"\e80b";}
+.pi-chat:before {content:"\e80c";}
+.pi-chat-b:before {content:"\e80d";}
+.pi-gif:before {content:"\e80e";}
+.pi-pdf:before {content:"\e80f";}
+.pi-note:before {content:"\e810";}
+.pi-clock:before {content:"\e811";}
+.pi-tails:before {content:"\e812";}
+.pi-http:before {content:"\e813";}
+.pi-printer-b:before {content:"\e814";}
+.pi-star:before {content:"\e815";}
+.pi-home:before {content:"\e816";}
+.pi-bookmark:before {content:"\e817";}
+.pi-3d:before {content:"\e818";}
+.pi-naver:before {content:"\e819";}
+.pi-naver-b:before {content:"\e81a";}
+.pi-blog:before {content:"\e81b";}
+.pi-blog-b:before {content:"\e81c";}
+.pi-talk:before {content:"\e81d";}
+.pi-story:before {content:"\e81e";}
+.pi-story-b:before {content:"\e81f";}
+.pi-vingle:before {content:"\e820";}
+.pi-vingle-b:before {content:"\e821";}
+.pi-cyworld:before {content:"\e822";}
+.pi-cyworld-b:before {content:"\e823";}
+.pi-pholar:before {content:"\e824";}
+.pi-pholar-b:before {content:"\e825";}
+.pi-google:before {content:"\e826";}
+.pi-google-b:before {content:"\e827";}
+.pi-facebook:before {content:"\e828";}
+.pi-facebook-b:before {content:"\e829";}
+.pi-twitter:before {content:"\e82a";}
+.pi-twitter-b:before {content:"\e82b";}
+.pi-linkedin:before {content:"\e82c";}
+.pi-linkedin-b:before {content:"\e82d";}
+.pi-pinterest:before {content:"\e82e";}
+.pi-quote-left:before {content:"\e82f";}
+.pi-cast:before {content:"\e830";}
+.pi-touch:before {content:"\e831";}
+.pi-new:before {content:"\e832";}
+.pi-help:before {content:"\e833";}
+.pi-star-badge:before {content:"\e834";}
+.pi-pinterest-b:before {content:"\e835";}
+.pi-weibo:before {content:"\e836";}
+.pi-weibo-b:before {content:"\e837";}
+.pi-youtube:before {content:"\e838";}
+.pi-youtube-b:before {content:"\e839";}
+.pi-share:before {content:"\e83a";}
+.pi-share-b:before {content:"\e83b";}
+.pi-sync:before {content:"\e83c";}
+.pi-sync-b:before {content:"\e83d";}
+.pi-more:before {content:"\e83e";}
+.pi-more-b:before {content:"\e83f";}
+.pi-plus:before {content:"\e840";}
+.pi-minus:before {content:"\e841";}
+.pi-printer:before {content:"\e842";}
+.pi-email:before {content:"\e843";}
+.pi-voice:before {content:"\e844";}
+.pi-instagram:before {content:"\e845";}
+.pi-instagram-b:before {content:"\e846";}
+.pi-rss:before {content:"\e847";}
+.pi-rss-b:before {content:"\e848";}
+.pi-email-b:before {content:"\e849";}
+.pi-email-c:before {content:"\e84a";}
+.pi-list:before {content:"\e84b";}
+.pi-dashboard:before {content:"\e84c";}
+.pi-more-vertical:before {content:"\e84d";}
+.pi-quote-right:before {content:"\e84e";}
+.pi-talk-b:before {content:"\e84f";}
+.pi-fingerprint:before {content:"\e850";}
+.pi-left:before {content:"\e900";}
+.pi-line-left:before {content:"\e901";}
+.pi-line-right:before {content:"\e902";}
+.pi-line-top:before {content:"\e903";}
+.pi-hwp:before {content:"\e904";}
+.pi-right:before {content:"\e905";}
+.pi-pdf-b:before {content:"\e906";}
+.pi-play-circle-outline:before {content:"\e907";}
+.pi-member:before {content:"\e908";}
+.pi-search:before {content:"\e909";}
+.pi-band:before {content:"\e90a";}
+.pi-band-b:before {content:"\e90b";}
+.pi-daum:before {content:"\e90c";}
+.pi-daum-b:before {content:"\e90d";}
+.pi-post:before {content:"\e90f";}
+.pi-post-b:before {content:"\e910";}
+.pi-vimeo:before {content:"\e911";}
+.pi-vimeo-b:before {content:"\e912";}
+.pi-newspaper:before {content:"\e913";}
