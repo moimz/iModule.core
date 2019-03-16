@@ -2505,7 +2505,7 @@ class iModule {
 	 */
 	function parsePermissionString($permissionString) {
 		$member = $this->getModule('member')->getMember();
-		if ($member->type == 'ADMINISTRATOR') return true;
+		if ($permissionString != 'false' && $member->type == 'ADMINISTRATOR') return true;
 		
 		if ($member->idx == 0) {
 			$permissionString = str_replace('{$member.level}','0',$permissionString);
