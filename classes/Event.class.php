@@ -202,7 +202,7 @@ class Event {
 		 */
 		if ($event == 'beforeGetData' || $event == 'afterGetData') {
 			$get = $caller;
-			unset($caller,$results);
+			unset($caller);
 		}
 		
 		/**
