@@ -36,6 +36,7 @@ if (strpos($container,'@') === 0) {
 }
 $IM->setContainerMode($module,$container);
 
+define('__IM_SITE__',true);
 define('__IM_CONTAINER__',true);
 
 /**
