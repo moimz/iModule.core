@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2019. 1. 13.
+ * @modified 2019. 4. 3.
  */
 Ext.Ajax.setTimeout(300000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
@@ -25,31 +25,32 @@ Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorF
 	
 	if (invalid.items.length > 0) {
 		var topField = invalid.items.shift();
-		if (form.owner.getScrollable() != null) {
-			var position = topField.getPosition()[1] - form.owner.getPosition()[1];
-			var scroll = form.owner.getScrollable().getPosition().y;
+		var panel = form.owner;
+		if (panel.getScrollable() != null) {
+			var position = topField.getPosition()[1] - panel.getPosition()[1];
+			var scroll = panel.getScrollable().getPosition().y;
 			
 			if (position < 50) {
 				var scrollTo = Math.max(0,scroll - (50 - position));
-				form.owner.scrollTo(0,scrollTo,true);
+				panel.scrollTo(0,scrollTo,true);
 			}
 			
-			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
-				var scrollTo = position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
-				form.owner.scrollTo(0,scrollTo,true);
+			if (position + 50 > panel.getScrollable().getElement().getBox().height) {
+				var scrollTo = position + scroll - panel.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
+				panel.scrollTo(0,scrollTo,true);
 			}
-		} else if (form.owner.ownerCt.scrollable != null) {
-			var position = topField.getPosition()[1] - form.owner.ownerCt.getPosition()[1];
-			var scroll = form.owner.ownerCt.getScrollable().getPosition().y;
+		} else if (panel.ownerCt.scrollable != null) {
+			var position = topField.getPosition()[1] - panel.ownerCt.getPosition()[1];
+			var scroll = panel.ownerCt.getScrollable().getPosition().y;
 			
 			if (position < 50) {
 				var scrollTo = Math.max(0,scroll - (50 - position));
-				form.owner.ownerCt.scrollTo(0,scrollTo,true);
+				panel.ownerCt.scrollTo(0,scrollTo,true);
 			}
 			
-			if (position + 50 > form.owner.getScrollable().getElement().getBox().height) {
-				var scrollTo = position + scroll - form.owner.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
-				form.owner.ownerCt.scrollTo(0,scrollTo,true);
+			if (position + 50 > panel.ownerCt.getScrollable().getElement().getBox().height) {
+				var scrollTo = position + scroll - panel.ownerCt.getScrollable().getElement().getBox().height + topField.getBox().height + 50;
+				panel.ownerCt.scrollTo(0,scrollTo,true);
 			}
 		}
 	}
