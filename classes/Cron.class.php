@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 4. 5.
  */
 class Cron {
 	/**
@@ -28,12 +28,11 @@ class Cron {
 		 * 전역변수 설정
 		 */
 		define('__IM_CRON__',true);
-		define('__IM_PATH__',str_replace(DIRECTORY_SEPARATOR.'classes','',__DIR__));
 		
 		/**
 		 * 크론작업을 할 사이트 호스트
 		 */
-		$this->hosts = count($hosts) == 0 ? array('localhost') : $hosts;
+		$this->hosts = count($hosts) == 0 ? array() : $hosts;
 		
 		/**
 		 * DB 테이블 별칭 정의
@@ -73,9 +72,10 @@ class Cron {
 		} else {
 			$_SERVER['HTTP_HOST'] = $host;
 			
-			REQUIRE_ONCE __IM_PATH__.'/configs/init.config.php';
+			REQUIRE_ONCE __DIR__.'/../configs/init.config.php';
 			
 			$IM = new iModule();
+			$site = $IM->getSite(false);
 			
 			/**
 			 * 크론작업이 필요한 모듈을 불러온다.
@@ -85,8 +85,6 @@ class Cron {
 				$this->daily($IM,$modules[$i]->module);
 				$this->weekly($IM,$modules[$i]->module);
 			}
-			
-			exit;
 		}
 	}
 	
@@ -111,7 +109,6 @@ class Cron {
 			$runtime = $IM->getMicroTime() - $start_time;
 			
 			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'DAILY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
-			ob_end_clean();
 		}
 	}
 	
@@ -138,7 +135,6 @@ class Cron {
 			$runtime = $IM->getMicroTime() - $start_time;
 			
 			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'WEEKLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
-			ob_end_clean();
 		}
 	}
 }
