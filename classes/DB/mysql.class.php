@@ -163,6 +163,10 @@ class mysql {
 		}
 	}
 	
+	public function desc($table) {
+		return $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
+	}
+	
 	public function compare($table,$schema) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$desc = $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
