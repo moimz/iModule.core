@@ -8,10 +8,19 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 4. 8.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);
+
+set_time_limit(0);
+@ini_set('memory_limit',-1);
+@ini_set('zlib.output_compression','Off');
+@ini_set('output_buffering','Off');
+@ini_set('output_handler','');
+if (function_exists('apache_setenv') == true) {
+	@apache_setenv('no-gzip',1);
+}
 
 $action = Request('action');
 $results = new stdClass();
