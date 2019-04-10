@@ -8,7 +8,7 @@
  * @author Arzz
  * @license MIT License
  * @version 1.4.0
- * @modified 2018. 8. 21.
+ * @modified 2019. 4. 10.
  */
 
 /**
@@ -201,7 +201,6 @@ function GetAntiSpamEmail($email,$isLink=true) {
  * @return string $time 변환된 시각
  */
 function GetTime($format,$time=null,$is_moment=true) {
-	$language = Request('language');
 	$time = $time === null ? time() : $time;
 	
 	/**
