@@ -104,11 +104,19 @@
 
 .mi-loading:before {content:"\ed00"}
 
-.mi-google:before {content:"\ef00"}
-.mi-google-plus:before {content:"\ef01"}
-.mi-facebook:before {content:"\ef02"}
-.mi-twitter:before {content:"\ef03"}
-.mi-naver:before {content:"\ef04"}
-.mi-github:before {content:"\ef05"}
-.mi-kakao-talk:before {content:"\ef06"}
-.mi-kakao-story:before {content:"\ef07"}
+.mi-google:before {content:"\ee00"}
+.mi-google-plus:before {content:"\ee01"}
+.mi-facebook:before {content:"\ee02"}
+.mi-twitter:before {content:"\ee03"}
+.mi-naver:before {content:"\ee04"}
+.mi-github:before {content:"\ee05"}
+.mi-kakao-talk:before {content:"\ee06"}
+.mi-kakao-story:before {content:"\ee07"}
+
+.mi-bell:before {content:"\ef01"}
+.mi-bell-o:before {content:"\ef02"}
+.mi-message:before {content:"\ef03"}
+.mi-message-o:before {content:"\ef04"}
+.mi-book:before {content:"\ef05"}
+.mi-book-o:before {content:"\ef06"}
+.mi-blocks:before {content:"\efff"}
