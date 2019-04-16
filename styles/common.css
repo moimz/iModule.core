@@ -184,12 +184,12 @@ div[data-role=input][data-type=select].success > button > i {color:#4caf50;}
 
 div[data-role=input][data-type=input] > input {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:18px; border-radius:0px;}
 div[data-role=input][data-type=input] > input:focus, div[data-role=input][data-type=input] > input.focus {border-color:#66afe9;}
-div[data-role=input][data-type=input] > input[disabled] {background:#f4f4f4; opacity:0.5; cursor:not-allowed;}
+div[data-role=input][data-type=input] > input[disabled] {background:#e5e5e5; opacity:0.5; cursor:not-allowed;}
 div[data-role=input][data-type=input] > input[type=date] {opacity:0; width:100%; height:100%; position:absolute; top:0; left:0; z-index:5;}
 div[data-role=input][data-type=input] > button {background:#fff; position:absolute; top:1px; right:1px; width:38px; height:38px; border:0; line-height:38px; cursor:pointer; color:#666;}
 div[data-role=input][data-type=input] > button:hover {background:#f4f4f4; color:#333;}
 div[data-role=input][data-type=input] > button:focus {border:1px solid #66afe9; top:0px; right:0px; width:40px; height:40px; line-height:38px;}
-div[data-role=input][data-type=input] > button[disabled] {background:#f4f4f4; opacity:0.5; cursor:not-allowed; color:#666;}
+div[data-role=input][data-type=input] > button[disabled] {background:#e5e5e5; opacity:0.5; cursor:not-allowed; color:#666;}
 div[data-role=input][data-type=input].extend > input {border-color:#66afe9;}
 div[data-role=input][data-type=input].extend > button {background:#428bca; color:#fff;}
 div[data-role=input][data-type=input].error > input {border-color:#f44336;}
@@ -201,7 +201,7 @@ div[data-role=input][data-type=input].extend > div[data-role=picker] {display:bl
 div[data-role=input][data-type=textarea] {height:auto;}
 div[data-role=input][data-type=textarea] > textarea {border:1px solid #e1e1e1; background:#fff; box-sizing:border-box; width:100%; height:40px; padding:10px; line-height:18px; border-radius:0px; min-height:100px; resize:none; display:block;}
 div[data-role=input][data-type=textarea] > textarea:focus, div[data-role=input][data-type=textarea] > textarea.focus {border-color:#66afe9;}
-div[data-role=input][data-type=textarea] > textarea[disabled] {background:#f4f4f4; opacity:0.5; cursor:not-allowed;}
+div[data-role=input][data-type=textarea] > textarea[disabled] {background:#e5e5e5; opacity:0.5; cursor:not-allowed;}
 div[data-role=input][data-type=textarea].error > textarea {border-color:#f44336;}
 div[data-role=input][data-type=textarea].success > textarea {border-color:#4caf50;}
 
@@ -211,7 +211,7 @@ div[data-role=input][data-type=checkbox] > label > button.checkbox.on {backgroun
 div[data-role=input][data-type=checkbox] > label > button.checkbox.on:before {content:"\eb10";}
 div[data-role=input][data-type=checkbox] > label > button.checkbox:focus {border-color:#66afe9;}
 div[data-role=input][data-type=checkbox].disabled > label {opacity:0.5; cursor:not-allowed;}
-div[data-role=input][data-type=checkbox].disabled > label > button {border-color:#ccc !important; background:#f4f4f4; opacity:0.8; cursor:not-allowed;}
+div[data-role=input][data-type=checkbox].disabled > label > button {border-color:#ccc !important; background:#e5e5e5; opacity:0.8; cursor:not-allowed;}
 div[data-role=input][data-type=checkbox].error > label {color:#f44336;}
 div[data-role=input][data-type=checkbox].error > label > button {border-color:#f44336;}
 div[data-role=input][data-type=checkbox].success > label {color:#4caf50;}
@@ -222,7 +222,7 @@ div[data-role=input][data-type=radio] > label > button.radio {display:inline-blo
 div[data-role=input][data-type=radio] > label > button.radio.on {border:8px solid #43b3ec; background:#fff;}
 div[data-role=input][data-type=radio] > label > button.radio:focus {border-color:#66afe9;}
 div[data-role=input][data-type=radio].disabled > label {opacity:0.8; cursor:not-allowed;}
-div[data-role=input][data-type=radio].disabled > label > button {border-color:#ccc !important; background:#f4f4f4; cursor:not-allowed;}
+div[data-role=input][data-type=radio].disabled > label > button {border-color:#ccc !important; background:#e5e5e5; cursor:not-allowed;}
 div[data-role=input][data-type=radio].error > label {color:#f44336;}
 div[data-role=input][data-type=radio].error > label > button {border-color:#f44336;}
 div[data-role=input][data-type=radio].success > label {color:#4caf50;}
