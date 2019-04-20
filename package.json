@@ -275,7 +275,7 @@
 				},
 				"type":{
 					"type":"enum",
-					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','HTML','LINK','EMPTY'",
+					"length":"'PAGE','EXTERNAL','WIDGET','MODULE','HTML','LINK','EMPTY','GROUPSTART','GROUPEND'",
 					"default":"EMPTY",
 					"comment":"종류"
 				},

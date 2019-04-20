@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 4. 20.
  */
 class iModule {
 	/**
@@ -1173,16 +1173,34 @@ class iModule {
 		 */
 		$sitemap = array();
 		$menus = $this->getMenus(null,$domain,$language);
+		
 		foreach ($menus as $menu) {
 			if (isset($menu->is_hide) == true && $menu->is_hide == true) continue;
 			
 			/**
 			 * 메뉴의 하위 메뉴를 가져온다.
 			 */
+			$group = null;
 			$menu->pages = array();
 			$pages = $this->getPages($menu->menu,null,$domain,$language);
 			foreach ($pages as $page) {
 				if (isset($page->is_hide) == true && $page->is_hide == true) continue;
+				if ($page->type == 'GROUPSTART') {
+					$group = new stdClass();
+					$group->code = substr($page->page,1);
+					$group->title = $page->title;
+					$group->icon = $page->icon;
+					$group->pages = array();
+					continue;
+				}
+				
+				if ($page->type == 'GROUPEND') {
+					$group = null;
+					continue;
+				}
+				
+				if ($group != null) $group->pages[] = $page;
+				$page->group = $group;
 				
 				$menu->pages[] = $page;
 			}
