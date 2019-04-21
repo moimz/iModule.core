@@ -101,6 +101,7 @@
 .mi-move:before {content:"\ec24"}
 .mi-link:before {content:"\ec25"}
 .mi-unlink:before {content:"\ec26"}
+.mi-edit:before {content:"\ec27"}
 
 .mi-loading:before {content:"\ed00"}
 
