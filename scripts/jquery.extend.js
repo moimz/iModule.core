@@ -1119,7 +1119,7 @@
 				e.preventDefault();
 				
 				var $lists = $("ul",$parent);
-				if ($lists.lenght == 0) return;
+				if ($lists.length == 0) return;
 				
 				var $items = $("li",$lists);
 				if ($items.length == 0) return;
