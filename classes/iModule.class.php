@@ -322,9 +322,11 @@ class iModule {
 			/**
 			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
 			 */
+			$groups = array();
 			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+				$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
 				
 				$sitemap = null;
 				
@@ -340,7 +342,6 @@ class iModule {
 				}
 				
 				$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
-				
 				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
 					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
 					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
@@ -355,11 +356,30 @@ class iModule {
 					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
 					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
 					
-					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) $this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) {
+						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+						$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+					}
 					
 					if ($sitemap[$j]->page == '') {
 						$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
 					} else {
+						if ($sitemap[$j]->type == 'GROUPSTART') {
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = new stdClass();
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->title = $sitemap[$j]->title;
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages = array();
+							continue;
+						}
+						
+						if ($sitemap[$j]->type == 'GROUPEND') {
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+							continue;
+						}
+						
+						if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $sitemap[$j];
+						$sitemap[$j]->group = $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu];
 						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
 					}
 				}
@@ -1134,6 +1154,12 @@ class iModule {
 		if ($current == null) return $this->printError('NOT_FOUND_SITE');
 		$this->site = clone $current;
 		
+		/**
+		 * @todo 디버그용
+		 */
+		if (Request('thema')) {
+			$this->site->templet = '#'.Request('thema');
+		}
 		$this->site->logo = json_decode($this->site->logo);
 		$this->site->description = $this->site->description ? $this->site->description : null;
 		
@@ -1180,28 +1206,10 @@ class iModule {
 			/**
 			 * 메뉴의 하위 메뉴를 가져온다.
 			 */
-			$group = null;
 			$menu->pages = array();
 			$pages = $this->getPages($menu->menu,null,$domain,$language);
 			foreach ($pages as $page) {
 				if (isset($page->is_hide) == true && $page->is_hide == true) continue;
-				if ($page->type == 'GROUPSTART') {
-					$group = new stdClass();
-					$group->code = substr($page->page,1);
-					$group->title = $page->title;
-					$group->icon = $page->icon;
-					$group->pages = array();
-					continue;
-				}
-				
-				if ($page->type == 'GROUPEND') {
-					$group = null;
-					continue;
-				}
-				
-				if ($group != null) $group->pages[] = $page;
-				$page->group = $group;
-				
 				$menu->pages[] = $page;
 			}
 			
