@@ -525,7 +525,7 @@ class iModule {
 						break;
 						
 					case 'NOT_FOUND_PAGE' :
-						$description = $value ? $value : $this->getUrl();
+						$description = GetString($value ? $value : $this->getUrl(),'replace');
 						$type = 'BACK';
 						break;
 						
