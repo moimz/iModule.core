@@ -645,7 +645,8 @@ class Module {
 		if (isset($package->attachments) == true && is_array($package->attachments) == true) {
 			for ($i=0, $loop=count($package->attachments);$i<$loop;$i++) {
 				if (is_dir($this->IM->getAttachmentPath().'/'.$package->attachments[$i]) == false) {
-					mkdir($this->IM->getAttachmentPath().'/'.$package->attachments[$i],0707);
+					mkdir($this->IM->getAttachmentPath().'/'.$package->attachments[$i]);
+					chmod($this->IM->getAttachmentPath().'/'.$package->attachments[$i],0707);
 				}
 			}
 		}
