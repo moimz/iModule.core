@@ -89,7 +89,7 @@ class Module {
 			$this->IM->cache()->store('core','modules','all',json_encode($modules));
 		}
 		
-		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
+		for ($i=0, $loop=count($modules);$i<$loop;$i++) {
 			$targets = $modules[$i]->targets ? json_decode($modules[$i]->targets) : new stdClass();
 			
 			foreach ($targets as $target=>$events) {
@@ -157,7 +157,7 @@ class Module {
 		if ($_SERVER['SCRIPT_NAME'] == '/admin/index.php') return;
 		
 		$globals = $this->IM->db()->select($this->table->module)->where('is_global','TRUE')->get();
-		for ($i=0, $loop=sizeof($globals);$i<$loop;$i++) {
+		for ($i=0, $loop=count($globals);$i<$loop;$i++) {
 			$this->IM->getModule($globals[$i]->module);
 		}
 	}
@@ -604,7 +604,7 @@ class Module {
 	 */
 	function getContextModules() {
 		$modules = $this->IM->db()->select($this->table->module)->where('is_context','TRUE')->orderBy('sort','asc')->get();
-		for ($i=0, $loop=sizeof($modules);$i<$loop;$i++) {
+		for ($i=0, $loop=count($modules);$i<$loop;$i++) {
 			$modules[$i]->title = $this->getTitle($modules[$i]->module);
 		}
 		
