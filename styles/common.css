@@ -88,33 +88,33 @@ div[data-role=box].yellow {background:#FFF8E1; border-color:#FFECB3;}
  */
 div[data-role=modal] {display:block; width:95%; max-width:500px; background:#fff; box-shadow:0px 1px 70px rgba(0,0,0,0.5); margin:0px auto;}
 div[data-role=modal] > form {margin:0; padding:0;}
-div[data-role=modal] > form > header {min-height:80px; padding:0; margin:0; position:relative; text-align:left; background:transparent; display:block; box-shadow:none;}
-div[data-role=modal] > form > header > h1 {font-size:18px; display:block; width:100%; height:auto; line-height:30px; padding:25px 60px 25px 20px; color:#333; overflow:hidden; box-sizing:border-box; margin:0;}
-div[data-role=modal] > form > header > button {position:absolute; top:20px; right:10px; width:40px; height:40px; font-size:20px; background:transparent; border:0px; cursor:pointer; color:#666;}
-div[data-role=modal] > form > header > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
-div[data-role=modal] > form > header > button:hover {color:#333;}
+div[data-role=modal] > form > div[data-role=header] {min-height:80px; padding:0; margin:0; position:relative; text-align:left; background:transparent; display:block; box-shadow:none;}
+div[data-role=modal] > form > div[data-role=header] > h1 {font-size:18px; display:block; width:100%; height:auto; line-height:30px; padding:25px 60px 25px 20px; color:#333; overflow:hidden; box-sizing:border-box; margin:0;}
+div[data-role=modal] > form > div[data-role=header] > button {position:absolute; top:20px; right:10px; width:40px; height:40px; font-size:20px; background:transparent; border:0px; cursor:pointer; color:#666;}
+div[data-role=modal] > form > div[data-role=header] > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
+div[data-role=modal] > form > div[data-role=header] > button:hover {color:#333;}
 div[data-role=modal][data-closable=FALSE] > form > header > button {display:none;}
-div[data-role=modal] > form > main {min-height:30px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:14px; color:#333; text-align:left; display:block;}
-div[data-role=modal] > form > main[data-fullsize=TRUE] {height:calc(100% - 122px);}
-div[data-role=modal] > form > main > label {display:block; height:30px; line-height:30px; font-weight:bold;}
-div[data-role=modal] > form > main > div[data-role=message] {font-size:14px; line-height:1.6;}
-div[data-role=modal] > form > main > div[data-role=message] + div[data-role=input] {margin-top:10px;}
-div[data-role=modal] > form > main > div[data-role=iframe] {display:block; width:100%; height:100%; font-size:0;}
-div[data-role=modal] > form > main > div[data-role=iframe] > iframe {display:block; border:0px; margin:0px; padding:0px; width:100%; height:100%;}
-div[data-role=modal] > form > main > div[data-role=iframe][data-fullsize=TRUE] {margin:0px -20px; width:calc(100% + 40px);}
-div[data-role=modal] > form > footer {display:table; table-layout:fixed; width:100%; height:auto; background:transparent; margin:0px; margin-top:20px; padding:0px;}
-div[data-role=modal] > form > main[data-fullsize=TRUE] + footer {margin-top:0px;}
-div[data-role=modal] > form > footer > div {display:table-cell; width:auto; vertical-align:middle;}
-div[data-role=modal] > form > footer > div > button {display:block; width:100%; height:42px; box-sizing:border-box; cursor:pointer; font-size:14px; line-height:42px; border:0; background:#bdbdbd; color:#fff;}
-div[data-role=modal] > form > footer > div > button:hover {background:#aeaeae;}
-div[data-role=modal] > form > footer > div > button:focus {border:1px dotted rgba(0,0,0,0.5); line-height:40px;}
-div[data-role=modal] > form > footer > div > button[disabled] {background:#bdbdbd !important; opacity:0.7; cursor:not-allowed;}
-div[data-role=modal] > form > footer > div > button[type=submit], div[data-role=modal] > form > footer > div > button.submit {background:#2196fe; color:#fff;}
-div[data-role=modal] > form > footer > div > button[type=submit]:hover, div[data-role=modal] > form > footer > div > button.submit:hover {background:#1e88e5;}
-div[data-role=modal] > form > footer > div > button[type=submit][disabled], div[data-role=modal] > form > footer > div > button.submit {background:#2196fe !important;}
-div[data-role=modal] > form > footer > div > button.danger {background:#f44336; color:#fff;}
-div[data-role=modal] > form > footer > div > button.danger:hover {background:#e53935;}
-div[data-role=modal] > form > footer > div > button[disabled].danger {background:#e53935 !important;}
+div[data-role=modal] > form > div[data-role=context] {min-height:30px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:14px; color:#333; text-align:left; display:block;}
+div[data-role=modal] > form > div[data-role=context][data-fullsize=TRUE] {height:calc(100% - 122px);}
+div[data-role=modal] > form > div[data-role=context] > label {display:block; height:30px; line-height:30px; font-weight:bold;}
+div[data-role=modal] > form > div[data-role=context] > div[data-role=message] {font-size:14px; line-height:1.6;}
+div[data-role=modal] > form > div[data-role=context] > div[data-role=message] + div[data-role=input] {margin-top:10px;}
+div[data-role=modal] > form > div[data-role=context] > div[data-role=iframe] {display:block; width:100%; height:100%; font-size:0;}
+div[data-role=modal] > form > div[data-role=context] > div[data-role=iframe] > iframe {display:block; border:0px; margin:0px; padding:0px; width:100%; height:100%;}
+div[data-role=modal] > form > div[data-role=context] > div[data-role=iframe][data-fullsize=TRUE] {margin:0px -20px; width:calc(100% + 40px);}
+div[data-role=modal] > form > div[data-role=footer] {display:table; table-layout:fixed; width:100%; height:auto; background:transparent; margin:0px; margin-top:20px; padding:0px;}
+div[data-role=modal] > form > div[data-role=context][data-fullsize=TRUE] + footer {margin-top:0px;}
+div[data-role=modal] > form > div[data-role=footer] > div {display:table-cell; width:auto; vertical-align:middle;}
+div[data-role=modal] > form > div[data-role=footer] > div > button {display:block; width:100%; height:42px; box-sizing:border-box; cursor:pointer; font-size:14px; line-height:42px; border:0; background:#bdbdbd; color:#fff;}
+div[data-role=modal] > form > div[data-role=footer] > div > button:hover {background:#aeaeae;}
+div[data-role=modal] > form > div[data-role=footer] > div > button:focus {border:1px dotted rgba(0,0,0,0.5); line-height:40px;}
+div[data-role=modal] > form > div[data-role=footer] > div > button[disabled] {background:#bdbdbd !important; opacity:0.7; cursor:not-allowed;}
+div[data-role=modal] > form > div[data-role=footer] > div > button[type=submit], div[data-role=modal] > form > div[data-role=footer] > div > button.submit {background:#2196fe; color:#fff;}
+div[data-role=modal] > form > div[data-role=footer] > div > button[type=submit]:hover, div[data-role=modal] > form > div[data-role=footer] > div > button.submit:hover {background:#1e88e5;}
+div[data-role=modal] > form > div[data-role=footer] > div > button[type=submit][disabled], div[data-role=modal] > form > div[data-role=footer] > div > button.submit {background:#2196fe !important;}
+div[data-role=modal] > form > div[data-role=footer] > div > button.danger {background:#f44336; color:#fff;}
+div[data-role=modal] > form > div[data-role=footer] > div > button.danger:hover {background:#e53935;}
+div[data-role=modal] > form > div[data-role=footer] > div > button[disabled].danger {background:#e53935 !important;}
 
 
 /**
@@ -486,11 +486,11 @@ div[data-role=context][data-type=html] > a.edit:hover {background:#1e88e5;}
 	div[data-role=pagination] > div {width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
 	div[data-role=pagination] > div > ul {white-space:nowrap;}
 	
-	div[data-role=modal] > form > header {min-height:60px;}
-	div[data-role=modal] > form > header > h1 {font-size:16px; height:auto; line-height:30px; padding:15px 60px 15px 20px;}
-	div[data-role=modal] > form > header > button {top:10px; right:10px;}
-	div[data-role=modal] > form > main {height:calc(100% - 130px);}
-	div[data-role=modal] > form > main[data-fullsize=TRUE] {height:calc(100% - 110px);}
+	div[data-role=modal] > form > div[data-role=header] {min-height:60px;}
+	div[data-role=modal] > form > div[data-role=header] > h1 {font-size:16px; height:auto; line-height:30px; padding:15px 60px 15px 20px;}
+	div[data-role=modal] > form > div[data-role=header] > button {top:10px; right:10px;}
+	div[data-role=modal] > form > div[data-role=context] {height:calc(100% - 130px);}
+	div[data-role=modal] > form > div[data-role=context][data-fullsize=TRUE] {height:calc(100% - 110px);}
 	
 	/**
 	 * 테이블
