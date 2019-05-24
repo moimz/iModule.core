@@ -86,6 +86,12 @@
 					"length":20,
 					"comment":"현재버전"
 				},
+				"previous":{
+					"type":"varchar",
+					"length":20,
+					"is_null":true,
+					"comment":"이전버전"
+				},
 				"hash":{
 					"type":"char",
 					"length":32,

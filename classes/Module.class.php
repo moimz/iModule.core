@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 5. 24.
  */
 class Module {
 	/**
@@ -695,7 +695,8 @@ class Module {
 		
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
-		if ($this->isInstalled($module) == false) {
+		$previous = $this->IM->db()->select($this->table->module)->where('module',$module)->getOne();
+		if ($previous == null) {
 			$sort = $this->IM->db()->select($this->table->module)->count();
 			$this->IM->db()->insert($this->table->module,array(
 				'module'=>$module,
@@ -720,6 +721,7 @@ class Module {
 			$this->IM->db()->update($this->table->module,array(
 				'hash'=>$this->getHash($module),
 				'version'=>$package->version,
+				'previous'=>$package->version != $previous->version ? $previous->version : $previous->previous,
 				'database'=>$database,
 				'is_global'=>isset($package->global) == true && $package->global === true ? 'TRUE' : 'FALSE',
 				'is_admin'=>isset($package->admin) == true && $package->admin === true ? 'TRUE' : 'FALSE',
