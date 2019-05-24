@@ -147,7 +147,7 @@ class Event {
 		 * 이벤트가 발생한 대상의 객체를 정의한다.
 		 */
 		if ($target === 'core') {
-			$Target = $IM;
+			$Target = $this->IM;
 		} else {
 			$Target = $this->IM->getModule($target);
 		}
