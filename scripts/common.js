@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 3. 3.
+ * @modified 2019. 5. 29.
  */
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
@@ -588,7 +588,7 @@ var iModule = {
 			$modal.attr("data-max-height",options.maxHeight);
 			
 			var $form = $("<form>").attr("id","iModuleModalForm");
-			var $header = $("<header>");
+			var $header = $("<div>").attr("data-role","header");
 			var $title = $("<h1>").html(title);
 			$header.append($title);
 			
@@ -597,10 +597,10 @@ var iModule = {
 			
 			$form.append($header);
 			
-			var $main = $("<main>").html(content);
+			var $main = $("<div>").attr("data-role","context").html(content);
 			$form.append($main);
 			
-			var $footer = $("<footer>");
+			var $footer = $("<div>").attr("data-role","footer");
 			
 			if (typeof buttons == "function") {
 				var $button = $("<button>").attr("type","button").attr("data-action","close").html(iModule.getText("button/close"));
@@ -639,7 +639,7 @@ var iModule = {
 			$modal.attr("data-max-height",0);
 			
 			var $form = $("<form>").attr("id","iModuleModalForm");
-			var $header = $("<header>");
+			var $header = $("<div>").attr("data-role","header");
 			var $title = $("<h1>").html(iModule.getText("text/error"));
 			$header.append($title);
 			
@@ -648,10 +648,10 @@ var iModule = {
 			
 			$form.append($header);
 			
-			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			var $main = $("<div>").attr("data-role","context").html($("<div>").attr("data-role","message").html(message));
 			$form.append($main);
 			
-			var $footer = $("<footer>");
+			var $footer = $("<div>").attr("data-role","footer");
 			
 			var $button = $("<button>").attr("type","submit").html(iModule.getText("button/confirm"));
 			$footer.append($("<div>").append($button));
@@ -680,7 +680,7 @@ var iModule = {
 			$modal.attr("data-max-height",0);
 			
 			var $form = $("<form>").attr("id","iModuleModalForm");
-			var $header = $("<header>");
+			var $header = $("<div>").attr("data-role","header");
 			var $title = $("<h1>").html(title);
 			$header.append($title);
 			
@@ -689,10 +689,10 @@ var iModule = {
 			
 			$form.append($header);
 			
-			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			var $main = $("<div>").attr("data-role","context").html($("<div>").attr("data-role","message").html(message));
 			$form.append($main);
 			
-			var $footer = $("<footer>");
+			var $footer = $("<div>").attr("data-role","footer");
 			
 			var $button = $("<button>").attr("type","submit").html(iModule.getText("button/confirm"));
 			$footer.append($("<div>").append($button));
@@ -721,16 +721,16 @@ var iModule = {
 			$modal.attr("data-max-height",0);
 			
 			var $form = $("<form>").attr("id","iModuleModalForm");
-			var $header = $("<header>");
+			var $header = $("<div>").attr("data-role","header");
 			var $title = $("<h1>").html(title);
 			$header.append($title);
 			
 			$form.append($header);
 			
-			var $main = $("<main>").html($("<div>").attr("data-role","message").html(message));
+			var $main = $("<div>").attr("data-role","context").html($("<div>").attr("data-role","message").html(message));
 			$form.append($main);
 			
-			var $footer = $("<footer>");
+			var $footer = $("<div>").attr("data-role","footer");
 			
 			var $button = $("<button>").attr("type","button").attr("data-action","ok").addClass("submit").html(iModule.getText("button/confirm"));
 			$footer.append($("<div>").append($button));
