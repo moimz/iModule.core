@@ -13,17 +13,6 @@
  */
 
 /**
- * 사이트 헤더 설정
- * 기본적인 HTTP보안설정 및 언어셋을 선언한다.
- */
-header("X-UA-Compatible: IE=Edge");
-header("X-XSS-Protection: 1");
-header("Content-type: text/html; charset=utf-8",true);
-header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-header("Cache-Control: post-check=0, pre-check=0", false);
-header("Pragma: no-cache");
-
-/**
  * iModule 상수정의
  * iModule 에서 사용되는 상수는 상수명 앞뒤를 언더바 2개로 감싼 형태로 정의힌다. (__[상수명]__)
  * 
@@ -128,4 +117,17 @@ if (defined('__DEBUG_MODE__') == true) {
 	error_reporting(0);
 	ini_set('display_errors',false);
 }
+
+/**
+ * 사이트 헤더 설정
+ * 기본적인 HTTP보안설정 및 언어셋을 선언한다.
+ */
+header("X-UA-Compatible: IE=Edge");
+header("X-XSS-Protection: 1");
+header("Content-type: text/html; charset=utf-8");
+header("Expires: 0");
+header("Last-Modified: ".gmdate('D, d M Y H:i:s').' GMT');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Cache-Control: pre-check=0, post-check=0, max-age=0');
+header('Pragma: no-cache');
 ?>
