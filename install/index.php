@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 6. 8.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install','',__DIR__).'/configs/init.config.php';
 
@@ -64,9 +64,6 @@ $acceptLanguage = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'],0,2);
 					<?php } ?>
 					<?php foreach ($package->directories as $directory=>$permission) { if (preg_match('/^@/',$directory) == true && is_dir(__IM_PATH__.DIRECTORY_SEPARATOR.str_replace('@','',$directory)) == false) continue; ?>
 					<li data-directory="<?php echo str_replace('@','',$directory); ?>" data-permission="<?php echo $permission; ?>"></li>
-					<?php } ?>
-					<?php if (isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true) { ?>
-					<li data-directory="<?php echo str_replace('@','',$_CONFIGS->attachment->path); ?>" data-permission="0707"></li>
 					<?php } ?>
 					<?php foreach ($package->configs as $config) { ?>
 					<li data-config="<?php echo $config; ?>"></li>

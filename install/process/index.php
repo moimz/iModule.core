@@ -66,9 +66,16 @@ if ($action == 'directory') {
 	$permission = Request('permission');
 	
 	$results->success = true;
-	$results->directory = $directory;
-	$results->created = CheckDirectoryPermission(strpos($directory,'/') === 0 ? $directory : __IM_PATH__.DIRECTORY_SEPARATOR.$directory,$permission);
-	$results->permission = $permission;
+	
+	if ($directory == 'attachments' && isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true) {
+		$results->directory = $directory;
+		$results->created = CheckDirectoryPermission($_CONFIGS->attachment->path,$permission);
+		$results->permission = $permission;
+	} else {
+		$results->directory = $directory;
+		$results->created = CheckDirectoryPermission(strpos($directory,'/') === 0 ? $directory : __IM_PATH__.DIRECTORY_SEPARATOR.$directory,$permission);
+		$results->permission = $permission;
+	}
 }
 
 if ($action == 'config') {
@@ -146,12 +153,14 @@ if ($action == 'install') {
 		if ($_CONFIGS->presets->db == false) $dbFile = @file_put_contents(__IM_PATH__.'/configs/db.config.php','<?php /*'.PHP_EOL.Encoder(json_encode($db),$key).PHP_EOL.'*/ ?>');
 		else $dbFile = true;
 		
-		if (is_dir(__IM_PATH__.'/attachments/cache') == false) {
-			mkdir(__IM_PATH__.'/attachments/cache',0707);
+		$attachments = isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true ? $_CONFIGS->attachment->path : __IM_PATH__.'/attachments';
+		
+		if (is_dir($attachments.'/cache') == false) {
+			mkdir($attachments.'/cache',0707);
 		}
 		
-		if (is_dir(__IM_PATH__.'/attachments/temp') == false) {
-			mkdir(__IM_PATH__.'/attachments/temp',0707);
+		if (is_dir($attachments.'/temp') == false) {
+			mkdir($attachments.'/temp',0707);
 		}
 		
 		if ($keyFile !== false && $dbFile !== false) {
