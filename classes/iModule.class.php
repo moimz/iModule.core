@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 4. 20.
+ * @modified 2019. 6. 8.
  */
 class iModule {
 	/**
@@ -1448,7 +1448,7 @@ class iModule {
 	 */
 	function setSiteTitle($title,$isSiteTitle=true) {
 		$title = strip_tags($title);
-		$this->siteTitle = $isSiteTitle == true && $this->site != null ? $this->site->title.' - '.$title : $title;
+		$this->siteTitle = $isSiteTitle == true && $this->site != null ? $title.' - '.$this->site->title : $title;
 	}
 	
 	/**
