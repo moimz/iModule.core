@@ -159,10 +159,6 @@ if ($action == 'install') {
 			mkdir($attachments.'/cache',0707);
 		}
 		
-		if (is_dir($attachments.'/session') == false) {
-			mkdir($attachments.'/session',0707);
-		}
-		
 		if (is_dir($attachments.'/temp') == false) {
 			mkdir($attachments.'/temp',0707);
 		}

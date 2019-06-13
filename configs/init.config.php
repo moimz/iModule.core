@@ -86,8 +86,7 @@ foreach ($_GET as $key=>$value) {
  * session 기본 설정
  * 아이모듈이 정상설치되어 별도의 세션폴더가 생성되어있다면, 해당 폴더에 세션을 저장한다.
  */
-$session_path = (isset($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true ? $_CONFIGS->attachment->path : __IM_PATH__.'/attachments').'/session';
-if (is_dir($session_path) == true) {
+if (isset($_CONFIGS->session_path) == true && is_dir($_CONFIGS->session_path) == true && is_writable($_CONFIGS->session_path) == true) {
 	session_save_path($session_path);
 }
 $session_name = session_name('IMSESSID');
