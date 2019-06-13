@@ -825,9 +825,10 @@ class iModule {
 	 * @param string[] $extacts 반드시 일치해야하는 컨텍스트 옵션
 	 * @param string[] $options 반드시 일치할 필요는 없는 컨텍스트 옵션
 	 * @param boolean $isSameDomain 현재 도메인 우선모드 (기본값 : false, true 일 경우 같은 도메인일 경우 우선, false 일 경우 $options 설정값에 우선)
+	 * @param boolean $isFullUrl 전체경로여부
 	 * @return string $url
 	 */
-	function getContextUrl($module,$context,$exacts=array(),$options=array(),$isSameDomain=false) {
+	function getContextUrl($module,$context,$exacts=array(),$options=array(),$isSameDomain=false,$isFullUrl=false) {
 		$matches = $this->getContextPage($module,$context);
 		
 		/**
@@ -856,7 +857,7 @@ class iModule {
 		 * 일치하는 페이지가 없을 경우 NULL 을 반환하고, 설정과 일치하는 페이지가 유일할 경우 해당 페이지를 반환한다.
 		 */
 		if (count($matches) == 0) return null;
-		if (count($matches) == 1) return $this->getUrl(false,false,false,false,false,$matches[0]->domain,$matches[0]->language).'/'.$matches[0]->url;
+		if (count($matches) == 1) return $this->getUrl(false,false,false,false,$isFullUrl,$matches[0]->domain,$matches[0]->language).'/'.$matches[0]->url;
 		
 		/**
 		 * 설정과 일치하는 페이지가 2개 이상일 경우, $options 설정이나, $isSameDomain 설정에 따라 최대한 일치하는 페이지를 재탐색한다.
@@ -880,7 +881,7 @@ class iModule {
 			/**
 			 * 같은 도메인에 설정과 일치하는 페이지가 유일할 경우, 해당 페이지를 반환한다.
 			 */
-			if (count($filters) == 1) return $this->getUrl(false,false,false,false,false,$filters[0]->domain,$filters[0]->language).'/'.$filters[0]->url;
+			if (count($filters) == 1) return $this->getUrl(false,false,false,false,$isFullUrl,$filters[0]->domain,$filters[0]->language).'/'.$filters[0]->url;
 		}
 		
 		if (count($filters) > 0) $matches = $filters;
@@ -902,7 +903,7 @@ class iModule {
 		}
 		
 		if ($page == null) return null;
-		return $this->getUrl(false,false,false,false,false,$page->domain,$page->language).'/'.$page->url;
+		return $this->getUrl(false,false,false,false,$isFullUrl,$page->domain,$page->language).'/'.$page->url;
 	}
 	
 	/**
