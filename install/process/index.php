@@ -240,6 +240,7 @@ if ($action == 'install') {
 							$dbConnect->insert('member_table',array('idx'=>1,'domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'reg_date'=>time(),'status'=>'ACTIVATED'))->execute();
 						}
 						
+						$dbConnect->insert('member_activity_table',array('midx'=>1,'reg_date'=>time() * 1000,'module'=>'member','code'=>'install','content'=>'{}','ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']))->execute();
 						$IM->Module->updateSize('member');
 					}
 				}
