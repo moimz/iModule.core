@@ -1424,13 +1424,14 @@ class iModule {
 	/**
 	 * 사이트 타이틀을 가져온다.
 	 *
+	 * @param boolean $is_origin 사이트설정의 원 사이트명을 가져올지 여부 (기본값 : false)
 	 * @return string $siteTitle
 	 */
-	function getSiteTitle() {
+	function getSiteTitle($is_origin=false) {
 		/**
 		 * 모듈 등에서 지정된 사이트타이틀이 있을 경우 해당 타이틀을 반환한다.
 		 */
-		if ($this->siteTitle != null) return $this->siteTitle;
+		if ($is_origin == false && $this->siteTitle != null) return $this->siteTitle;
 		
 		/**
 		 * 현재 접속한 사이트의 정보를 찾을 수 없는 경우 NULL 을 반환한다.
