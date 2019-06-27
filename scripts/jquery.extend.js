@@ -1666,7 +1666,7 @@
 		
 		var count = count !== undefined ? count : 1;
 		var $form = this;
-		var data = $("input[type=file]",$form).length == 0 ? $form.serialize() : new FormData($form[0]);
+		var data = $("input[type=file][name]",$form).length == 0 ? $form.serialize() : new FormData($form[0]);
 		
 		$("input, select, textarea",$form).each(function() {
 			if ($(this).attr("type") == "checkbox") {
@@ -1682,9 +1682,9 @@
 			type:"POST",
 			url:url,
 			data:data,
-			processData:$("input[type=file]",$form).length == 0 ? true : false,
+			processData:$("input[type=file][name]",$form).length == 0 ? true : false,
 			dataType:"json",
-			contentType:$("input[type=file]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
+			contentType:$("input[type=file][name]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) $form.status("error",result.errors);
@@ -1796,6 +1796,7 @@
 					}
 					$(this).disable();
 				} else if (status == "default" || status == "success" || status == "error") {
+					$(this).outerWidth("");
 					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
 					if ($(this).attr("data-loading") == "TRUE") {
 						$(this).enable();
@@ -1822,6 +1823,7 @@
 					if ($(this).is(":disabled") == false) $(this).attr("data-loading","TRUE");
 					$(this).disable();
 				} else if (status == "default" || status == "success" || status == "error") {
+					$(this).outerWidth("");
 					if ($(this).data("defaultHtml") !== undefined) $(this).html($(this).data("defaultHtml"));
 					if ($(this).attr("data-loading") == "TRUE") {
 						$(this).enable();
