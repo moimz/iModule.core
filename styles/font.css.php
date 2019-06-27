@@ -8,7 +8,7 @@
  * @author Arzz
  * @license MIT License
  * @version 1.0.0
- * @modified 2018. 5. 6.
+ * @modified 2019. 6. 26.
  */
 header("Content-Type:text/css");
 
@@ -24,7 +24,7 @@ if ($default != null) $fontFamily = $default.', ';
 else $fontFamily = '';
 
 if ($language == 'ko') $fontFamily.= '"Apple SD Neo Gothic", "malgun gothic", dotum';
-
+else $fontFamily.= 'Arial';
 $fontFamily.= ', sans-serif';
 echo 'html, body {font-family:'.$fontFamily.';}';
 ?>
