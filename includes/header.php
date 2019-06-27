@@ -16,7 +16,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="<?php echo $IM->getViewport(); ?>">
-<title><?php echo $IM->getSiteTitle(); ?></title>
+<title data-origin="<?php echo $IM->getSiteTitle(true); ?>"><?php echo $IM->getSiteTitle(); ?></title>
 <?php echo $IM->getHeadResource(); ?>
 </head>
 <body>
