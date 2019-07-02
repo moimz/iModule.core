@@ -16,6 +16,17 @@ Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidt
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false});
 Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,enableColumnMove:false});
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
+Ext.define("Ext.moimz.selection.Model",{override:"Ext.selection.Model",vetoSelection:function(e) {
+	if (e.stopSelection) {
+		return true;
+	} else if (e.type !== 'keydown' && e.button !== 0) {
+		if (this.ignoreRightMouseSelection) {
+			return true;
+		}
+	} else {
+		return e.type === 'mousedown';
+	}
+}});
 Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorField:function(form) {
 	var form = form ? form : this;
 	
