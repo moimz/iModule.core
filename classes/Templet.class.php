@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 7. 3.
  */
 class Templet {
 	/**
@@ -1109,7 +1109,7 @@ class Templet {
 			$startPage = floor(($p-1)/$pagenum) * $pagenum + 1;
 			$endPage = $startPage + $pagenum - 1 < $total ? $startPage + $pagenum - 1 : $total;
 			$prevPageStart = $startPage - $pagenum > 0 ? $startPage - $pagenum : false;
-			$nextPageStart = $endPage + 1 < $total ? $endPage + 1 : false;
+			$nextPageStart = $endPage < $total ? $endPage + 1 : false;
 		} else {
 			$startPage = $p - floor($pagenum/2) > 0 ? $p - floor($pagenum/2) : 1;
 			$endPage = $p + floor($pagenum/2) > $pagenum ? $p + floor($pagenum/2) : $startPage + $pagenum - 1;
