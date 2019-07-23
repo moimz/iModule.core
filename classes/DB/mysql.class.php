@@ -663,13 +663,18 @@ class mysql {
 	
 	private function _buildWhere() {
 		if (empty($this->_where) == true) return;
-		
 		$this->_query.= ' WHERE ';
 		$this->_where[0][0] = '';
-		foreach ($this->_where as $cond) {
+		
+		foreach ($this->_where as $index=>&$cond) {
 			list ($concat,$wValue,$wKey) = $cond;
 			
-			$this->_query.= ' '.$concat.' ';
+			if ($wKey == '(') {
+				$this->_query.= ' '.$concat.' ';
+				if (isset($this->_where[$index+1]) == true) $this->_where[$index+1][0] = '';
+			} elseif ($wKey != ')') {
+				$this->_query.= ' '.$concat.' ';
+			}
 			if (is_array($wValue) == false || (strtolower(key($wValue)) != 'inset' && strtolower(key($wValue)) != 'fulltext')) $this->_query.= $wKey;
 			
 			if ($wValue === null) continue;
