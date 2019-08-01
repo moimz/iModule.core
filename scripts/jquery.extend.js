@@ -1587,7 +1587,7 @@
 		var $tab = $("ul[data-role=tab][data-name="+this.attr("data-name")+"]");
 		var $box = $("> div[data-tab="+tab+"]",this);
 		if ($box.length == 1) {
-			var position = $("body").scrollTop();
+			var position = $(document).scrollTop();
 			$("> div[data-tab]:visible",this).hide();
 			$("> div[data-tab]:visible",this).triggerHandler("hide");
 			
@@ -1599,7 +1599,7 @@
 			$("> li.selected",$tab).removeClass("selected");
 			$("> li[data-tab="+tab+"]",$tab).addClass("selected");
 			
-			$("body").scrollTop(position);
+			$(document).scrollTop(position);
 		}
 	};
 	
