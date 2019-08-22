@@ -42,7 +42,7 @@
 				},
 				"type":{
 					"type":"enum",
-					"length":"'DAILY','WEEKLY','MONTHLY'",
+					"length":"'HOURLY','DAILY','WEEKLY','MONTHLY'",
 					"default":"DAILY",
 					"comment":"반복일정"
 				},

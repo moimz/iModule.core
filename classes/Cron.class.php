@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 4. 5.
+ * @modified 2019. 8. 22.
  */
 class Cron {
 	/**
@@ -72,19 +72,46 @@ class Cron {
 		} else {
 			$_SERVER['HTTP_HOST'] = $host;
 			
-			REQUIRE_ONCE __DIR__.'/../configs/init.config.php';
+			REQUIRE_ONCE __IM_CRON_PATH__.'/configs/init.config.php';
 			
 			$IM = new iModule();
 			$site = $IM->getSite(false);
+			
+			$hour = date('h');
 			
 			/**
 			 * 크론작업이 필요한 모듈을 불러온다.
 			 */
 			$modules = $IM->getModule()->getCronModules();
 			for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-				$this->daily($IM,$modules[$i]->module);
-				$this->weekly($IM,$modules[$i]->module);
+				$this->hourly($IM,$modules[$i]->module);
+				if ($hour == 4) $this->daily($IM,$modules[$i]->module);
+				if ($hour == 5) $this->weekly($IM,$modules[$i]->module);
 			}
+		}
+	}
+	
+	/**
+	 * 모듈별 일별 작업을 실행한다.
+	 */
+	function hourly($IM,$module) {
+		$me = $IM->getModule($module);
+		
+		/**
+		 * 일별 작업파일이 있는지 확인한다.
+		 */
+		if (is_file($me->getModule()->getPath().'/crons/hourly.php') == true) {
+			$start_date = time();
+			$start_time = $IM->getMicroTime();
+			
+			ob_start();
+			INCLUDE $me->getModule()->getPath().'/crons/hourly.php';
+			$result = ob_get_clean();
+			
+			$end_date = time();
+			$runtime = $IM->getMicroTime() - $start_time;
+			
+			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'HOURLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
 		}
 	}
 	
