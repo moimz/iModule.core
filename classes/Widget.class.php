@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 9. 5.
  */
 class Widget {
 	/**
@@ -386,8 +386,10 @@ class Widget {
 	
 	/**
 	 * 위젯을 출력한다.
+	 *
+	 * @param boolean $is_return_html
 	 */
-	function doLayout() {
+	function doLayout($is_return_html=false) {
 		/**
 		 * 위젯이 로드되지 않았을 경우 에러메세지를 출력한다.
 		 */
@@ -460,6 +462,8 @@ class Widget {
 		$values = new stdClass();
 		$values->templet = $this->getTemplet()->getName(true);
 		$this->IM->fireEvent('afterDoWidgetLayout',$this->getClass() === null ? 'core' : $this->getClass()->getModule()->getName(),$this->widgetName,$values,$html);
+		
+		if ($is_return_html === true) return $html;
 		
 		echo $html;
 	}
