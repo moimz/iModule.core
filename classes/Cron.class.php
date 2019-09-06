@@ -98,7 +98,7 @@ class Cron {
 		$me = $IM->getModule($module);
 		
 		/**
-		 * 일별 작업파일이 있는지 확인한다.
+		 * 시간별 작업파일이 있는지 확인한다.
 		 */
 		if (is_file($me->getModule()->getPath().'/crons/hourly.php') == true) {
 			$start_date = time();
@@ -111,7 +111,7 @@ class Cron {
 			$end_date = time();
 			$runtime = $IM->getMicroTime() - $start_time;
 			
-			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'HOURLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
+			if ($result) $IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'HOURLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
 		}
 	}
 	
@@ -135,7 +135,7 @@ class Cron {
 			$end_date = time();
 			$runtime = $IM->getMicroTime() - $start_time;
 			
-			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'DAILY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
+			if ($result) $IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'DAILY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
 		}
 	}
 	
@@ -161,7 +161,7 @@ class Cron {
 			$end_date = time();
 			$runtime = $IM->getMicroTime() - $start_time;
 			
-			$IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'WEEKLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
+			if ($result) $IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'WEEKLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
 		}
 	}
 }
