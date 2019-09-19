@@ -93,12 +93,10 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-grid-cell-button .x-grid-cell-inner button.danger[disabled] {background-color:rgb(219, 63, 38) !important;}
 .x-grid-cell-right {text-align:right !important;}
 
-.x-menu-header-title {height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0; margin-right:-1px;}
-.x-menu-header-title .x-title-item {display:block; max-width:200px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
-
 .x-main-panel .x-panel-header-default {background:#48535f; border:1px solid #2d3844;}
 .x-main-panel .x-panel-header-title-default {color:#adb3b8;}
-.x-menu-title {max-width:250px; height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
+.x-menu-title {height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0;}
+.x-menu-title > div {max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 .x-form-help {margin-top:5px; line-height:1.6; font-size:11px; color:#666;}
 .x-box-default {padding:8px; font-size:12px; line-height:1.6; background:#ffffef; color:#666;}
 
