@@ -77,7 +77,7 @@ class Cron {
 			$IM = new iModule();
 			$site = $IM->getSite(false);
 			
-			$hour = date('h');
+			$hour = date('G');
 			
 			/**
 			 * 크론작업이 필요한 모듈을 불러온다.
