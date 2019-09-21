@@ -288,7 +288,6 @@ function GetPhoneNumber($phone,$code='82',$is_included_code=false) {
  */
 function GetDefaultLanguages() {
 	$languages = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
-	print_r($languages);
 	foreach ($languages as &$language) {
 		$language = substr($language,0,2);
 	}
