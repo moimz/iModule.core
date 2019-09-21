@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.4.0
- * @modified 2019. 4. 10.
+ * @version 1.5.0
+ * @modified 2019. 9. 21.
  */
 
 /**
@@ -279,6 +279,21 @@ function GetPhoneNumber($phone,$code='82',$is_included_code=false) {
 	}
 
 	return $value;
+}
+
+/**
+ * 사용자 브라우져의 언어코드를 가져온다.
+ *
+ * @return string[] $languages
+ */
+function GetDefaultLanguages() {
+	$languages = explode(',',$_SERVER['HTTP_ACCEPT_LANGUAGE']);
+	print_r($languages);
+	foreach ($languages as &$language) {
+		$language = substr($language,0,2);
+	}
+	
+	return array_unique($languages);
 }
 
 /**
