@@ -9,7 +9,7 @@
  * @version 1.0.0
  * @modified 2019. 3. 14.
  */
-@font-face {font-family:"post"; src:url("../fonts/post.woff2") format("woff2"), url("../fonts/post.woff") format("woff"), url("../fonts/post.ttf") format("truetype"), url("../fonts/post.svg") format("svg"); font-weight:normal; font-style:normal;}
+@font-face {font-family:"post"; src:url("../../fonts/post.woff2") format("woff2"), url("../../fonts/post.woff") format("woff"), url("../../fonts/post.ttf") format("truetype"), url("../../fonts/post.svg") format("svg"); font-weight:normal; font-style:normal;}
 
 .pi {display:inline-block; font-style:normal; font-family:post; font-size:inherit; text-rendering:auto; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
  

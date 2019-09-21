@@ -16,9 +16,11 @@ $language = isset($_GET['language']) == true ? $_GET['language'] : 'ko';
 $font = isset($_GET['font']) == true ? explode(',',$_GET['font']) : array();
 $default = isset($_GET['default']) == true ? $_GET['default'] : null;
 
+$css = '';
 for ($i=0, $loop=count($font);$i<$loop;$i++) {
-	if (is_file('./fonts/'.$font[$i].'.css') == true) echo file_get_contents('./fonts/'.$font[$i].'.css');
+	if (is_file('./fonts/'.$font[$i].'.css') == true) $css.= file_get_contents('./fonts/'.$font[$i].'.css');
 }
+echo str_replace('../../fonts','../fonts',$css);
 
 if ($default != null) $fontFamily = $default.', ';
 else $fontFamily = '';
