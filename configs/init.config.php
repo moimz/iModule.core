@@ -47,7 +47,7 @@ REQUIRE_ONCE __IM_PATH__.'/classes/functions.php';
  * iModule 환경설정값을 저장한다.
  * iModule.presets.php 파일에 선언된 환경설정값을 우선시하고, 해당 파일에 선언되어 있지 않은 환경설정은 iModule 설치시 입력된 정보를 저장한다.
  *
- * @see iModule.config.sample.php
+ * @see iModule.preset.php.example
  */
 $_CONFIGS = new stdClass();
 $_CONFIGS->presets = new stdClass();
