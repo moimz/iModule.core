@@ -1,14 +1,14 @@
 <?php
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * iModule의 설치작업을 처리한다.
+ * MoimzTools 설치작업을 처리한다.
  * 
  * @file /install/process/index.php
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
- * @version 3.0.0
- * @modified 2019. 4. 8.
+ * @version 1.2.0
+ * @modified 2019. 9. 22.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);

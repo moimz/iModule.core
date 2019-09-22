@@ -1,13 +1,13 @@
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * iModule 에 포함된 ExtJS 라이브러리 기능을 확장하고 iModule 에 맞게 재정의한다.
+ * MoimzTools 에 포함된 ExtJS 라이브러리 기능을 확장하고 MoimzTools 에 맞게 재정의한다.
  * 
  * @file /scripts/extjs.extend.js
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2019. 9. 19.
+ * @modified 2019. 9. 22.
  */
 Ext.Ajax.setTimeout(300000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});

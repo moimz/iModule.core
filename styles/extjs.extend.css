@@ -1,7 +1,7 @@
 /**
- * 이 파일은 iModule 의 일부입니다. (https://www.imodules.io)
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
  *
- * iModule 에 포함된 ExtJS 라이브러리 스타일시트를 확장하고 iModule 에 맞게 재정의한다.
+ * MoimzTools 에 포함된 ExtJS 라이브러리 스타일시트를 확장하고 MoimzTools 에 맞게 재정의한다.
  * 
  * @file /styles/extjs.extend.css
  * @author Arzz (arzz@arzz.com)
@@ -116,14 +116,6 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-stepbar > div:first-child:before {content:"";}
 .x-stepbar > div.selected > span {opacity:1; background:#5fa2dd; color:#fff; font-weight:bold;}
 
-/*
-.x-form-wysiwyg {height:345px !important; table-layout:fixed;}
-.x-form-wysiwyg > label {height:345px !important; overflow:hidden;}
-.x-form-wysiwyg > div {height:345px !important; overflow:hidden;}
-.x-form-wysiwyg > div > div {height:345px !important; overflow:hidden;}
-.x-form-wysiwyg > div > div > div {height:345px !important; overflow:hidden;}
-.x-form-wysiwyg > div > div > div > div {height:345px !important; overflow:hidden;}
-*/
 /**
  * For Chrome 56
  */
