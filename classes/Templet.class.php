@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 7. 3.
+ * @modified 2019. 9. 27.
  */
 class Templet {
 	/**
@@ -509,7 +509,7 @@ class Templet {
 					$this->templetConfigs->$key->help = null;
 				}
 				$this->templetConfigs->$key->default = isset($value->default) == true ? $value->default : null;
-				$this->templetConfigs->$key->is_multiple = isset($this->templetConfigs->$key->is_multiple) == true && $this->templetConfigs->$key->is_multiple === true;
+				$this->templetConfigs->$key->options = isset($value->options) == true && is_array($value->options) == true ? $value->options : array();
 				if (isset($this->templetConfigs->$key->value) == false) $this->templetConfigs->$key->value = $this->templetConfigs->$key->default;
 			}
 		}
