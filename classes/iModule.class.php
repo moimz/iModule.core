@@ -489,6 +489,8 @@ class iModule {
 			if ($string != null) $returnString = $string;
 		}
 		
+		$this->fireEvent('afterGetText','core',$code,$returnString);
+		
 		if ($returnString == null) return $replacement === null ? $code : $replacement;
 		else return $returnString;
 	}

@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 10. 10.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 
@@ -50,9 +50,11 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 	header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 	header('Cache-Control:post-check=0, pre-check=0', false);
 	header('Pragma:no-cache');
+	
 	exit(json_encode(array('success'=>false,'message'=>$IM->getErrorText('FORBIDDEN')),JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 } else {
 	if ($_module != null) {
+		if (preg_match('/^@/',$_action) == true) $IM->getModule('admin')->saveProcessLog($_module,$_action);
 		$results = $IM->getModule($_module,true)->doProcess($_action);
 		
 		if ($results !== null) {
