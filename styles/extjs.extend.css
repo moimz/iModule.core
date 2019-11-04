@@ -98,6 +98,7 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-menu-title {height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0;}
 .x-menu-title > div {max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 .x-form-help {margin-top:5px; line-height:1.6; font-size:11px; color:#666;}
+.x-form-display-field-body .x-form-help {padding-top:0; margin-top:0;}
 .x-box-default {padding:8px; font-size:12px; line-height:1.6; background:#ffffef; color:#666;}
 
 .x-tool-maximize {font-size:14px; line-height:16px;}
