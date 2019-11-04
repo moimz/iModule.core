@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 5. 29.
+ * @modified 2019. 11. 4.
  */
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
@@ -806,6 +806,7 @@ var iModule = {
 	 * @param int height 가로크기
 	 * @param boolean scroll 스크롤바여부
 	 * @param string name 창이름
+	 * @param window window
 	 */
 	openPopup:function(url,width,height,scroll,name) {
 		if (screen.availWidth < width) width = screen.availWidth - 50;
@@ -818,7 +819,10 @@ var iModule = {
 		
 		if (opener) {
 			setTimeout(iModule.resizePopup,500,opener,url,width,height);
+			return opener;
 		}
+		
+		return null;
 	},
 	/**
 	 * 브라우져에 따라 팝업창 크기가 다르므로, 팝업창이 열린 후 정확한 사이트로 리사이징한다.
@@ -841,7 +845,7 @@ var iModule = {
 			popup.window.resizeBy(resizeWidth,resizeHeight);
 		} catch(e) {}
 		
-		popup.location.replace(url);
+		if (url) popup.location.replace(url);
 	},
 	/**
 	 * 현재창의 크기를 리사이즈한다.
