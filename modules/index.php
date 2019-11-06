@@ -12,6 +12,9 @@
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
+define('__IM_SITE__',true);
+define('__IM_CONTAINER__',true);
+
 /**
  * iModule 코어를 선언하고, 모듈 컨테이너를 불러온다.
  * 
@@ -36,9 +39,6 @@ if (strpos($container,'@') === 0) {
 }
 $IM->setContainerMode($module,$container);
 
-define('__IM_SITE__',true);
-define('__IM_CONTAINER__',true);
-
 /**
  * 호출변수가 없거나 호출하려는 모듈이 설치가 되어 있지 않은 경우, 에러메세지를 출력한다.
  */
@@ -52,6 +52,11 @@ if ($module === null || $container == null || $IM->getModule($module) === null) 
 if (method_exists($IM->getModule($module),'getContainer') === false) {
 	return $IM->printError('NOT_SUPPORT_CONTAINER');
 }
+
+/**
+ * 사이트내 글로벌하게 동작하도록 설정된 모듈(예 : member, push 등)을 불러온다.
+ */
+$IM->getModule()->loadGlobals();
 
 /**
  * 외부 컨테이너를 호출하여 출력한다.
