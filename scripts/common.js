@@ -815,10 +815,36 @@ var iModule = {
 		var windowLeft = (screen.availWidth - width) / 2;
 		var windowTop = (screen.availHeight - height) / 2;
 		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
-		var opener = window.open("", name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
+		var opener = window.open(url, name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
 		
 		if (opener) {
-			setTimeout(iModule.resizePopup,500,opener,url,width,height);
+//			setTimeout(iModule.resizePopup,500,opener,url,width,height);
+			return opener;
+		}
+		
+		return null;
+	},
+	/**
+	 * 빈페이지 팝업창을 연다.
+	 *
+	 * @param string url 페이지 URL
+	 * @param int width 가로크기
+	 * @param int height 가로크기
+	 * @param boolean scroll 스크롤바여부
+	 * @param string name 창이름
+	 * @param window window
+	 */
+	emptyPopup:function(width,height,scroll,name) {
+		if (screen.availWidth < width) width = screen.availWidth - 50;
+		if (screen.availHeight < height) height = screen.availHeight - 50;
+		
+		var windowLeft = (screen.availWidth - width) / 2;
+		var windowTop = (screen.availHeight - height) / 2;
+		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
+		var opener = window.open(ENV.DIR + "/includes/empty.php", name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
+		
+		if (opener) {
+			setTimeout(iModule.resizePopup,500,opener,null,width,height);
 			return opener;
 		}
 		
