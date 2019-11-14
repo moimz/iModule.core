@@ -891,21 +891,34 @@ class iModule {
 		/**
 		 * $options 설정과 최대한 많이 일치하는 페이지를 재탐색한다.
 		 */
-		$page = null;
+		$matchCount = 0;
+		$filters = array();
+		
 		foreach ($matches as $match) {
 			/**
 			 * 일치하는 $options 설정값 갯수
 			 */
-			$match->matchCount = 0;
+			$count = 0;
 			foreach ($options as $key=>$value) {
-				if (isset($match->context->configs->$key) == true && $match->context->configs->$key == $value) $match->matchCount++;
+				if (isset($match->context->configs->$key) == true && $match->context->configs->$key == $value) $count++;
 			}
 			
-			if ($page == null || $page->matchCount < $match->matchCount) $page = $match;
+			if ($count > $matchCount) {
+				$filters = array($match);
+				$matchCount = $count;
+			} elseif ($count == $matchCount) {
+				$filters[] = $match;
+			}
 		}
 		
-		if ($page == null) return null;
-		return $this->getUrl(false,false,false,false,$isFullUrl,$page->domain,$page->language).'/'.$page->url;
+		if (count($filters) == 0) return null;
+		if (count($filters) == 1) return $this->getUrl(false,false,false,false,$isFullUrl,$filters[0]->domain,$filters[0]->language).'/'.$filters[0]->url;
+		
+		foreach ($filters as $match) {
+			if ($match->domain == $this->site->domain && $match->language == $this->language) return $this->getUrl(false,false,false,false,$isFullUrl,$match->domain,$match->language).'/'.$match->url;
+		}
+		
+		return $this->getUrl(false,false,false,false,$isFullUrl,$filters[0]->domain,$filters[0]->language).'/'.$filters[0]->url;
 	}
 	
 	/**
