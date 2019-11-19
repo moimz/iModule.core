@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 1. 29.
+ * @modified 2019. 11. 19.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1622,6 +1622,7 @@
 			url:url,
 			data:data,
 			dataType:"json",
+			timeout:3600,
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false) {
@@ -1684,6 +1685,7 @@
 			data:data,
 			processData:$("input[type=file][name]",$form).length == 0 ? true : false,
 			dataType:"json",
+			timeout:3600,
 			contentType:$("input[type=file][name]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
