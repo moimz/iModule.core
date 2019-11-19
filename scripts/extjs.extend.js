@@ -9,7 +9,7 @@
  * @version 3.0.0
  * @modified 2019. 11. 19.
  */
-Ext.Ajax.setTimeout(3600);
+Ext.Ajax.setTimeout(60000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
 Ext.define("Ext.moimz.data.JsonStore",{override:"Ext.data.JsonStore",pageSize:0});
 Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x"});
