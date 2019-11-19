@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 11. 19.
  */
 
 /**
@@ -90,9 +90,7 @@ if (isset($_CONFIGS->session_path) == true && is_dir($_CONFIGS->session_path) ==
 	session_save_path($session_path);
 }
 $session_name = session_name('IMSESSID');
-if (isset($_CONFIGS->sessionDomain) == true) {
-	session_set_cookie_params(0,'/',$_CONFIGS->sessionDomain);
-}
+session_set_cookie_params(0,'/',isset($_CONFIGS->sessionDomain) == true ? $_CONFIGS->sessionDomain : '',isset($_SERVER['HTTPS']) == true && $_SERVER['HTTPS'] == 'on',!(isset($_SERVER['HTTPS']) == true && $_SERVER['HTTPS'] == 'on'));
 session_start();
 
 /**
