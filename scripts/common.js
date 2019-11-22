@@ -275,6 +275,38 @@ var iModule = {
 		};
 	},
 	/**
+	 * 브라우져의 세션스토리지 데이터를 저장하거나 가져온다.
+	 */
+	session:function(name,value) {
+		if (window.sessionStorage === undefined) return;
+		
+		var storage = {};
+		if (window.sessionStorage["iModule"] !== undefined) {
+			try {
+				storage = JSON.parse(window.sessionStorage["iModule"]);
+			} catch (e) {
+				storage = {};
+			}
+		}
+		
+		if (value === undefined) {
+			if (storage[name] !== undefined) {
+				return storage[name];
+			} else {
+				return null;
+			}
+		} else {
+			try {
+				storage[name] = value;
+				window.sessionStorage["iModule"] = JSON.stringify(storage);
+				
+				return true;
+			} catch (e) {
+				return false;
+			}
+		}
+	},
+	/**
 	 * 알림메세지 관련
 	 */
 	alert:{
