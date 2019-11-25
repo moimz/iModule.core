@@ -7,8 +7,8 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.2.0
- * @modified 2018. 5. 6.
+ * @version 1.3.0
+ * @modified 2019. 11. 23.
  */
 class mysql {
 	private $db;
@@ -146,15 +146,43 @@ class mysql {
 		return $this->_dynamicBindResults($stmt);
 	}
 	
-	public function exists($table) {
+	public function tables($include_desc=false) {
+		if ($include_desc == true) {
+			$tables = $this->rawQuery('SHOW TABLE STATUS');
+			for ($i=0, $loop=count($tables);$i<$loop;$i++) {
+				$table = new stdClass();
+				$table->name = $tables[$i]->Name;
+				$table->engine = $tables[$i]->Engine;
+				$table->rows = $tables[$i]->Rows;
+				$table->data_length = $tables[$i]->Data_length;
+				$table->index_length = $tables[$i]->Index_length;
+				$table->total_length = $table->data_length + $table->index_length;
+				$table->collation = $tables[$i]->Collation;
+				$table->comment = $tables[$i]->Comment;
+				
+				$tables[$i] = $table;
+			}
+		} else {
+			$tables = $this->rawQuery("SHOW TABLES");
+			for ($i=0, $loop=count($tables); $i<$loop;$i++) {
+				foreach ($tables[$i] as $key=>$name) {
+					$tables[$i] = $name;
+				}
+			}
+		}
+		
+		return $tables;
+	}
+	
+	public function exists($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$count = $this->rawQuery("SHOW TABLES LIKE '".$this->_prefix.$table."'");
+		$count = $this->rawQuery("SHOW TABLES LIKE '".($included_prefix == true ? '' : $this->_prefix).$table."'");
 		return count($count) == 1;
 	}
 	
-	public function size($table) {
+	public function size($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$data = $this->rawQuery("SELECT `DATA_LENGTH`, `INDEX_LENGTH` FROM `information_schema`.`TABLES` WHERE `table_schema`='".$this->db->database."' and `table_name`='".$this->_prefix.$table."'");
+		$data = $this->rawQuery("SELECT `DATA_LENGTH`, `INDEX_LENGTH` FROM `information_schema`.`TABLES` WHERE `table_schema`='".$this->db->database."' and `table_name`='".($included_prefix == true ? '' : $this->_prefix).$table."'");
 		
 		if (count($data) > 0) {
 			return $data[0]->DATA_LENGTH + $data[0]->INDEX_LENGTH;
@@ -163,8 +191,30 @@ class mysql {
 		}
 	}
 	
-	public function desc($table) {
-		return $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
+	public function desc($table,$included_prefix=false) {
+		$columns = $this->rawQuery('SHOW FULL COLUMNS FROM `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
+		for ($i=0, $loop=count($columns);$i<$loop;$i++) {
+			$column = new stdClass();
+			$column->field = $columns[$i]->Field;
+			
+			if (preg_match('/(.*?)\(([0-9]+)\)/',$columns[$i]->Type,$match) == true) {
+				$column->type = $match[1];
+				$column->length = intval($match[2]);
+			} else {
+				$column->type = $columns[$i]->Type;
+				$column->length = null;
+			}
+			$column->collation = $columns[$i]->Collation;
+			$column->key = $columns[$i]->Key;
+			$column->comment = $columns[$i]->Comment;
+			$column->null = $columns[$i]->Null == 'YES';
+			$column->auto_increment = $columns[$i]->Extra == 'auto_increment';
+			$column->origin = $columns[$i];
+			
+			$columns[$i] = $column;
+		}
+		
+		return $columns;
 	}
 	
 	public function compare($table,$schema) {
