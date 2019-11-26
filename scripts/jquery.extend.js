@@ -1615,7 +1615,7 @@
 			callback = data;
 			data = null;
 		}
-		var count = count ? count : 0;
+		var count = count !== undefined ? count : 0;
 		
 		$.ajax({
 			type:"POST",
