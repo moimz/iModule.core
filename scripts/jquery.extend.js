@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 11. 19.
+ * @modified 2019. 11. 26.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1637,11 +1637,11 @@
 				}
 			},
 			error:function() {
-				if (count == 3) {
+				if (count === false || count == 3) {
 					if (typeof Ext == "object") {
-						Ext.Msg.show({title:iModule.getText("text/error"),msg:iModule.getErrorText("DISCONNECT_ERROR"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
+						if (count !== false) Ext.Msg.show({title:iModule.getText("text/error"),msg:iModule.getErrorText("DISCONNECT_ERROR"),buttons:Ext.Msg.OK,icon:Ext.Msg.ERROR});
 					} else {
-						iModule.alert.show("error",iModule.getErrorText("DISCONNECT_ERROR"),5);
+						if (count !== false) iModule.alert.show("error",iModule.getErrorText("DISCONNECT_ERROR"),5);
 						if (typeof callback == "function") callback({success:false});
 					}
 				} else {
@@ -1703,8 +1703,9 @@
 				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
 				 */
 				if (count === false || count == 3) {
-					$form.status("error");
-					iModule.alert.show("error","Server Connect Error!",5);
+					if (count !== false) $form.status("error");
+					if (count !== false) iModule.alert.show("error",iModule.getErrorText("DISCONNECT_ERROR"),5);
+					if (typeof callback == "function") callback({success:false});
 				} else {
 					setTimeout(function($form,url,callback,count) { $form.status("default"); $form.send(url,callback,count); },1000,$form,url,callback,++count);
 				}
