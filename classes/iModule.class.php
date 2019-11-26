@@ -9,7 +9,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 6. 8.
+ * @modified 2019. 11. 26.
  */
 class iModule {
 	/**
@@ -309,9 +309,10 @@ class iModule {
 				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__;
 				if ($this->language != $site->language || $this->menu != 'index' || $this->page != null) $redirectUrl.= '/'.$this->language.'/';
 				if ($this->menu != 'index' || $this->page != null) {
-					$redirectUrl.= $this->menu ? $this->menu : '';
-					$redirectUrl.= $this->page ? '/'.$this->page : '';
+					$redirectUrl.= $this->menu.'/'.$this->page;
+					$redirectUrl.= $this->idx ? '/'.$this->idx : '';
 				}
+				$redirectUrl.= $this->getQueryString(array());
 				header("HTTP/1.1 301 Moved Permanently");
 				header("location:".$redirectUrl);
 				exit;
