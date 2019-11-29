@@ -283,6 +283,7 @@ class iModule {
 			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
 			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
 			$this->siteDefaultLanguages[$this->domain] = $site->language;
+			$this->language = $site->language;
 		} else {
 			/**
 			 * 언어셋이 지정되었고, 해당 언어셋이 현재 사이트에서 사용중인지 확인한다. 만약 사용중인 언어셋이 아니라면 기본언어셋을 사용한다.
