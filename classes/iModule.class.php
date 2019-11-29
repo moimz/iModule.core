@@ -282,7 +282,6 @@ class iModule {
 			 */
 			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
 			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
-			$this->language = $site->language;
 			$this->siteDefaultLanguages[$this->domain] = $site->language;
 		} else {
 			/**
@@ -296,8 +295,6 @@ class iModule {
 				 * 기본 언어셋이 없을 경우 에러메세지를 출력한다.
 				 */
 				if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
-				
-				$this->language = $site->language;
 			}
 		}
 		
@@ -306,13 +303,22 @@ class iModule {
 		 */
 		if (defined('__IM_SITE__') == true) {
 			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
-				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain.__IM_DIR__;
-				if ($this->language != $site->language || $this->menu != 'index' || $this->page != null) $redirectUrl.= '/'.$this->language.'/';
-				if ($this->menu != 'index' || $this->page != null) {
-					$redirectUrl.= $this->menu.'/'.$this->page;
-					$redirectUrl.= $this->idx ? '/'.$this->idx : '';
+				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain;
+				
+				if (defined('__IM_CONTAINER__') == true || isset($_SERVER['REDIRECT_URL']) == true) {
+					$redirectUrl.= preg_replace('/^\/'.$this->language.'/','/'.$site->language,$_SERVER['REDIRECT_URL']);
+				} else {
+					$redirectUrl.= __IM_DIR__;
+					if ($this->getDefaultLanguage($site->domain) != $site->language || $this->menu != 'index' || $this->page != null || $this->idx != null) {
+						$redirectUrl.= '/'.$site->language;
+						
+						if ($this->menu != 'index' || $this->page != null || $this->idx != null) $redirectUrl.= '/'.$this->menu;
+						if ($this->page != null || $this->idx != null) $redirectUrl.= '/'.$this->page;
+						if ($this->idx != null) $redirectUrl.= '/'.$this->idx;
+					}
 				}
-				$redirectUrl.= $this->getQueryString(array());
+				$redirectUrl.= $this->getQueryString();
+				
 				header("HTTP/1.1 301 Moved Permanently");
 				header("location:".$redirectUrl);
 				exit;
