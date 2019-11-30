@@ -407,7 +407,7 @@
 					"default":"UNIVERSAL",
 					"comment":"회원관리방식"
 				},
-				"is_ssl":{
+				"is_https":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
 					"default":"FALSE",

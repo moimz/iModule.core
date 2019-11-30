@@ -166,7 +166,7 @@ if ($action == 'install') {
 		if ($keyFile !== false && $dbFile !== false) {
 			if (CreateDatabase($dbConnect,$package->databases) == true) {
 				if ($dbConnect->select('site_table')->count() == 0) {
-					$dbConnect->insert('site_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'title'=>'iModule','description'=>'Site Description','templet'=>'default','templet_configs'=>'{}','logo'=>'{"default":-1,"footer":-1}','is_ssl'=>(isset($_SERVER['HTTPS']) == true ? 'TRUE' : 'FALSE'),'is_default'=>'TRUE','sort'=>0))->execute();
+					$dbConnect->insert('site_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'title'=>'iModule','description'=>'Site Description','templet'=>'default','templet_configs'=>'{}','logo'=>'{"default":-1,"footer":-1}','is_https'=>(isset($_SERVER['HTTPS']) == true ? 'TRUE' : 'FALSE'),'is_default'=>'TRUE','sort'=>0))->execute();
 				} else {
 					$dbConnect->update('site_table',array('templet_configs'=>'{}'))->where('templet_configs','')->execute();
 				}

@@ -227,6 +227,14 @@ class iModule {
 		$this->sites = $this->db()->select($this->table->site)->orderBy('sort','asc')->get();
 		
 		/**
+		 * @todo is_ssl 컬럼이 is_https 컬럼으로 변경됨에 따른 수정사항 (차후 제거필요)
+		 */
+		if (count($this->sites) > 0 && isset($this->sites[0]->is_https) == false) {
+			$this->db()->rawQuery("ALTER TABLE `im_site_table` CHANGE `is_ssl` `is_https` ENUM('TRUE','FALSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FALSE' COMMENT 'SSL접속여부'");
+			return $this->initSites($is_sitemap);
+		}
+		
+		/**
 		 * 현재 접속한 도메인에 해당하는 사이트가 없을 경우, 유사한 사이트를 찾는다.
 		 */
 		if ($this->db()->select($this->table->site)->where('domain',$this->domain)->has() == false) {
@@ -303,8 +311,8 @@ class iModule {
 		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
 		 */
 		if (defined('__IM_SITE__') == true) {
-			if (($site->is_ssl == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
-				$redirectUrl = ($site->is_ssl == 'TRUE' ? 'https://' : 'http://').$site->domain;
+			if (($site->is_https == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
+				$redirectUrl = ($site->is_https == 'TRUE' ? 'https://' : 'http://').$site->domain;
 				
 				if (defined('__IM_CONTAINER__') == true || isset($_SERVER['REDIRECT_URL']) == true) {
 					$redirectUrl.= preg_replace('/^\/'.$this->language.'/','/'.$site->language,$_SERVER['REDIRECT_URL']);
@@ -803,7 +811,7 @@ class iModule {
 				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
 				$url.= $domain.__IM_DIR__;
 			} else {
-				$url = $check->is_ssl == 'TRUE' ? 'https://' : 'http://';
+				$url = $check->is_https == 'TRUE' ? 'https://' : 'http://';
 				$url.= $domain.__IM_DIR__;
 			}
 		} else {
@@ -1002,7 +1010,7 @@ class iModule {
 				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
 				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
 			} else {
-				$url = $check->is_ssl == 'TRUE' ? 'https://' : 'http://';
+				$url = $check->is_https == 'TRUE' ? 'https://' : 'http://';
 				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
 			}
 		} else {
@@ -1107,7 +1115,7 @@ class iModule {
 		}
 		
 		for ($i=0, $loop=count($links);$i<$loop;$i++) {
-			$links[$i]->url = ($links[$i]->is_ssl == 'TRUE' ? 'https://' : 'http://').$links[$i]->domain.__IM_DIR__.($links[$i]->language == $this->language ? '' : '/'.$links[$i]->language);
+			$links[$i]->url = ($links[$i]->is_https == 'TRUE' ? 'https://' : 'http://').$links[$i]->domain.__IM_DIR__.($links[$i]->language == $this->language ? '' : '/'.$links[$i]->language);
 		}
 		
 		$this->siteLinks = $links;
