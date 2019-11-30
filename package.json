@@ -411,7 +411,7 @@
 					"type":"enum",
 					"length":"'TRUE','FALSE'",
 					"default":"FALSE",
-					"comment":"SSL접속여부"
+					"comment":"HTTPS접속여부"
 				},
 				"is_default":{
 					"type":"enum",

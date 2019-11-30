@@ -230,7 +230,7 @@ class iModule {
 		 * @todo is_ssl 컬럼이 is_https 컬럼으로 변경됨에 따른 수정사항 (차후 제거필요)
 		 */
 		if (count($this->sites) > 0 && isset($this->sites[0]->is_https) == false) {
-			$this->db()->rawQuery("ALTER TABLE `im_site_table` CHANGE `is_ssl` `is_https` ENUM('TRUE','FALSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FALSE' COMMENT 'SSL접속여부'");
+			$this->db()->rawQuery("ALTER TABLE `im_site_table` CHANGE `is_ssl` `is_https` ENUM('TRUE','FALSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FALSE' COMMENT 'HTTPS접속여부'");
 			return $this->initSites($is_sitemap);
 		}
 		
