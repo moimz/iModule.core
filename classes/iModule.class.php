@@ -2567,11 +2567,13 @@ class iModule {
 		if ($permissionString != 'false' && $member->type == 'ADMINISTRATOR') return true;
 		
 		if ($member->idx == 0) {
+			$permissionString = str_replace('{$member.idx}','0',$permissionString);
 			$permissionString = str_replace('{$member.level}','0',$permissionString);
 			$permissionString = str_replace('{$member.type}',"'GUEST'",$permissionString);
 			$permissionString = str_replace('{$member.email}',"''",$permissionString);
 			$permissionString = str_replace('{$member.label}',"''",$permissionString);
 		} else {
+			$permissionString = str_replace('{$member.idx}',$member->idx,$permissionString);
 			$permissionString = str_replace('{$member.level}',$member->level->level,$permissionString);
 			$permissionString = str_replace('{$member.type}',"'".$member->type."'",$permissionString);
 			$permissionString = str_replace('{$member.email}',"'".$member->email."'",$permissionString);
