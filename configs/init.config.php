@@ -90,7 +90,7 @@ if (isset($_CONFIGS->session_path) == true && is_dir($_CONFIGS->session_path) ==
 	session_save_path($session_path);
 }
 $session_name = session_name('IMSESSID');
-session_set_cookie_params(0,'/',isset($_CONFIGS->sessionDomain) == true ? $_CONFIGS->sessionDomain : '',isset($_SERVER['HTTPS']) == true && $_SERVER['HTTPS'] == 'on',!(isset($_SERVER['HTTPS']) == true && $_SERVER['HTTPS'] == 'on'));
+session_set_cookie_params(0,'/',isset($_CONFIGS->sessionDomain) == true ? $_CONFIGS->sessionDomain : '',IsHttps() == true,IsHttps() == false);
 session_start();
 
 /**

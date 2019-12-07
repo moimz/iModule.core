@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.5.0
- * @modified 2019. 9. 21.
+ * @version 1.6.0
+ * @modified 2019. 12. 8.
  */
 
 /**
@@ -813,6 +813,19 @@ function GetHexToRgb($hex,$opacity=null) {
 	} else {
 		return $rgb;
 	}
+}
+
+/**
+ * HTTPS 접속여부를 확인한다.
+ *
+ * @return boolean $isHttps
+ */
+function IsHttps() {
+	if (isset($_SERVER['HTTPS']) == true && $_SERVER['HTTPS'] == 'on') return true;
+	if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) == true && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https') return true;
+	if (isset($_SERVER['HTTP_X_FORWARDED_SSL']) == true && $_SERVER['HTTP_X_FORWARDED_SSL'] == 'on') return true;
+	
+	return false;
 }
 
 /**

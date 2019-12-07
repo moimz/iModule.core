@@ -311,7 +311,7 @@ class iModule {
 		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
 		 */
 		if (defined('__IM_SITE__') == true) {
-			if (($site->is_https == 'TRUE' && empty($_SERVER['HTTPS']) == true) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
+			if (($site->is_https == 'TRUE' && IsHttps() == false) || $_SERVER['HTTP_HOST'] != $site->domain || $this->language != $site->language) {
 				$redirectUrl = ($site->is_https == 'TRUE' ? 'https://' : 'http://').$site->domain;
 				
 				if (defined('__IM_CONTAINER__') == true || isset($_SERVER['REDIRECT_URL']) == true) {
@@ -754,7 +754,7 @@ class iModule {
 	 * @param boolean $isDir true : iModule 이 설치된 디렉토리 경로를 포함한다.
 	 */
 	function getHost($isDir=false) {
-		$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
+		$url = IsHttps() == true ? 'https://' : 'http://';
 		$url.= $this->domain;
 		if ($isDir == true) $url.= __IM_DIR__;
 		
@@ -808,7 +808,7 @@ class iModule {
 			$domain = $domain == null ? $_SERVER['HTTP_HOST'] : $domain;
 			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
 			if ($check == null) {
-				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
+				$url = IsHttps() == true ? 'https://' : 'http://';
 				$url.= $domain.__IM_DIR__;
 			} else {
 				$url = $check->is_https == 'TRUE' ? 'https://' : 'http://';
@@ -978,7 +978,7 @@ class iModule {
 		foreach ($params as $key=>$value) $queryStrings[] = $key.'='.urlencode($value);
 		
 		if ($isFullUrl == true) {
-			$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
+			$url = IsHttps() == true ? 'https://' : 'http://';
 			$url.= $_SERVER['HTTP_HOST'].__IM_DIR__;
 		} else {
 			$url = '';
@@ -1007,7 +1007,7 @@ class iModule {
 		if ($isFullUrl == true || $domain !== $_SERVER['HTTP_HOST']) {
 			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
 			if ($check == null) {
-				$url = isset($_SERVER['HTTPS']) == true ? 'https://' : 'http://';
+				$url = IsHttps() == true ? 'https://' : 'http://';
 				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
 			} else {
 				$url = $check->is_https == 'TRUE' ? 'https://' : 'http://';

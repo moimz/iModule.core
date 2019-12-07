@@ -34,8 +34,8 @@ class OAuthClient {
 	
 	function __construct() {
 		$temp = explode('?',$_SERVER['REQUEST_URI']);
-		if (empty($_SERVER['HTTPS']) == true) $this->_redirectUrl = 'http://'.$_SERVER['HTTP_HOST'].array_shift($temp);
-		else $this->_redirectUrl = 'https://'.$_SERVER['HTTP_HOST'].array_shift($temp);
+		if (IsHttps() == true) $this->_redirectUrl = 'https://'.$_SERVER['HTTP_HOST'].array_shift($temp);
+		else $this->_redirectUrl = 'http://'.$_SERVER['HTTP_HOST'].array_shift($temp);
 		
 		if ($this->getSession('OAUTH_ACCESS_TOKEN') == null) {
 			$_SESSION['OAUTH_ACCESS_TOKEN'] = array();
