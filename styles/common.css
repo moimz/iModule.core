@@ -62,7 +62,7 @@ div[data-role=wrapper] > div[data-role=tooltip].bottom > div:before {position:ab
 body.disabled {overflow:hidden;}
 body.disabled > div[data-role=wrapper] {filter:blur(5px);}
 body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); color:#fff; font-size:50px;}
-body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch; padding:0; border:0;}
+body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch; padding:0; margin:0; border:0;}
 body.disabled > div[data-role=disabled].loading {display:table;}
 body.disabled > div[data-role=disabled].loading > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:20px; padding:0;}
 /*
