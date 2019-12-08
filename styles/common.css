@@ -11,7 +11,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 12. 8.
  */
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#222;}
@@ -62,7 +62,7 @@ div[data-role=wrapper] > div[data-role=tooltip].bottom > div:before {position:ab
 body.disabled {overflow:hidden;}
 body.disabled > div[data-role=wrapper] {filter:blur(5px);}
 body.disabled > div[data-role=disabled] {position:fixed; z-index:10000; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.4); color:#fff; font-size:50px;}
-body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch; padding:0;}
+body.disabled > div[data-role=disabled] > div[data-role=box] {width:100%; height:100%; box-sizing:border-box; vertical-align:middle; overflow:auto; -webkit-overflow-scrolling:touch; padding:0; border:0;}
 body.disabled > div[data-role=disabled].loading {display:table;}
 body.disabled > div[data-role=disabled].loading > div[data-role=box] {display:table-cell; text-align:center; vertical-align:middle; font-size:20px; padding:0;}
 /*
@@ -93,7 +93,7 @@ div[data-role=modal] > form > div[data-role=header] > h1 {font-size:18px; displa
 div[data-role=modal] > form > div[data-role=header] > button {position:absolute; top:20px; right:10px; width:40px; height:40px; font-size:20px; background:transparent; border:0px; cursor:pointer; color:#666;}
 div[data-role=modal] > form > div[data-role=header] > button > i {width:40px; height:40px; line-height:40px; text-align:center;}
 div[data-role=modal] > form > div[data-role=header] > button:hover {color:#333;}
-div[data-role=modal][data-closable=FALSE] > form > header > button {display:none;}
+div[data-role=modal][data-closable=FALSE] > form > div[data-role=header] > button {display:none;}
 div[data-role=modal] > form > div[data-role=context] {min-height:30px; height:calc(100% - 122px); width:100%; padding:0px 20px; box-sizing:border-box; font-size:14px; color:#333; text-align:left; display:block;}
 div[data-role=modal] > form > div[data-role=context][data-fullsize=TRUE] {height:calc(100% - 122px);}
 div[data-role=modal] > form > div[data-role=context] > label {display:block; height:30px; line-height:30px; font-weight:bold;}
