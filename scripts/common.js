@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 11. 4.
+ * @modified 2019. 12. 11.
  */
 var iModule = {
 	isMobile:navigator.userAgent.match(/(iPhone|iPod|iPad|Android)/) !== null,
@@ -280,26 +280,40 @@ var iModule = {
 	session:function(name,value) {
 		if (window.sessionStorage === undefined) return;
 		
-		var storage = {};
-		if (window.sessionStorage["iModule"] !== undefined) {
-			try {
-				storage = JSON.parse(window.sessionStorage["iModule"]);
-			} catch (e) {
-				storage = {};
-			}
-		}
+		name = "IM_" + name;
 		
 		if (value === undefined) {
-			if (storage[name] !== undefined) {
-				return storage[name];
+			if (window.sessionStorage[name] !== undefined) {
+				return JSON.parse(window.sessionStorage[name]);
 			} else {
 				return null;
 			}
 		} else {
 			try {
-				storage[name] = value;
-				window.sessionStorage["iModule"] = JSON.stringify(storage);
-				
+				window.sessionStorage[name] = JSON.stringify(value);
+				return true;
+			} catch (e) {
+				return false;
+			}
+		}
+	},
+	/**
+	 * 브라우져의 로컬스토리지 데이터를 저장하거나 가져온다.
+	 */
+	storage:function(name,value) {
+		if (window.localStorage === undefined) return;
+		
+		name = "IM_" + name;
+		
+		if (value === undefined) {
+			if (window.localStorage[name] !== undefined) {
+				return JSON.parse(window.localStorage[name]);
+			} else {
+				return null;
+			}
+		} else {
+			try {
+				window.localStorage[name] = JSON.stringify(value);
 				return true;
 			} catch (e) {
 				return false;
