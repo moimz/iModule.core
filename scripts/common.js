@@ -290,7 +290,8 @@ var iModule = {
 			}
 		} else {
 			try {
-				window.sessionStorage[name] = JSON.stringify(value);
+				if (value === null) delete window.sessionStorage[name];
+				else window.sessionStorage[name] = JSON.stringify(value);
 				return true;
 			} catch (e) {
 				return false;
@@ -313,7 +314,8 @@ var iModule = {
 			}
 		} else {
 			try {
-				window.localStorage[name] = JSON.stringify(value);
+				if (value === null) delete window.sessionStorage[name];
+				else window.localStorage[name] = JSON.stringify(value);
 				return true;
 			} catch (e) {
 				return false;
