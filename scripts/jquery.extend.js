@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 11. 26.
+ * @modified 2019. 12. 11.
  */
 (function($) {
 	$.propHooks.disabled = {
@@ -1161,6 +1161,73 @@
 	};
 	
 	/**
+	 * 폼 객체를 자동저장한다.
+	 */
+	$.fn.autosave = function($forms) {
+		if (this.length > 1) {
+			var $forms = this;
+			$forms.each(function() {
+				return $(this).autosave($forms);
+			});
+			return;
+		}
+		
+		if (this.is("form[data-autosave]") == false || this.attr("data-autosave") == "false" || this.data("autosaved") !== undefined) return;
+		
+		var $form = this;
+		$form.on("autosave",function() {
+			if ($(this).data("saving") == true) return;
+			
+			$(this).data("saving",true);
+			
+			var data = {};
+			var inputs = $(this).serializeArray();
+			for (var i=0, loop=inputs.length;i<loop;i++) {
+				var name = inputs[i].name;
+				var value = inputs[i].value;
+				
+				var $input = $("*[name='"+name+"']",$(this));
+				
+				if ($input.is("[type=hidden]") == true) continue;
+				
+				data[name] = value;
+			}
+			
+			iModule.storage("AUTOSAVE-" + $(this).attr("data-autosave"),data);
+			
+			$(this).data("saving",false);
+		});
+		
+		$form.data("autosaved",setInterval(function($form) { $form.triggerHandler("autosave"); },10000,$form));
+		
+		var data = iModule.storage("AUTOSAVE-" + $form.attr("data-autosave")) !== null ? iModule.storage("AUTOSAVE-" + $form.attr("data-autosave")) : null;
+		
+		if (data !== null) {
+			clearInterval($form.data("autosaved"));
+			$form.data("autosaved",null);
+			
+			iModule.modal.confirm("안내","이전에 작성하던 내용이 있습니다.<br>해당내용을 불러오시겠습니까?",function($button) {
+				if ($button.attr("data-action") == "ok") {
+					$form.set(data,null,function(result) {
+						$form.data("autosaved",setInterval(function($form) { $form.triggerHandler("autosave"); },10000,$form));
+						iModule.modal.close();
+					});
+				}
+				
+				if ($button.attr("data-action") == "cancel") {
+					iModule.storage("AUTOSAVE-" + $form.attr("data-autosave"),null);
+					$form.data("autosaved",setInterval(function($form) { $form.triggerHandler("autosave"); },10000,$form));
+					iModule.modal.close();
+				}
+			});
+			
+			return false;
+		}
+		
+		return true;
+	};
+	
+	/**
 	 * 데이터를 불러온다.
 	 */
 	$.fn.set = function(url,params,callback) {
@@ -1172,64 +1239,71 @@
 		if (this.is("form") == true) {
 			var $form = this;
 			
-			$.send(url,params,function(result) {
-				if (result.success == true && result.data) {
-					for (var field in result.data) {
-						var value = result.data[field];
-						
-						var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"]",$form);
-						if ($field.length > 0) {
-							if ($field.is("select") == true) {
-								if (value) {
-									if ($("option[value="+value+"]",$field).length == 0) {
-										$field.attr("data-value",value);
-									} else {
-										$field.val(value);
-									}
+			if (typeof url == "object") {
+				var data = url;
+				var result = params;
+				
+				for (var field in data) {
+					var value = data[field];
+					
+					var $field = $("input[name="+field+"], select[name="+field+"], textarea[name="+field+"]",$form);
+					if ($field.length > 0) {
+						if ($field.is("select") == true) {
+							if (value) {
+								if ($("option[value="+value+"]",$field).length == 0) {
+									$field.attr("data-value",value);
+								} else {
+									$field.val(value);
 								}
-							} else if ($field.is("input[type=radio]") == true) {
+							}
+						} else if ($field.is("input[type=radio]") == true) {
+							$field.each(function() {
+								if ($(this).attr("value") == value) {
+									$(this).prop("checked",true);
+								}
+							});
+						} else if ($field.is("input[type=checkbox]") == true) {
+							$field.prop("checked",value === true || value == $field.attr("value"));
+						} else if ($field.is("textarea[data-wysiwyg=TRUE]") == true) {
+							$field.froalaEditor("html.set",value);
+							$field.val(value);
+						} else {
+							$field.val(value);
+						}
+						
+						if ($field.parents("div[data-role=tags]").length == 1) {
+							$field.parents("div[data-role=tags]").inits();
+						}
+						
+						$field.trigger("change");
+					} else {
+						var $field = $("input[name='"+field+"[]'], select[name='"+field+"[]'], textarea[name='"+field+"[]']",$form);
+						if ($field.length > 0) {
+							if (typeof value == "string") value = value.split(",");
+							for (var i=0, loop=value.length;i<loop;i++) {
+								value[i] = value[i].toString();
+							}
+							if ($field.is("input[type=checkbox]") == true) {
 								$field.each(function() {
-									if ($(this).attr("value") == value) {
+									if ($.inArray($(this).attr("value"),value) > -1) {
 										$(this).prop("checked",true);
+									} else {
+										$(this).prop("checked",false);
 									}
 								});
-							} else if ($field.is("input[type=checkbox]") == true) {
-								$field.prop("checked",value === true || value == $field.attr("value"));
-							} else if ($field.is("textarea[data-wysiwyg=TRUE]") == true) {
-								$field.froalaEditor("html.set",value);
-								$field.val(value);
-							} else {
-								$field.val(value);
-							}
-							
-							if ($field.parents("div[data-role=tags]").length == 1) {
-								$field.parents("div[data-role=tags]").inits();
-							}
-							
-							$field.trigger("change");
-						} else {
-							var $field = $("input[name='"+field+"[]'], select[name='"+field+"[]'], textarea[name='"+field+"[]']",$form);
-							if ($field.length > 0) {
-								if (typeof value == "string") value = value.split(",");
-								for (var i=0, loop=value.length;i<loop;i++) {
-									value[i] = value[i].toString();
-								}
-								if ($field.is("input[type=checkbox]") == true) {
-									$field.each(function() {
-										if ($.inArray($(this).attr("value"),value) > -1) {
-											$(this).prop("checked",true);
-										} else {
-											$(this).prop("checked",false);
-										}
-									});
-								}
 							}
 						}
 					}
 				}
 				
 				if (typeof callback == "function") callback(result);
-			});
+			} else {
+				$.send(url,params,function(result) {
+					if (result.success == true && result.data) {
+						$form.set(result.data,result,callback);
+					}
+				});
+			}
 		}
 	};
 	
@@ -1688,6 +1762,11 @@
 			timeout:60000,
 			contentType:$("input[type=file][name]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
 			success:function(result) {
+				if (result.success == true && $form.data("autosaved") !== undefined) {
+					clearTimeout(form.data("autosaved"));
+					iModule.storage("AUTOSAVE-" + $form.attr("data-autosave"),null);
+				}
+				
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false && result.errors) $form.status("error",result.errors);
 				if (result.message) {
@@ -1703,6 +1782,11 @@
 				 * 재시도 횟수가 3회일 경우 에러를 발생하고 멈춘다.
 				 */
 				if (count === false || count == 3) {
+					if ($form.data("autosaved") !== undefined) {
+						clearTimeout(form.data("autosaved"));
+						iModule.storage("AUTOSAVE-" + $form.attr("data-autosave"),null);
+					}
+					
 					if (count !== false) $form.status("error");
 					if (count !== false) iModule.alert.show("error",iModule.getErrorText("DISCONNECT_ERROR"),5);
 					if (typeof callback == "function") callback({success:false});
@@ -2212,347 +2296,4 @@
 			}
 		}
 	});
-	/*
-	$.fn.positionScroll = function() {
-		if (this.offset().top < $("body").scrollTop() + $("#iModuleNavigation.fixed").outerHeight() + 50) {
-			$("html,body").animate({scrollTop:this.offset().top - $("#iModuleNavigation.fixed").outerHeight() - 50},"slow");
-		} else if (this.offset().top + this.outerHeight() + $("#iModuleNavigation").outerHeight() > $("body").scrollTop() + $(window).height()) {
-			$("html,body").animate({scrollTop:this.offset().top + this.outerHeight() - $(window).height() + $("#iModuleNavigation").outerHeight() },"slow");
-		}
-	};
-	
-	$.fn.reset = function() {
-		if (this.is("form")) {
-			$("input,textarea",this).each(function() {
-				$(this).reset();
-			});
-			
-			this.formStatus("default");
-		} else if (this.attr("type") == "radio" || this.attr("type") == "checkbox") {
-			if (this.attr("checked") == "checked") {
-				this.prop("checked",true);
-			} else {
-				this.prop("checked",false);
-			}
-		} else if (this.attr("data-wysiwyg") == "true") { 
-			this.froalaEditor("html.set","");
-			Attachment.reset(this.attr("id")+"-attachment");
-		} else if (this.is("div.selectControl") == true) {
-			if (this.data("originText")) $("button",this).html(this.data("originText")+' <span class="arrow"></span>');
-		} else {
-			this.val("");
-		}
-		
-		return this;
-	};
-	
-	$.fn.formInit = function(submitter,checker) {
-		if (this.is("form")) {
-			this.off("submit");
-			
-			this.on("submit",function() {
-				if ($(this).formCheck() == false) return false;
-				if (typeof submitter == "function") {
-					submitter($(this));
-				}
-				return false;
-			});
-			
-			$("input,textarea",this).each(function() {
-				$(this).inputInit(checker);
-			});
-		}
-		
-		return this;
-	};
-	
-	$.fn.formStatus = function(status,messages) {
-		if (this.is("form")) {
-			$("input,textarea",this).each(function() {
-				if (messages === undefined || (messages !== undefined && messages[$(this).attr("name")] !== undefined)) {
-					$(this).inputStatus(status,messages !== undefined && messages[$(this).attr("name")] !== undefined ? messages[$(this).attr("name")] : "");
-				}
-			});
-			
-			if (status == "error") $("input[data-loading=true], textarea[data-loading=true]",this).attr("data-loading","false").attr("disabled",false);
-			
-			$("button[type=submit]",this).each(function() {
-				$(this).buttonStatus(status);
-			});
-		}
-		
-		return this;
-	};
-	
-	$.fn.formCheck = function() {
-		var isSuccess = true;
-		var scrollTop = -1;
-		
-		$("input, textarea",this).each(function() {
-			var $inputBlock = $(this).parents(".inputBlock, inputInline");
-			var $helpBlock = $(".helpBlock",$inputBlock);
-			var $errorBlock = $(".errorBlock",$inputBlock);
-			
-			$inputBlock.removeClass("hasError hasSuccess");
-			
-			var isError = false;
-			
-			if ($(this).attr("data-required") == "true") {
-				if ($(this).attr("type") == "checkbox" && $(this).is(":checked") == false) {
-					isError = true;
-				} else if ($(this).val().length == 0) {
-					isError = true;
-				}
-			}
-			
-			if (isError == true) {
-				scrollTop = scrollTop == -1 || $inputBlock.position().top < scrollTop ? $inputBlock.position().top : scrollTop;
-				if ($errorBlock.length > 0 && $errorBlock.attr("data-error")) {
-					$errorBlock.html($errorBlock.attr("data-error"));
-					$errorBlock.show();
-				} else if ($helpBlock.length > 0 && $helpBlock.attr("data-error")) {
-					$helpBlock.html($helpBlock.attr("data-error"));
-				}
-				$inputBlock.addClass("hasError");
-				
-				isSuccess = isError !== true && isSuccess == true;
-			} else {
-				if ($helpBlock.length > 0 && $helpBlock.attr("data-success")) {
-					$helpBlock.html($helpBlock.attr("data-success"));
-				}
-				$inputBlock.addClass("hasSuccess");
-			}
-		});
-		
-		if (scrollTop > -1 && ($("body").scrollTop() + $(window).height() < scrollTop || $("body").scrollTop() + $("#iModuleNavigation").outerHeight(true) + 30 > scrollTop)) {
-			$("html,body").animate({scrollTop:scrollTop - $("#iModuleNavigation").outerHeight(true) - 30},"fast");
-		}
-		
-		return isSuccess;
-	};
-	
-	$.fn.inputInit = function(checker) {
-		if (this.is("input,textarea")) {
-			if (typeof checker == "function") {
-				this.on("blur",function() {
-					checker($(this));
-				});
-			}
-			this.inputStatus("default");
-		}
-	};
-	
-	$.fn.dateInit = function() {
-		this.each(function() {
-			if ($(this).is("div.dateControl") == true) {
-				var $input = $(this);
-				var format = $input.attr("data-format") ? $input.attr("data-format") : "YYYY-MM-DD";
-				
-				$("input",$input).pikaday({
-					format:format,
-					onSelect:function() {
-						$(this._o.field).triggerHandler("change");
-					}
-				});
-			}
-		});
-	};
-	
-	$.fn.selectInit = function() {
-		if (this.is("div") == false) return;
-		if (this.attr("data-field").indexOf("#") == 0) {
-			var $field = $(this.attr("data-field"));
-		} else if (this.attr("data-field")) {
-			var $field = $("input[name="+this.attr("data-field")+"]",this.parents("form"));
-		} else {
-			var $field = null;
-		}
-		
-		this.data("originText",$("> button",this).text());
-		this.data("field",$field);
-		$field.data("controller",this);
-		
-		if ($field != null && $field.val().length > 0 && $("li[data-value='"+$field.val()+"']",this).length > 0) {
-			$("> button",this).html($("li[data-value='"+$field.val()+"']",this).html()+' <span class="arrow"></span>');
-		}
-		
-		$field.off("change",function() {
-			var $list = $("li[data-value='"+$(this).val()+"']",$(this).data("controller"));
-			if ($list.length > 0) {
-				$("> button",$(this).data("controller")).html($list.html()+' <span class="arrow"></span>');
-			}
-		});
-		$field.on("change",function() {
-			var $list = $("li[data-value='"+$(this).val()+"']",$(this).data("controller")).clone();
-			if ($list.length > 0) {
-				$("button",$list).remove();
-				$("> button",$(this).data("controller")).html($list.html()+' <span class="arrow"></span>');
-			}
-		});
-	
-		$("> button",this).attr("type","button");
-		$("> button",this).off("click");
-		$("> button",this).on("click",function(event) {
-			if ($(this).parents("div.selectControl").hasClass("selectControlExtend") == true) {
-				$(this).parents("div.selectControl").removeClass("selectControlExtend");
-				$(this).parents("div.selectControl").find("li:not(.divider):visible:not([data-disabled=true])").attr("tabindex",null);
-			} else {
-				$(this).parents("div.selectControl").addClass("selectControlExtend");
-				if ($(this).parents("div.selectControl").attr("value") !== undefined) {
-					$(this).parents("div.selectControl").find("li:not(.divider):visible:not([data-disabled=true])").attr("tabindex",1);
-					iModule.focusDelay($(this).parents("div.selectControl").find("li[data-value='"+$(this).parents("div.selectControl").attr("value")+"']"),100);
-				}
-				$(document).triggerHandler("iModule.selectControl.extend",[$(this).parents("div.selectControl")]);
-			}
-			$(this).focus();
-			event.preventDefault();
-		});
-		
-		$("> button",this).off("keydown");
-		$("> button",this).on("keydown",function(event) {
-			if (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 27) {
-				event.preventDefault();
-				if ($(this).parents("div.selectControl").hasClass("selectControlExtend") == false || ($(this).parents("div.selectControl").hasClass("selectControlExtend") == true && event.keyCode == 27)) {
-					return $(this).click();
-				}
-				
-				var items = $(this).parents("div.selectControl").find("li:not(.divider):visible:not([data-disabled=true])").attr("tabindex",1);
-				if (items.length == 0) return;
-				
-				var index = items.index(items.filter(":focus"));
-	
-				if (event.keyCode == 38 && index > 0) index--;
-				if (event.keyCode == 40 && index < items.length - 1) index++;
-				if (!~index) index = 0;
-				
-				$(items).eq(index).focus();
-			}
-		});
-		
-		$("ul > li",this).off("keydown");
-		$("ul > li",this).on("keydown",function(event) {
-			event.preventDefault();
-			
-			if (event.keyCode == 38 || event.keyCode == 40 || event.keyCode == 27) {
-				if ($(this).parents("div.selectControl").length == 0 || ($(this).parents("div.selectControl").hasClass("selectControlExtend") == true && event.keyCode == 27)) {
-					return $($(this).parents("div.selectControl").find("button")).click();
-				}
-				
-				var items = $(this).parents("div.selectControl").find("li:not(.divider):visible:not([data-disabled=true])");
-	
-				if (items.length == 0) return;
-				
-				var index = items.index(items.filter(":focus"));
-	
-				if (event.keyCode == 38 && index > 0) index--;
-				if (event.keyCode == 40 && index < items.length - 1) index++;
-				if (!~index) index = 0;
-				
-				$(items).eq(index).focus();
-				event.preventDefault();
-			}
-			
-			if (event.keyCode == 13) {
-				var items = $(this).parents("div.selectControl").find("li:not(.divider):visible:not([data-disabled=true])");
-				var index = items.index(items.filter(":focus"));
-				if (!~index) return;
-				
-				$(items).eq(index).click();
-				event.preventDefault();
-			}
-		});
-		
-		$("ul > li",this).off("keyword");
-		$("ul > li",this).on("click",function(event) {
-			if ($(this).hasClass("divider") == true || $(this).attr("data-disabled") == "true") return;
-			
-			$(this).parents("div.selectControl").data("field").val($(this).attr("data-value"));
-			$(this).parents("div.selectControl").data("field").triggerHandler("change");
-			
-			$($(this).parents("div.selectControl").find("> button")).click();
-			$($(this).parents("div.selectControl").find("> button")).focus();
-		});
-		
-		$("ul > li > button",this).on("click",function(event) {
-			event.preventDefault();
-			event.stopPropagation();
-		});
-	};
-	
-	$.fn.inputStatus = function(status,message) {
-		if (this.is("input,textarea")) {
-			var $inputBlock = this.parents(".inputBlock, .inputInline");
-			if ($inputBlock.length > 0) {
-				var $helpBlock = $(".helpBlock",$inputBlock);
-				$inputBlock.removeClass("hasSuccess hasError");
-				
-				if (status == "default") {
-					if (!$helpBlock.attr("data-default")) $helpBlock.attr("data-default",$helpBlock.html());
-					var helpMessage = message ? message : $helpBlock.attr("data-default");
-				} else if (status == "loading" || status == "success") {
-					var helpMessage = message ? message : $helpBlock.attr("data-success");
-					$inputBlock.addClass("hasSuccess");
-				} else if (status == "error") {
-					var helpMessage = message ? message : $helpBlock.attr("data-error");
-					$inputBlock.addClass("hasError");
-				}
-				
-				if (helpMessage) $helpBlock.html(helpMessage);
-				else if ($helpBlock.attr("data-default")) $helpBlock.html($helpBlock.attr("data-default"));
-				else if (status == "loading" || status == "success") $helpBlock.empty();
-			}
-			
-			if (status == "error") {
-				this.inputScroll();
-			}
-			
-			if ((status == "disable" || status == "loading") && this.is(":disabled") == false && this.attr("data-loading") != "true") this.attr("data-loading","true").attr("disabled",true);
-			else if (this.attr("data-loading") == "true") this.attr("data-loading","false").attr("disabled",false);
-		}
-	};
-	
-	var inputScrollTimer = null;
-	var $inputScrollLast = null;
-	$.fn.inputScroll = function() {
-		if (inputScrollTimer != null) {
-			clearTimeout(inputScrollTimer);
-			inputScrollTimer = null;
-		}
-		
-		if (this.attr("data-wysiwyg") == "true") {
-			var $object = $(".fr-box",this.parent());
-		} else {
-			var $object = this;
-		}
-		
-		if ($inputScrollLast == null || $inputScrollLast.offset().top > $object.offset().top) {
-			$inputScrollLast = $object;
-		}
-		
-		inputScrollTimer = setTimeout(function() { $inputScrollLast.positionScroll(); inputScrollTimer = null; $inputScrollLast = null;},200);
-	};
-	
-	$.fn.buttonStatus = function(status) {
-		if (this.is("button")) {
-			if (status == "loading") {
-				this.data("default",this.html());
-				var text = '<i class="fa fa-spin fa-spinner"></i>';
-				if (this.attr("data-loading") !== undefined) text+= ' '+this.attr("data-loading");
-				else text+= ' Loading...';
-				this.html(text).attr("disabled",true);
-			} else if (status == "reset" || status == "default") {
-				if (this.data("default") !== undefined) {
-					this.html(this.data("default"));
-				}
-				this.attr("disabled",false);
-			} else if (status == "error") {
-				setTimeout(function($button) { $button.buttonStatus("reset"); },200,this);
-			} else if (status == "disable") {
-				this.attr("disabled",true);
-			} else if (status == "enable") {
-				this.attr("disabled",false);
-			}
-		}
-	};
-	*/
 })(jQuery);

@@ -39,6 +39,11 @@ var iModule = {
 		$("form",$container).status("default");
 		
 		/**
+		 * 자동저장 form 처리
+		 */
+		//$("form[data-autosave]").autosave();
+		
+		/**
 		 * tab 객체 초기화
 		 */
 		$("*[data-role=tab]",$container).inits();
