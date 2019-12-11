@@ -314,7 +314,7 @@ var iModule = {
 			}
 		} else {
 			try {
-				if (value === null) delete window.sessionStorage[name];
+				if (value === null) delete window.localStorage[name];
 				else window.localStorage[name] = JSON.stringify(value);
 				return true;
 			} catch (e) {
