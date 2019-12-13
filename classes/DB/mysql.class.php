@@ -7,8 +7,8 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.3.0
- * @modified 2019. 11. 23.
+ * @version 1.3.1
+ * @modified 2019. 12. 13.
  */
 class mysql {
 	private $db;
@@ -81,6 +81,10 @@ class mysql {
 		$mysqli = @new mysqli($db->host,$db->username,$db->password,$db->database,$db->port);
 		if ($mysqli->connect_errno) return false;
 		return true;
+	}
+	
+	function getPrefix($prefix) {
+		return $this->_prefix;
 	}
 	
 	function setPrefix($prefix) {
@@ -383,9 +387,9 @@ class mysql {
 		return true;
 	}
 	
-	public function drop($table) {
+	public function drop($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$this->rawQuery('DROP TABLE IF EXISTS `'.$this->_prefix.$table.'`');
+		$this->rawQuery('DROP TABLE IF EXISTS `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
 		
 		return $this->getLastError() == '';
 	}
