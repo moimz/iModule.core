@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2019. 12. 15.
  */
 class Plugin {
 	/**
@@ -474,6 +474,16 @@ class Plugin {
 	function isInstalled($plugin=null) {
 		if ($plugin !== null) return $this->IM->db()->select($this->table->plugin)->where('plugin',$plugin)->has();
 		else return $this->pluginInstalled !== null;
+	}
+	
+	/**
+	 * 설치되어 있는 모든 플러그인목록을 가져온다.
+	 *
+	 * @return object[] $plugins
+	 */
+	function getPlugins() {
+		$plugins = $this->IM->db()->select($this->table->plugin)->orderBy('sort','asc')->get();
+		return $plugins;
 	}
 	
 	/**
