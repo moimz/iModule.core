@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2019. 4. 20.
+ * @modified 2019. 12. 17.
  */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
@@ -95,6 +95,8 @@ tr.x-grid-row-summary:first-child {display:none;}
 
 .x-main-panel .x-panel-header-default {background:#48535f; border:1px solid #2d3844;}
 .x-main-panel .x-panel-header-title-default {color:#adb3b8;}
+.x-main-panel .x-main-default-panel .x-panel-header-default {background:#5fa2dd; border:1px solid #5fa2dd;}
+.x-main-panel .x-main-default-panel .x-panel-header-title-default {color:#f0f0f0;}
 .x-menu-title {height:36px; line-height:36px; background:#48535f; color:#fff; font-size:12px; padding:0px 10px; font-weight:bold; cursor:default; min-width:150px; margin:-1px; border-bottom:1px solid #d0d0d0;}
 .x-menu-title > div {max-width:250px; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 .x-form-help {margin-top:5px; line-height:1.6; font-size:11px; color:#666;}
