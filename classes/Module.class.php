@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 5. 24.
+ * @modified 2019. 12. 17.
  */
 class Module {
 	/**
@@ -189,6 +189,19 @@ class Module {
 	 */
 	function getTable($table) {
 		return empty($this->table->$table) == true ? null : $this->table->$table;
+	}
+	
+	/**
+	 * [코어/모듈내부] 모듈 아이콘 반환한다.
+	 *
+	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
+	 * @return string $title 모듈 아이콘
+	 */
+	function getIcon($module=null) {
+		$package = $this->getPackage($module);
+		if ($package == null) return '';
+		
+		return $package->icon;
 	}
 	
 	/**
