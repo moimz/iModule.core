@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 12. 18.
+ * @modified 2019. 10. 10.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 
@@ -55,9 +55,6 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 } else {
 	if ($_module != null) {
 		if (preg_match('/^@/',$_action) == true) $IM->getModule('admin')->saveProcessLog($_module,$_action);
-		
-		session_write_close();
-		
 		$results = $IM->getModule($_module,true)->doProcess($_action);
 		
 		if ($results !== null) {
