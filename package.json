@@ -315,6 +315,12 @@
 					"type":"text",
 					"comment":"컨텍스트 설정"
 				},
+				"permission":{
+					"type":"varchar",
+					"length":255,
+					"default":"true",
+					"comment":"권힌"
+				},
 				"is_footer":{
 					"type":"enum",
 					"length":"'TRUE','FALSE'",

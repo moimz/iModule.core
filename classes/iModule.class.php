@@ -233,6 +233,10 @@ class iModule {
 			$this->db()->rawQuery("ALTER TABLE `im_site_table` CHANGE `is_ssl` `is_https` ENUM('TRUE','FALSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FALSE' COMMENT 'HTTPS접속여부'");
 			return $this->initSites($is_sitemap);
 		}
+		$check = $this->db()->select($this->table->sitemap)->getOne();
+		if ($check != null && isset($check->permission) == false) {
+			$this->db()->rawQuery("ALTER TABLE `im_sitemap_table` ADD `permission` VARCHAR(255) NOT NULL DEFAULT 'true' COMMENT '권한' AFTER `context`;");
+		}
 		
 		/**
 		 * 현재 접속한 도메인에 해당하는 사이트가 없을 경우, 유사한 사이트를 찾는다.
@@ -359,6 +363,7 @@ class iModule {
 				
 				$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
 				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
+					$sitemap[$j]->permission = isset($sitemap[$j]->permission) == true ? $this->parsePermissionString($sitemap[$j]->permission) : true;
 					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
 					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
 					
@@ -1233,6 +1238,7 @@ class iModule {
 		$menus = $this->getMenus(null,$domain,$language);
 		
 		foreach ($menus as $menu) {
+			if (isset($menu->permission) == true && $menu->permission == false) continue;
 			if (isset($menu->is_hide) == true && $menu->is_hide == true) continue;
 			
 			/**
@@ -1241,6 +1247,7 @@ class iModule {
 			$menu->pages = array();
 			$pages = $this->getPages($menu->menu,null,$domain,$language);
 			foreach ($pages as $page) {
+				if (isset($page->permission) == true && $page->permission == false) continue;
 				if (isset($page->is_hide) == true && $page->is_hide == true) continue;
 				$menu->pages[] = $page;
 			}
