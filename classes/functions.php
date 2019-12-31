@@ -8,7 +8,7 @@
  * @author Arzz
  * @license MIT License
  * @version 1.6.0
- * @modified 2019. 12. 8.
+ * @modified 2019. 12. 31.
  */
 
 /**
@@ -193,35 +193,35 @@ function GetAntiSpamEmail($email,$isLink=true) {
 }
 
 /**
- * 사업자 번호 형식 맞는지 확인한다.
+ * 사업자번호 형식이 맞는지 확인한다.
  *
- * @param string $n
- * @return bool
+ * @param string $number
+ * @return boolean $isValid
  */
-function CheckCompanyNumber($n) {
-    $no = str_replace("-", "", $n);
-    if(strlen($no)===10) {
-        $CHECKNUMS = array(1, 3, 7, 1, 3, 7, 1, 3, 5);
-        $checkSum = 0;
-        $lastNumber = 0;
-        for ($i = 0; $i < 9; $i++) {
-            $tmp = ($CHECKNUMS[$i] * $no[$i]);
-            if ($i < 8) {
-                $checkSum += $tmp;
-            } else { // 9번째 곱셈의 결과를 각 자리수를 더함 ( ex: 8*5=45 => 4 + 5 = 9
-                $tmp2 = (string)$tmp;
-                $checkSum += (int)$tmp2[0] + (int)$tmp2[1];
-                $lastNumber = (10 - ($checkSum % 10)) % 10; // (10 - (체크섬 % 10)) % 10
-            }
-        }
-        if ($no[9] == $lastNumber) {
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        return false;
-    }
+function CheckCompanyNumber($number) {
+	$number = str_replace('-','',$number);
+	if (strlen($number) === 10) {
+		$CHECKNUMS = array(1,3,7,1,3,7,1,3,5);
+		$checkSum = 0;
+		$lastNumber = 0;
+		for ($i = 0; $i < 9; $i++) {
+			$tmp = ($CHECKNUMS[$i] * $number[$i]);
+			if ($i < 8) {
+				$checkSum += $tmp;
+			} else { // 9번째 곱셈의 결과를 각 자리수를 더함 ( ex: 8*5=45 => 4 + 5 = 9
+				$tmp2 = (string)$tmp;
+				$checkSum += (int)$tmp2[0] + (int)$tmp2[1];
+				$lastNumber = (10 - ($checkSum % 10)) % 10; // (10 - (체크섬 % 10)) % 10
+			}
+		}
+		if ($number[9] == $lastNumber) {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		return false;
+	}
 }
 
 /**
