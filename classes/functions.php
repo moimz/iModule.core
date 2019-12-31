@@ -181,18 +181,6 @@ function CheckPhoneNumber($phone) {
 }
 
 /**
- * 이메일형식이 이메일수집봇에 의해 자동으로 수집되지 않도록 변환한다.
- *
- * @param string $email 이메일주소
- * @param boolean $isLink 이메일링크를 포함할지 여부 (기본값 : true)
- * @return boolean $email 변환된 이메일주소
- */
-function GetAntiSpamEmail($email,$isLink=true) {
-	$email = str_replace('@','<i class="fa fa-at"></i>',$email);
-	return $isLink == true ? '<span class="iModuleEmail">'.$email.'</span>' : $email;
-}
-
-/**
  * 사업자번호 형식이 맞는지 확인한다.
  *
  * @param string $number
@@ -204,14 +192,14 @@ function CheckCompanyNumber($number) {
 		$CHECKNUMS = array(1,3,7,1,3,7,1,3,5);
 		$checkSum = 0;
 		$lastNumber = 0;
-		for ($i = 0; $i < 9; $i++) {
+		for ($i=0;$i<9;$i++) {
 			$tmp = ($CHECKNUMS[$i] * $number[$i]);
 			if ($i < 8) {
 				$checkSum += $tmp;
-			} else { // 9번째 곱셈의 결과를 각 자리수를 더함 ( ex: 8*5=45 => 4 + 5 = 9
+			} else { // 9번째 곱셈의 결과를 각 자리수를 더함 (ex: 8*5=45 => 4 + 5 = 9)
 				$tmp2 = (string)$tmp;
-				$checkSum += (int)$tmp2[0] + (int)$tmp2[1];
-				$lastNumber = (10 - ($checkSum % 10)) % 10; // (10 - (체크섬 % 10)) % 10
+				$checkSum+= (int)$tmp2[0] + (int)$tmp2[1];
+				$lastNumber = (10 - ($checkSum % 10)) % 10; // (10 - (체크섬 % 10)) % 10)
 			}
 		}
 		if ($number[9] == $lastNumber) {
@@ -222,6 +210,18 @@ function CheckCompanyNumber($number) {
 	} else {
 		return false;
 	}
+}
+
+/**
+ * 이메일형식이 이메일수집봇에 의해 자동으로 수집되지 않도록 변환한다.
+ *
+ * @param string $email 이메일주소
+ * @param boolean $isLink 이메일링크를 포함할지 여부 (기본값 : true)
+ * @return boolean $email 변환된 이메일주소
+ */
+function GetAntiSpamEmail($email,$isLink=true) {
+	$email = str_replace('@','<i class="fa fa-at"></i>',$email);
+	return $isLink == true ? '<span class="iModuleEmail">'.$email.'</span>' : $email;
 }
 
 /**
