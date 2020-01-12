@@ -2362,8 +2362,21 @@ class iModule {
 		 * $config->context->page : 불러올 2차 메뉴(page)명
 		 */
 		if ($config->type == 'PAGE') {
-			$this->page = $config->context->page;
-			return $this->getPageContext($menu,$config->context->page);
+			if ($config->context->page == '@') {
+				$code = null;
+				foreach ($this->getPages($menu) as $item) {
+					if ($item->permission == true) {
+						$code = $item->page;
+						break;
+					}
+				}
+				
+				if ($code == null) return $this->printError('NOT_FOUND_PAGE');
+			} else {
+				$code = $config->context->page;
+			}
+			$this->page = $code;
+			return $this->getPageContext($menu,$code);
 		}
 		
 		$context = '';
