@@ -512,6 +512,8 @@ div[data-role=context][data-type=html] > a.edit:hover {background:#1e88e5;}
 	ul[data-role=form] > li > label.small {width:90px;}
 }
 
+*.only-print {display:none;}
 @media print {
 	* {-webkit-print-color-adjust:exact; color-adjust:exact;}
+	*.only-print {display:block;}
 }
