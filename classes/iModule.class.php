@@ -860,6 +860,17 @@ class iModule {
 		if (count($matches) == 0) return null;
 		
 		/**
+		 * 메뉴권한을 확인한다.
+		 */
+		$filters = array();
+		foreach ($matches as $match) {
+			if (isset($match->permission) == false || $this->parsePermissionString($match->permission) == true) {
+				$filters[] = $match;
+			}
+		}
+		$matches = $filters;
+		
+		/**
 		 * 반드시 일치해야하는 설정값을 가진 페이지를 탐색한다.
 		 */
 		$filters = array();
@@ -953,7 +964,7 @@ class iModule {
 		$values = (object)get_defined_vars();
 		$matches = array();
 		
-		$pages = $this->db()->select($this->table->sitemap,'domain,language,menu,page,context')->where('type','MODULE')->where('context','{"module":"'.$module.'"%','LIKE')->get();
+		$pages = $this->db()->select($this->table->sitemap,'domain,language,menu,page,permission,context')->where('type','MODULE')->where('context','{"module":"'.$module.'"%','LIKE')->get();
 		foreach ($pages as $page) {
 			$page->context = json_decode($page->context);
 			if ($context != $page->context->context) continue;
