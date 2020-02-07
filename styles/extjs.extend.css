@@ -73,6 +73,8 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-grid-group-title {font-size:13px; font-weight:bold; color:#000;}
 .x-grid-group-title > i {margin-right:8px;}
 
+.x-column-header-multiline .x-column-header-text-inner {display:-webkit-box; white-space:normal; max-height:51px !important; line-height:17px; overflow:hidden; padding-right:5px; -webkit-line-clamp:3; -webkit-box-orient: vertical;}
+
 .x-grid-dark .x-column-header {background-color:#48535f; border-color:#2d3844; color:#adb3b8;}
 .x-grid-dark .x-column-header-over {background:#2d3844;}
 .x-grid-dark .x-grid-header-ct {border:1px solid #2d3844;}
