@@ -14,7 +14,50 @@ Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootPro
 Ext.define("Ext.moimz.data.JsonStore",{override:"Ext.data.JsonStore",pageSize:0});
 Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x"});
 Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidth:60});
-Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false});
+Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false,usermenu:false,
+	beforeRender: function() {
+		var me = this,
+			rootHeaderCt = me.getRootHeaderCt(),
+			isSortable = me.isSortable(),
+			labels = [],
+			ariaAttr;
+ 
+		me.callParent();
+		
+		if (!me.usermenu && !isSortable && !me.groupable &&
+				!me.lockable && (rootHeaderCt.grid.enableColumnHide === false ||
+				!rootHeaderCt.getHideableColumns().length)) {
+			me.menuDisabled = true;
+		}
+		
+		if (me.usermenu == true) me.menuDisabled = false;
+		if (me.cellWrap) {
+			me.variableRowHeight = true;
+		}
+		
+		ariaAttr = me.ariaRenderAttributes || (me.ariaRenderAttributes = {});
+		
+		ariaAttr['aria-readonly'] = true;
+		
+		if (isSortable) {
+			ariaAttr['aria-sort'] = me.ariaSortStates[me.sortState];
+		}
+		
+		if (me.isSubHeader) {
+			labels = me.getLabelChain();
+			
+			if (me.text) {
+				labels.push(Ext.util.Format.stripTags(me.text));
+			}
+			
+			if (labels.length) {
+				ariaAttr['aria-label'] = labels.join(' ');
+			}
+		}
+		
+		me.protoEl.unselectable();
+	}
+});
 Ext.define("Ext.moimz.grid.Panel",{override:"Ext.grid.Panel",columnLines:true,enableColumnMove:false});
 Ext.define("Ext.moimz.selection.CheckboxModel",{override:"Ext.selection.CheckboxModel",headerWidth:30,checkOnly:false});
 Ext.define("Ext.moimz.menu.Menu",{override:"Ext.menu.Menu",addTitle:function(title) {
