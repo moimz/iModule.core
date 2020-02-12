@@ -55,7 +55,7 @@ if (preg_match('/^@/',$_action) == true && $IM->getModule('member')->isAdmin() =
 } else {
 	if ($_module != null) {
 		if (preg_match('/^@/',$_action) == true) $IM->getModule('admin')->saveProcessLog($_module,$_action);
-		if (preg_match('/^@?(check|delete|download|move|save|update)/',$_action) == true) session_write_close();
+		if (preg_match('/^@?(get|check|delete|download|move|save|update)/',$_action) == true) session_write_close();
 		$results = $IM->getModule($_module,true)->doProcess($_action);
 		
 		if ($results !== null) {
