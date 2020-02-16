@@ -8,12 +8,11 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2020. 2. 16.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
 define('__IM_SITE__',true);
-define('__IM_CONTAINER__',true);
 
 /**
  * iModule 코어를 선언하고, 모듈 컨테이너를 불러온다.
@@ -33,9 +32,11 @@ $idx = Request('_idx');
 $IM->menu = '#';
 $IM->page = '#';
 
+if ($IM->getModule()->getContainerMode($module) == 'DEFAULT') define('__IM_CONTAINER__',true);
+
 if (strpos($container,'@') === 0) {
 	$container = preg_replace('/^@/','',$container);
-	define('__IM_CONTAINER_POPUP__',true);
+	if ($IM->getModule()->getContainerMode($module) == 'DEFAULT') define('__IM_CONTAINER_POPUP__',true);
 }
 $IM->setContainerMode($module,$container);
 

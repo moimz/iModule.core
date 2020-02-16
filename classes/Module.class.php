@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 12. 17.
+ * @modified 2020. 2. 16.
  */
 class Module {
 	/**
@@ -242,6 +242,17 @@ class Module {
 	function getHash($module=null) {
 		$module = $module == null ? $this->loaded : $module;
 		return file_exists(__IM_PATH__.'/modules/'.$module.'/package.json') == true ? md5_file(__IM_PATH__.'/modules/'.$module.'/package.json') : false;
+	}
+	
+	/**
+	 * [코어/모듈내부] 모듈의 컨테이너모드를 반환한다.
+	 *
+	 * @param string $module(옵션) 모듈명 (코어에서 호출시 사용, 모듈내부에서 호출시 호출한 모듈명)
+	 * @return string $container_mode
+	 */
+	function getContainerMode($module=null) {
+		$package = $this->getPackage($module);
+		return $package != null && isset($package->container_mode) == true ? $package->container_mode : 'DEFAULT';
 	}
 	
 	/**
