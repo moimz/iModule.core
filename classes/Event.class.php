@@ -170,6 +170,14 @@ class Event {
 		}
 		
 		/**
+		 * 설치이벤트
+		 */
+		if ($event == 'afterInstall') {
+			$mode = $caller;
+			unset($caller);
+		}
+		
+		/**
 		 * 언어팩처리
 		 */
 		if ($event == 'afterGetText') {
