@@ -2609,9 +2609,14 @@ class iModule {
 			$permissionString = str_replace('{$member.type}',"'".$member->type."'",$permissionString);
 			$permissionString = str_replace('{$member.email}',"'".$member->email."'",$permissionString);
 			
-			if (preg_match_all('/\{\$member\.label\}(.*?)(==|!=)(.*?)\'(.*?)\'/',$permissionString,$match,PREG_SET_ORDER) == true) {
+			$labels = array();
+			foreach ($member->label as $label) {
+				$labels[] = $label->idx;
+			}
+			
+			if (preg_match_all('/\{\$member\.label\}(.*?)(==|!=)(.*?)\'?([0-9]+)\'?/',$permissionString,$match,PREG_SET_ORDER) == true) {
 				for ($i=0, $loop=count($match);$i<$loop;$i++) {
-					$string = 'in_array(\''.$match[$i][4].'\',$member->label) '.$match[$i][2].' true';
+					$string = 'in_array('.$match[$i][4].',$labels) '.$match[$i][2].' true';
 					$permissionString = str_replace($match[$i][0],$string,$permissionString);
 				}
 			}
@@ -2636,7 +2641,7 @@ class iModule {
 	function checkPermissionString($permissionString) {
 		$permissionString = str_replace('{$member.level}',"0",$permissionString);
 		$permissionString = str_replace('{$member.type}',"'MEMBER'",$permissionString);
-		$permissionString = str_replace('{$member.label}',"'default'",$permissionString);
+		$permissionString = str_replace('{$member.label}',"0",$permissionString);
 		$permissionString = str_replace('{$member.email}',"'email@email.com'",$permissionString);
 		
 		/**
