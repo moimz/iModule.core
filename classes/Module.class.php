@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2020. 2. 16.
+ * @modified 2020. 2. 19.
  */
 class Module {
 	/**
@@ -447,7 +447,7 @@ class Module {
 	function setConfig($key,$value) {
 		if ($this->moduleConfigs == null) return $this;
 		$this->moduleConfigs->{$key} = $value;
-		$this->IM->db()->update($this->table->module,array('configs'=>json_encode($this->moduleConfigs,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK)))->where('module',$this->loaded)->execute();
+		$this->IM->db()->update($this->table->module,array('configs'=>json_encode($this->moduleConfigs,JSON_UNESCAPED_UNICODE)))->where('module',$this->loaded)->execute();
 		
 		return $this;
 	}
@@ -695,6 +695,7 @@ class Module {
 				if ($type->type == 'boolean') $value = $value === true || $value === 'on' ? true : false;
 				elseif ($type->type == 'array' && is_array($value) == false) $value = json_decode($value);
 				elseif ($type->type == 'number' && is_numeric($value) == false) $value = floatVal($value);
+				elseif ($type->type == 'int' && is_numeric($value) == false) $value = intval($value);
 				
 				if ($type->type == 'templet') $templetFields[] = $config;
 				
@@ -715,7 +716,7 @@ class Module {
 		} else {
 			$configs = new stdClass();
 		}
-		$configs = json_encode($configs,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK);
+		$configs = json_encode($configs,JSON_UNESCAPED_UNICODE);
 		
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
