@@ -1,0 +1,62 @@
+/**
+ * 이 파일은 MoimzTools 의 일부입니다. (https://www.moimz.com)
+ *
+ * 두개의 텍스트의 차이점을 비교한 결과를 출력하기 위한 기본 스타일시트
+ *
+ * @file /styles/diff.css
+ * @author Arzz
+ * @license MIT License
+ * @version 1.0.0
+ * @modified 2020. 2. 24.
+ */
+@import url('https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding|Roboto+Mono&display=swap');
+
+div[data-role=diff] h1 {background:#f5f8fa; border-bottom:1px solid #d1d5da; font-size:12px; height:30px; line-height:30px; padding-left:10px; font-family:"Roboto Mono", "Nanum Gothic Coding"; margin:0; padding:0; padding:5px 10px;}
+div[data-role=diff] h1 div[data-role=button] {float:right; height:30px; font-size:0px; background:blue; vertical-align:middle; line-height:1; padding:0;}
+div[data-role=diff] h1 div[data-role=button] button {border:1px solid #e5e5e5; background:#fff; width:30px; height:30px; line-height:28px; font-size:0; margin:0; padding:0;}
+div[data-role=diff] h1 div[data-role=button] button svg {width:16px; height:16px; margin:6px; fill:#333;}
+div[data-role=diff] h1 div[data-role=button] button + button {border-left:0;}
+div[data-role=diff][data-mode=inline] h1 div[data-role=button] button:nth-child(1) {background:#2196F3;}
+div[data-role=diff][data-mode=inline] h1 div[data-role=button] button:nth-child(1) svg {fill:#fff;}
+div[data-role=diff][data-mode=side] h1 div[data-role=button] button:nth-child(2) {background:#2196F3;}
+div[data-role=diff][data-mode=side] h1 div[data-role=button] button:nth-child(2) svg {fill:#fff;}
+div[data-role=diff] table {width:100%; border-collapse:collapse; border-spacing:0; empty-cells:show; table-layout:fixed; font-size:12px;}
+
+div[data-role=diff] table th {width:50px; background:#f4f4f4; color:rgba(0,0,0,0.4); font-weight:normal; text-align:right; padding-right:5px; vertical-align:top; padding:3px; line-height:16px; user-select:none; -webkit-user-select:none; -ms-user-select:none; font-family:"Roboto Mono";}
+div[data-role=diff] table th span::before {content:attr(data-line-number);}
+div[data-role=diff] table td {width:100%; color:rgba(0,0,0,0.9); padding:3px; word-break:break-all; line-height:16px; font-family:"Roboto Mono", "Nanum Gothic Coding";}
+
+div[data-role=diff][data-mode=inline] table td[data-role=left] {display:none;}
+div[data-role=diff][data-mode=inline] table td[data-role=right] {display:none;}
+div[data-role=diff][data-mode=inline] table td[data-role=inline] {display:table-cell;}
+div[data-role=diff][data-mode=inline] table tr[data-role=inline] {display:table-row;}
+div[data-role=diff][data-mode=inline] table tr[data-role=side] {display:none;}
+
+div[data-role=diff][data-mode=side] table td[data-role=left] {display:table-cell;}
+div[data-role=diff][data-mode=side] table td[data-role=right] {display:table-cell;}
+div[data-role=diff][data-mode=side] table td[data-role=inline] {display:none;}
+div[data-role=diff][data-mode=side] table tr[data-role=inline] {display:none;}
+div[data-role=diff][data-mode=side] table tr[data-role=side] {display:table-row;}
+
+div[data-role=diff][data-mode=inline] table tr.insert th[data-role=left] {background:#cdffd8;}
+div[data-role=diff][data-mode=side] table tr.insert th[data-role=right] {background:#cdffd8;}
+div[data-role=diff] table tr.insert td[data-role=right] {background:#e6ffed;}
+div[data-role=diff][data-mode=inline] tr.insert th[data-role=right] {background:#cdffd8;}
+div[data-role=diff] table tr.insert td[data-role=inline] {background:#e6ffed;}
+
+div[data-role=diff][data-mode=inline] table tr.delete th[data-role=left] {background:#ffdce0;}
+div[data-role=diff][data-mode=side] table tr.delete th[data-role=left] {background:#ffdce0;}
+div[data-role=diff] table tr.delete td[data-role=left] {background:#ffeef0;}
+div[data-role=diff][data-mode=inline] table tr.delete th[data-role=right] {background:#ffdce0;}
+div[data-role=diff] table tr.delete td[data-role=inline] {background:#ffeef0;}
+
+div[data-role=diff] table tr.replace th[data-role=left] {background:#ffdce0;}
+div[data-role=diff] table tr.replace td[data-role=left] {background:#ffeef0;}
+div[data-role=diff] table tr.replace th[data-role=right] {background:#cdffd8;}
+div[data-role=diff] table tr.replace td[data-role=right] {background:#e6ffed;}
+
+div[data-role=diff] table ins {background:#acf2bd; text-decoration:none;}
+div[data-role=diff] table del {background:#fdb8c0; text-decoration:none;}
+
+div[data-role=diff] table tbody.skipped th {background:#dbedff; height:30px; font-size:16px; line-height:20px; text-align:center;}
+div[data-role=diff] table tbody.skipped td {background:#f1f8ff; height:30px;}
