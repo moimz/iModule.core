@@ -784,7 +784,7 @@ class mysql {
 					$comparison = ' MATCH ('.$wKey.') AGAINST (? IN BOOLEAN MODE)';
 					
 					$keylist = explode(' ',$val);
-					for ($i=0, $loop=sizeof($keylist);$i<$loop;$i++) {
+					for ($i=0, $loop=count($keylist);$i<$loop;$i++) {
 						$keylist[$i] = '\'+'.$keylist[$i].'*\'';
 					}
 					$keylist = implode(' ',$keylist);

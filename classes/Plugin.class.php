@@ -98,7 +98,7 @@ class Plugin {
 			$this->IM->cache()->store('core','plugins','all',json_encode($plugins));
 		}
 		
-		for ($i=0, $loop=sizeof($plugins);$i<$loop;$i++) {
+		for ($i=0, $loop=count($plugins);$i<$loop;$i++) {
 			$targets = $plugins[$i]->targets ? json_decode($plugins[$i]->targets) : new stdClass();
 			
 			foreach ($targets as $target=>$events) {
