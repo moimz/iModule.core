@@ -465,6 +465,7 @@
 							} else {
 								$input.val("");
 							}
+							$input.triggerHandler("change");
 						});
 					} else {
 						$input.attr("type","text");
