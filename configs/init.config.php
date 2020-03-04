@@ -37,7 +37,7 @@ if (defined('__IM_PATH__') == false) define('__IM_PATH__',str_replace(DIRECTORY_
 if (defined('__IM_DIR__') == false) define('__IM_DIR__',str_replace($_SERVER['DOCUMENT_ROOT'],'',__IM_PATH__));
 
 /**
- * iModule 에서 공통적으로 사용하는 기본 함수셋을 불러온다.
+ * 모임즈툴즈에서 공통적으로 사용하는 기본 함수셋을 불러온다.
  *
  * @see /classes/functions.php
  */
@@ -98,19 +98,19 @@ session_start();
  * 우선적으로 /classes 폴더를 우선탐색하며, class 이름이 Module 로 시작할 경우 각 모듈의 최상위폴더의 Module[모듈명].class.php 파일을 탐색한다.
  * 모든 class 파일은 [클래스명].class.php 파일명의 규칙을 지켜야한다.
  */
-function iModuleAutoLoader($class) {
+function MoimzToolsAutoLoader($class) {
 	if ($class != 'Module' && preg_match('/^Module/',$class) == true) {
 		$module = strtolower(preg_replace('/^Module/','',$class));
-		if (file_exists(__IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php';
+		if (is_file(__IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/modules/'.$module.'/'.$class.'.class.php';
 	} elseif (preg_match('/^PHPExcel_/',$class) == true) {
-		if (file_exists(__IM_PATH__.'/classes/'.str_replace('_','/',$class).'.php') == true) {
+		if (is_file(__IM_PATH__.'/classes/'.str_replace('_','/',$class).'.php') == true) {
 			REQUIRE_ONCE __IM_PATH__.'/classes/'.str_replace('_','/',$class).'.php';
 		}
 	} else {
-		if (file_exists(__IM_PATH__.'/classes/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/classes/'.$class.'.class.php';
+		if (is_file(__IM_PATH__.'/classes/'.$class.'.class.php') == true) REQUIRE_ONCE __IM_PATH__.'/classes/'.$class.'.class.php';
 	}
 }
-spl_autoload_register('iModuleAutoLoader');
+spl_autoload_register('MoimzToolsAutoLoader');
 
 if (defined('__DEBUG_MODE__') == true) {
 	error_reporting(E_ALL);

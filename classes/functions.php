@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.6.0
- * @modified 2019. 12. 31.
+ * @version 1.6.1
+ * @modified 2020. 3. 4.
  */
 
 /**
@@ -103,11 +103,11 @@ function Decoder($value,$key=null,$mode='base64') {
 	$valueLen = strlen($output);
 	if ($valueLen % 16 > 0) return false;
 
-	$padSize = ord($output{$valueLen - 1});
+	$padSize = ord($output[$valueLen - 1]);
 	if (($padSize < 1) || ($padSize > 16)) return false;
 
 	for ($i=0;$i<$padSize;$i++) {
-		if (ord($output{$valueLen - $i - 1}) != $padSize) return false;
+		if (ord($output[$valueLen - $i - 1]) != $padSize) return false;
 	}
 	
 	return substr($output,0,$valueLen-$padSize);
