@@ -395,6 +395,7 @@ function GetString($str,$code) {
 		 * 정규식에 들어갈 수 있도록 정규식에 사용되는 문자열을 치환한다.
 		 */
 		case 'reg' :
+			$str = str_replace('\\','\\\\',$str);
 			$str = str_replace('[','\[',$str);
 			$str = str_replace(']','\]',$str);
 			$str = str_replace('(','\(',$str);
@@ -405,7 +406,6 @@ function GetString($str,$code) {
 			$str = str_replace('-','\-',$str);
 			$str = str_replace('+','\+',$str);
 			$str = str_replace('^','\^',$str);
-			$str = str_replace('\\','\\\\',$str);
 			$str = str_replace('$','\$',$str);
 			$str = str_replace('/','\/',$str);
 		break;
