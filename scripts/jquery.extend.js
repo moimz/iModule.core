@@ -1697,7 +1697,7 @@
 			url:url,
 			data:data,
 			dataType:"json",
-			timeout:60000,
+			timeout:600000,
 			success:function(result) {
 				if (typeof callback == "function" && callback(result) === false) return false;
 				if (result.success == false) {
@@ -1760,7 +1760,7 @@
 			data:data,
 			processData:$("input[type=file][name]",$form).length == 0 ? true : false,
 			dataType:"json",
-			timeout:60000,
+			timeout:600000,
 			contentType:$("input[type=file][name]",$form).length == 0 ? "application/x-www-form-urlencoded; charset=UTF-8" : false,
 			success:function(result) {
 				if (result.success == true && $form.data("autosaved") !== undefined) {
