@@ -124,11 +124,11 @@ if (defined('__DEBUG_MODE__') == true) {
  * 사이트 헤더 설정
  * 기본적인 HTTP보안설정 및 언어셋을 선언한다.
  */
-header("X-UA-Compatible: IE=Edge");
-header("X-XSS-Protection: 1");
-header("Content-type: text/html; charset=utf-8");
-header("Expires: 0");
-header("Last-Modified: ".gmdate('D, d M Y H:i:s').' GMT');
+header('X-UA-Compatible: IE=Edge');
+header('X-XSS-Protection: 1');
+header('Content-type: text/html; charset=utf-8');
+header('Expires: 0');
+header('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT');
 header('Cache-Control: no-store, no-cache, must-revalidate');
 header('Cache-Control: pre-check=0, post-check=0, max-age=0');
 header('Pragma: no-cache');
