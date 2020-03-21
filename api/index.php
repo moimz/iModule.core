@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2018. 12. 21.
+ * @modified 2020. 3. 21.
  */
 header('Cache-Control:no-store, no-cache, must-revalidate, max-age=0');
 header('Cache-Control:post-check=0, pre-check=0', false);
@@ -50,7 +50,7 @@ if ($_module != null && $IM->Module->isInstalled($_module) == true) {
 		$data = null;
 	}
 	
-	if ($data !== null) {
+	if ($data !== null && isset($data->success) == true) {
 		$results = $data;
 	} else {
 		$results->success = false;
