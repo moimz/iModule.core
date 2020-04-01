@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2020. 2. 16.
+ * @modified 2020. 4. 1.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'modules','',__DIR__).'/configs/init.config.php';
 
@@ -20,7 +20,6 @@ define('__IM_SITE__',true);
  * @see /classes/iMdoule.class.php
  */
 $IM = new iModule();
-$IM->getSite();
 
 /**
  * 컨테이너 호출변수
@@ -39,6 +38,7 @@ if (strpos($container,'@') === 0) {
 	if ($IM->getModule()->getContainerMode($module) == 'DEFAULT') define('__IM_CONTAINER_POPUP__',true);
 }
 $IM->setContainerMode($module,$container);
+$IM->getSite();
 
 /**
  * 호출변수가 없거나 호출하려는 모듈이 설치가 되어 있지 않은 경우, 에러메세지를 출력한다.
