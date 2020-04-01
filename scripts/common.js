@@ -633,6 +633,7 @@ var iModule = {
 			options.closable =  options.closable !== false;
 			
 			var $modal = $("<div>").attr("data-role","modal");
+			$modal.data("modal","custom");
 			$modal.attr("data-closable",options.closable == true ? "TRUE" : "FALSE");
 			$modal.attr("data-fullsize",options.fullsize == true ? "TRUE" : "FALSE");
 			$modal.attr("data-width",options.width);
@@ -684,6 +685,8 @@ var iModule = {
 		},
 		error:function(message,callback) {
 			var $modal = $("<div>").attr("data-role","modal");
+			$modal.data("modal","error");
+			$modal.data("message",message);
 			$modal.attr("data-closable","TRUE");
 			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
@@ -725,6 +728,8 @@ var iModule = {
 		},
 		alert:function(title,message,callback,closable) {
 			var $modal = $("<div>").attr("data-role","modal");
+			$modal.data("modal","error");
+			$modal.data("message",message);
 			$modal.attr("data-closable",closable === false ? "FALSE" : "TRUE");
 			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
@@ -766,6 +771,8 @@ var iModule = {
 		},
 		confirm:function(title,message,callback) {
 			var $modal = $("<div>").attr("data-role","modal");
+			$modal.data("modal","confirm");
+			$modal.data("message",message);
 			$modal.attr("data-closable","TRUE");
 			$modal.attr("data-fullsize","FALSE");
 			$modal.attr("data-width",400);
@@ -808,7 +815,8 @@ var iModule = {
 			var $box = $("div[data-role=disabled] > div[data-role=box]");
 			$box.empty();
 			
-			var $modal = $(html);
+			var $modal = typeof html == "string" ? $(html) : html;
+			if ($modal.data("modal") === undefined) $modal.data("modal","html");
 			$box.append($modal);
 			
 			iModule.modal.init();
@@ -822,7 +830,7 @@ var iModule = {
 				iModule.modal.close();
 			});
 			
-			$modal.triggerHandler("show",[$modal]);
+			$(document).triggerHandler("modal.show",[$modal]);
 		},
 		close:function(check_closable) {
 			var check_closable = check_closable === true;
@@ -840,7 +848,7 @@ var iModule = {
 				$("body").scrollTop(scroll);
 			}
 			
-			$modal.triggerHandler("close",[$modal]);
+			$(document).triggerHandler("modal.close",[$modal]);
 			
 			if (iModule.isMobile == true) {
 				$box.animate({marginTop:-$box.outerHeight(true)},"",function() {
