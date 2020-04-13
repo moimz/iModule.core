@@ -13,7 +13,7 @@
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
-.x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:20px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:0px 5px -1px 0px; vertical-align:middle; text-overflow:clip}
+.x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:19px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:0px 0px -1px 0px; vertical-align:middle; text-overflow:clip}
 .x-grid-cell-inner > i.tree {width:20px; margin-right:5px; display:inline-block; vertical-align:middle;}
 .x-grid-cell-inner > i.tree:before {position:absolute; left:15px; width:10px; height:100%; content:" "; border-left:1px dotted #ccc; background:transparent;}
 .x-grid-cell-inner > i.tree:after {position:absolute; top:0; left:15px; width:10px; height:50%; content:" "; border-bottom:1px dotted #ccc;}
@@ -64,7 +64,6 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-grid-cell-row-checker {vertical-align:top !important;}
 .x-grid-cell-row-checker .x-grid-cell-inner {padding:0px; width:100%; height:100%;}
 .x-grid-cell-row-checker .x-grid-cell-inner .x-grid-row-checker {width:100%; height:100%; padding:7px 4px 7px 7px;}
-.x-grid-cell-inner i.xi, .x-grid-cell-inner i.xi2, .x-grid-cell-inner i.fa, .x-grid-cell-inner i.mi {margin:-2px 0px; height:20px; line-height:19px; vertical-align:middle;}
 
 .x-grid-group-hd {border-bottom:2px solid #222; padding-top:20px;}
 .x-grid-item-container > table:not([class]) + .x-grid-item .x-grid-group-hd {padding-top:10px !important;}
