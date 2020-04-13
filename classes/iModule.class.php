@@ -351,7 +351,7 @@ class iModule {
 				$sitemap = null;
 				
 				/**
-				 * 사이트 구성모듈이 있는 경우 해당 모듈을 통해 사이트맵을 가져온다.
+				 * 사이트맵을 구성하는 모듈을 사용하는 사이트일 경우, 해당 모듈을 통해 사이트맵을 가져온다.
 				 */
 				if (strpos($this->sites[$i]->templet,'#') === 0) {
 					$temp = explode('.',substr($this->sites[$i]->templet,1));
