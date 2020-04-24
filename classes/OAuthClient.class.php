@@ -119,9 +119,9 @@ class OAuthClient {
 		return $this->_authUrl.'?'.http_build_query($params,null,'&');
 	}
 	
-	function getAccessToken() {
+	function getAccessToken($is_raw=false) {
 		if ($this->_accessToken != null && ($this->_accessToken->expires_in == 0 || $this->_accessToken->expires_in > time())) {
-			return $this->_accessToken->access_token;
+			return $is_raw == true ? $this->_accessToken : $this->_accessToken->access_token;
 		} elseif ($this->_refreshToken != null) {
 			$this->setGrantType('refresh_token');
 			$this->authenticate();
@@ -142,11 +142,12 @@ class OAuthClient {
 		return $this;
 	}
 	
-	function setAccessToken($token,$type='Url',$expires_in=0) {
+	function setAccessToken($token,$type='Url',$expires_in=0,$rawData=null) {
 		$this->_accessToken = new stdClass();
 		$this->_accessToken->access_token = $token;
 		$this->_accessToken->token_type = $type;
 		$this->_accessToken->expires_in = $expires_in;
+		$this->_accessToken->rawData = $rawData;
 		
 		$_SESSION['OAUTH_ACCESS_TOKEN'][$this->_clientId] = $this->_accessToken;
 		
@@ -165,6 +166,12 @@ class OAuthClient {
 	
 	function setGrantType($type) {
 		$this->_grantType = $type;
+		
+		return $this;
+	}
+	
+	function setHeader($headers=array()) {
+		$this->_headers = array_merge($this->_headers,$headers);
 		
 		return $this;
 	}
@@ -196,7 +203,7 @@ class OAuthClient {
 		$token = $this->executeRequest($this->_tokenUrl,$params,$this->_method);
 		
 		if ($token !== false && !empty($token->access_token)) {
-			$this->setAccessToken($token->access_token,isset($token->token_type) == true ? strtoupper($token->token_type) : 'URL',isset($token->expires_in) == true ? time() + $token->expires_in : 0);
+			$this->setAccessToken($token->access_token,isset($token->token_type) == true ? strtoupper($token->token_type) : 'URL',isset($token->expires_in) == true ? time() + $token->expires_in : 0,$token);
 			if (!empty($token->refresh_token)) $this->setRefreshToken($token->refresh_token);
 			$this->setAccessType('online');
 			$this->setGrantType('authorization_code');

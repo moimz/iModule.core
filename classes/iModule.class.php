@@ -1771,13 +1771,14 @@ class iModule {
 	 * @param boolean $is_fullurl 전체 URL 여부
 	 * @return string
 	 */
-	function getRequestUri($is_querystring,$is_fullurl=false) {
+	function getRequestUri($is_querystring=true,$is_fullurl=false) {
 		if (isset($_SERVER['REQUEST_URI']) == true) {
 			$url = $_SERVER['REQUEST_URI'];
 		} else {
 			$url = __IM_DIR__ ? __IM_DIR__ : '/';
 		}
 		
+		if ($url == false) $url = explode('?',$url)[0];
 		if ($is_fullurl == true) $url = $this->getHost(false).$url;
 		
 		return $url;
