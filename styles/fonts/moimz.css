@@ -6,8 +6,8 @@
  * @file /styles/fonts/moimz.css
  * @author Arzz
  * @license MIT License
- * @version 1.1.0
- * @modified 2018. 4. 6.
+ * @version 1.2.0
+ * @modified 2020. 4. 26.
  */
 @font-face {font-family:"moimz"; src:url("../../fonts/moimz.woff2") format("woff2"), url("../../fonts/moimz.woff") format("woff"), url("../../fonts/moimz.ttf") format("truetype"), url("../../fonts/moimz.svg") format("svg"); font-weight:normal; font-style:normal}
 
@@ -113,6 +113,7 @@
 .mi-github:before {content:"\ee05"}
 .mi-kakao-talk:before {content:"\ee06"}
 .mi-kakao-story:before {content:"\ee07"}
+.mi-slack:before {content:"\ee08"}
 
 .mi-bell:before {content:"\ef01"}
 .mi-bell-o:before {content:"\ef02"}
