@@ -101,5 +101,19 @@ class Cache {
 		
 		return file_put_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache',$data);
 	}
+	
+	/**
+	 * 캐시파일 내용을 초기화한다.
+	 *
+	 * @param string $controller 캐시파일을 생성한 컨트롤러 (module, widget, plugin, core)
+	 * @param string $component 캐시파일을 생성한 컴포넌트
+	 * @param string $code 캐시파일 고유코드
+	 * @return boolean $success
+	 */
+	function reset($controller,$component,$code) {
+		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return false;
+		
+		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) unlink($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
+	}
 }
 ?>
