@@ -37,7 +37,7 @@ class mysql {
 		if ($db !== null) {
 			$this->db = $db;
 			if (isset($this->db->port) == false) $this->db->port = 3306;
-			if (isset($this->db->charset) == false) $this->db->charset = 'utf8';
+			if (isset($this->db->charset) == false) $this->db->charset = 'utf8mb4';
 		}
 		
 		$this->_class = $class;
