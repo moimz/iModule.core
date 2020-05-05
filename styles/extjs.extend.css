@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2019. 12. 17.
+ * @modified 2020. 5. 6.
  */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
@@ -39,6 +39,8 @@
 .x-field.x-form-wysiwyg .x-form-text-wrap {overflow:visible !important;}
 
 .x-form-no-padding .x-form-text-default {padding-right:0px;}
+
+.x-fieldset-body .x-field:last-child {margin-bottom:4px;}
 
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
 .x-form-display-field-default {margin-top:0px; padding-top:8px;}
