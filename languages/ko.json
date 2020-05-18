@@ -54,6 +54,7 @@
 		"NOT_FOUND_EXTERNAL_FILE":"외부파일을 찾을 수 없습니다.",
 		"NOT_FOUND_MODULE":"모듈이 설치되지 않았거나, 서버에 존재하지 않습니다.",
 		"NOT_FOUND_FILE":"파일을 찾을 수 없습니다.",
+		"NOT_FOUND_LANGUAGE":"사이트언어셋을 찾을 수 없습니다.",
 		"NOT_SUPPORT_CONTAINER":"해당 모듈은 외부컨테이너를 지원하지 않습니다.",
 		"ALPHABET_NUMBER_UNDERBAR_ONLY":"알파벳 및 숫자, 그리고 언더바(_)만 입력가능합니다.",
 		"LOWER_CASE_ALPHABET_ONLY":"영어 소문자만 입력가능합니다.",

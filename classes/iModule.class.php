@@ -281,7 +281,7 @@ class iModule {
 			 * 전체 사이트 정보를 참고해도 현재 접속한 도메인의 사이트를 찾을 수 없을 경우 에러메세지를 출력한다.
 			 */
 			if ($isAlias == false) {
-				$this->printError('SITE_NOT_FOUND');
+				$this->printError('NOT_FOUND_SITE');
 			}
 		}
 		
@@ -293,7 +293,7 @@ class iModule {
 			 * 언어셋이 지정되지 않았을 경우 기본언어셋을 검색한다. 만약 찾을 수 없다면 에러메세지를 출력한다.
 			 */
 			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
-			if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
+			if ($site == null) $this->printError('NOT_FOUND_LANGUAGE');
 			$this->siteDefaultLanguages[$this->domain] = $site->language;
 			$this->language = $site->language;
 		} else {
@@ -307,7 +307,7 @@ class iModule {
 				/**
 				 * 기본 언어셋이 없을 경우 에러메세지를 출력한다.
 				 */
-				if ($site == null) $this->printError('LANGUAGE_NOT_FOUND');
+				if ($site == null) $this->printError('NOT_FOUND_LANGUAGE');
 			}
 		}
 		
@@ -2246,13 +2246,14 @@ class iModule {
 		/**
 		 * 이벤트를 발생시킨다.
 		 */
-		$values = new stdClass();
-		$values->message = $message;
-		$values->description = $description;
-		$values->type = $type;
-		$values->link = $link;
-		
-		$this->fireEvent('afterGetContext','core','error',$values,$html);
+		if (is_object($code) == true || $code != 'NOT_FOUND_SITE') {
+			$values = new stdClass();
+			$values->message = $message;
+			$values->description = $description;
+			$values->type = $type;
+			$values->link = $link;
+			$this->fireEvent('afterGetContext','core','error',$values,$html);
+		}
 		
 		if ($type == 'LOGIN') {
 			$header = PHP_EOL.'<form id="iModuleErrorForm">'.PHP_EOL;
