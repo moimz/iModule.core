@@ -7,8 +7,8 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.3.1
- * @modified 2019. 12. 13.
+ * @version 1.3.2
+ * @modified 2020. 5. 26.
  */
 class mysql {
 	private $db;
@@ -228,11 +228,12 @@ class mysql {
 		
 		$auto_increment = '';
 		for ($i=0, $loop=count($desc);$i<$loop;$i++) {
+			
 			if (isset($schema->columns->{$desc[$i]->Field}) == false) return false;
 			if ($desc[$i]->Collation && $desc[$i]->Collation != 'utf8mb4_unicode_ci') return false;
 			
 			$compare = $schema->columns->{$desc[$i]->Field};
-			if (preg_match('/(.*?)\((.*?)\)/',$desc[$i]->Type,$match) == true) {
+			if (preg_match('/(.*?)\((.*?)\)$/',$desc[$i]->Type,$match) == true) {
 				if ($compare->type != $match[1]) return false;
 				if ($compare->length != $match[2]) return false;
 			} else {
