@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.6.1
- * @modified 2020. 3. 4.
+ * @version 1.7.0
+ * @modified 2020. 6. 8.
  */
 
 /**
@@ -71,11 +71,7 @@ function Encoder($value,$key=null,$mode='base64') {
 	$padSize = 16 - (strlen($value) % 16);
 	$value = $value.str_repeat(chr($padSize),$padSize);
 	
-	if (function_exists('openssl_encrypt') == true) {
-		$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
-	} else {
-		$output = mcrypt_encrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
-	}
+	$output = openssl_encrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
 	
 	return $mode == 'base64' ? base64_encode($output) : bin2hex($output);
 }
@@ -94,11 +90,8 @@ function Decoder($value,$key=null,$mode='base64') {
 	$key = $key !== null ? md5($key) : md5($_CONFIGS->key);
 	$value = $mode == 'base64' ? base64_decode(str_replace(' ','+',$value)) : hex2bin($value);
 	
-	if (function_exists('openssl_decrypt') == true) {
-		$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
-	} else {
-		$output = mcrypt_decrypt(MCRYPT_RIJNDAEL_128,$key,$value,MCRYPT_MODE_CBC,str_repeat(chr(0),16));
-	}
+	$output = openssl_decrypt($value,'AES-256-CBC',$key,OPENSSL_RAW_DATA | OPENSSL_ZERO_PADDING,str_repeat(chr(0),16));
+	if ($output === false) return false;
 	
 	$valueLen = strlen($output);
 	if ($valueLen % 16 > 0) return false;
@@ -685,7 +678,7 @@ function CheckDependency($dependency,$version) {
 		$check->installed = function_exists('ImageCreateFromJPEG');
 		$check->installedVersion = null;
 	} elseif ($dependency == 'encrypt') {
-		$check->installed = function_exists('openssl_encrypt') || function_exists('mcrypt_encrypt');
+		$check->installed = function_exists('openssl_encrypt');
 		$check->installedVersion = null;
 	} else {
 		$check->installed = false;
