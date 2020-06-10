@@ -7,13 +7,13 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 3.0.0
- * @modified 2020. 5. 6.
+ * @modified 2020. 6. 11.
  */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
-.x-grid-cell-inner > i.icon {width:20px; height:20px; display:inline-block; line-height:19px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:0px 0px -1px 0px; vertical-align:middle; text-overflow:clip}
+.x-grid-cell-inner > i.icon {width:18px; height:18px; display:inline-block; line-height:18px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:0px 0px 0px 0px; vertical-align:middle; text-overflow:clip;}
 .x-grid-cell-inner > i.tree {width:20px; margin-right:5px; display:inline-block; vertical-align:middle;}
 .x-grid-cell-inner > i.tree:before {position:absolute; left:15px; width:10px; height:100%; content:" "; border-left:1px dotted #ccc; background:transparent;}
 .x-grid-cell-inner > i.tree:after {position:absolute; top:0; left:15px; width:10px; height:50%; content:" "; border-bottom:1px dotted #ccc;}
