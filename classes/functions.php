@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.7.0
- * @modified 2020. 6. 8.
+ * @version 1.7.1
+ * @modified 2020. 6. 16.
  */
 
 /**
@@ -171,38 +171,6 @@ function CheckPhoneNumber($phone) {
 	
 	if (preg_match('/^02/',$phone) == true) return preg_match('/^02[0-9]{7,8}$/',$phone);
 	else return preg_match('/^0[0-9]{9,11}$/',$phone);
-}
-
-/**
- * 사업자번호 형식이 맞는지 확인한다.
- *
- * @param string $number
- * @return boolean $isValid
- */
-function CheckCompanyNumber($number) {
-	$number = str_replace('-','',$number);
-	if (strlen($number) === 10) {
-		$CHECKNUMS = array(1,3,7,1,3,7,1,3,5);
-		$checkSum = 0;
-		$lastNumber = 0;
-		for ($i=0;$i<9;$i++) {
-			$tmp = ($CHECKNUMS[$i] * $number[$i]);
-			if ($i < 8) {
-				$checkSum += $tmp;
-			} else { // 9번째 곱셈의 결과를 각 자리수를 더함 (ex: 8*5=45 => 4 + 5 = 9)
-				$tmp2 = (string)$tmp;
-				$checkSum+= (int)$tmp2[0] + (int)$tmp2[1];
-				$lastNumber = (10 - ($checkSum % 10)) % 10; // (10 - (체크섬 % 10)) % 10)
-			}
-		}
-		if ($number[9] == $lastNumber) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
 }
 
 /**
