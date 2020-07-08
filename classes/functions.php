@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.7.1
- * @modified 2020. 6. 16.
+ * @version 1.7.2
+ * @modified 2020. 7. 8.
  */
 
 /**
@@ -495,6 +495,16 @@ function GetDateOfWeek($year,$week) {
 	
 	$time = $start + ($week - 1) * 7 * 60 * 60 * 24 - date('w',$start) * 60 * 60 * 24;
 	return date('Y-m-d',$time);
+}
+
+/**
+ * 클라이언트 아이피를 가져온다.
+ * Proxy 서버를 통해 접속하였을 경우에도 가급적 실제 아이피를 가져온다.
+ *
+ * @return string $ip
+ */
+function GetClientIp() {
+	return isset($_SERVER['HTTP_X_FORWARDED_FOR']) == true ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 }
 
 /**
