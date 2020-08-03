@@ -873,13 +873,12 @@ var iModule = {
 		if (screen.availWidth < width) width = screen.availWidth - 50;
 		if (screen.availHeight < height) height = screen.availHeight - 50;
 		
-		var windowLeft = (screen.availWidth - width) / 2;
-		var windowTop = (screen.availHeight - height) / 2;
+		var windowLeft = Math.ceil((screen.availWidth - width) / 2);
+		var windowTop = Math.ceil((screen.availHeight - height) / 2);
 		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
 		var opener = window.open(url, name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
 		
 		if (opener) {
-//			setTimeout(iModule.resizePopup,500,opener,url,width,height);
 			return opener;
 		}
 		
@@ -899,8 +898,8 @@ var iModule = {
 		if (screen.availWidth < width) width = screen.availWidth - 50;
 		if (screen.availHeight < height) height = screen.availHeight - 50;
 		
-		var windowLeft = (screen.availWidth - width) / 2;
-		var windowTop = (screen.availHeight - height) / 2;
+		var windowLeft = Math.ceil((screen.availWidth - width) / 2);
+		var windowTop = Math.ceil((screen.availHeight - height) / 2);
 		windowTop = windowTop > 20 ? windowTop - 20 : windowTop;
 		var opener = window.open(ENV.DIR + "/includes/empty.php", name !== undefined ? name : "", "top=" + windowTop + ",left=" + windowLeft + ",width=" + width + ",height=" + height + ",scrollbars=" + (scroll == true ? "1" : "0"));
 		
