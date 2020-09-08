@@ -1,0 +1,20 @@
+@font-face {
+	font-family:"NotoSans";
+	font-style:normal;
+	font-weight:100;
+	src:url("../../fonts/NotoSans-Light.woff") format("woff"), url("../../fonts/NotoSans-Light.woff2") format("woff2");
+}
+
+@font-face {
+	font-family:"NotoSans";
+	font-style:normal;
+	font-weight:400;
+	src:url("../../fonts/NotoSans-Regular.woff") format("woff"), url("../../fonts/NotoSans-Regular.woff2") format("woff2");
+}
+
+@font-face {
+	font-family:"NotoSans";
+	font-weight:700;
+	font-style:normal;
+	src:url("../../fonts/NotoSans-Bold.woff") format("woff"), url("../../fonts/NotoSans-Bold.woff2") format("woff2");
+}
