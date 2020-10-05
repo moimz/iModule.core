@@ -675,7 +675,7 @@ class mysql {
 		$isInsert = strpos($this->_query,'INSERT') !== false || strpos($this->_query,'REPLACE') !== false;
 		$isUpdate = strpos($this->_query,'UPDATE');
 		if ($isInsert !== false) {
-			$this->_query.= '(`'.implode(array_keys($tableData),'`,`').'`)';
+			$this->_query.= '(`'.implode('`,`',array_keys($tableData)).'`)';
 			$this->_query.= ' VALUES(';
 		}
 		
