@@ -1308,6 +1308,8 @@ class iModule {
 			} else {
 				$sorts[$pages[$i]->sort * 100] = $pages[$i];
 			}
+			$pages[$i]->is_hide = $pages[$i]->is_hide == 'TRUE';
+			$pages[$i]->permission = isset($pages[$i]->permission) == true ? $this->parsePermissionString($pages[$i]->permission) : true;
 		}
 		
 		ksort($sorts);
