@@ -189,6 +189,27 @@ if ($action == 'install') {
 				}
 				
 				if ($results->success == true) {
+					$installed = $IM->Module->install('member',null,'default',false);
+					if ($installed !== true) {
+						$results->success = false;
+						$results->message = $installed;
+						$results->target = 'member';
+					} else {
+						$mHash = new Hash();
+						$password = $mHash->password_hash($admin_password);
+						
+						if ($dbConnect->select('member_table')->where('idx',1)->has() == true) {
+							$dbConnect->update('member_table',array('domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'status'=>'ACTIVATED'))->where('idx',1)->execute();
+						} else {
+							$dbConnect->insert('member_table',array('idx'=>1,'domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'reg_date'=>time(),'status'=>'ACTIVATED'))->execute();
+						}
+						
+						$dbConnect->insert('member_activity_table',array('midx'=>1,'reg_date'=>time() * 1000,'module'=>'member','code'=>'install','content'=>'{}','ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']))->execute();
+						$IM->Module->updateSize('member');
+					}
+				}
+				
+				if ($results->success == true) {
 					$installed = $IM->Module->install('push');
 					if ($installed !== true) {
 						$results->success = false;
@@ -221,27 +242,6 @@ if ($action == 'install') {
 						$results->success = false;
 						$results->message = $installed;
 						$results->target = 'email';
-					}
-				}
-				
-				if ($results->success == true) {
-					$installed = $IM->Module->install('member',null,'default',false);
-					if ($installed !== true) {
-						$results->success = false;
-						$results->message = $installed;
-						$results->target = 'member';
-					} else {
-						$mHash = new Hash();
-						$password = $mHash->password_hash($admin_password);
-						
-						if ($dbConnect->select('member_table')->where('idx',1)->has() == true) {
-							$dbConnect->update('member_table',array('domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'status'=>'ACTIVATED'))->where('idx',1)->execute();
-						} else {
-							$dbConnect->insert('member_table',array('idx'=>1,'domain'=>'*','type'=>'ADMINISTRATOR','email'=>$admin_email,'password'=>$password,'name'=>$admin_name,'nickname'=>$admin_nickname,'reg_date'=>time(),'status'=>'ACTIVATED'))->execute();
-						}
-						
-						$dbConnect->insert('member_activity_table',array('midx'=>1,'reg_date'=>time() * 1000,'module'=>'member','code'=>'install','content'=>'{}','ip'=>$_SERVER['REMOTE_ADDR'],'agent'=>$_SERVER['HTTP_USER_AGENT']))->execute();
-						$IM->Module->updateSize('member');
 					}
 				}
 				
