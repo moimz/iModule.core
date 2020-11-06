@@ -399,7 +399,11 @@ class iModule {
 							continue;
 						}
 						
-						if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $sitemap[$j];
+						if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) {
+							$temp = json_decode(json_encode($sitemap[$j]));
+							unset($temp->group);
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $temp;
+						}
 						$sitemap[$j]->group = $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu];
 						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
 					}
