@@ -10,23 +10,23 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^admin/([^\/]+)/?$ admin/index.php?menu=$1 [L]
-RewriteRule ^admin/([^\/]+)/([^\/]+)$ admin/index.php?menu=$1&page=$2 [L]
-RewriteRule ^admin/([^\/]+)/([^\/]+)/([^\/]+)$ admin/index.php?menu=$1&page=$2&tab=$3 [L]
+RewriteRule ^admin/([^\/]+)/([^\/]+)/?$ admin/index.php?menu=$1&page=$2 [L]
+RewriteRule ^admin/([^\/]+)/([^\/]+)/([^\/]+)/?$ admin/index.php?menu=$1&page=$2&tab=$3 [L]
 RewriteRule ^admin/([^\/]+)/([^\/]+)/([^\/]+)/(.*?)$ admin/index.php?menu=$1&page=$2&tab=$3&view=$4 [L]
 RewriteRule ^api/([^\/]+)/([^\/]+)/(.*?)?$ api/index.php?_module=$1&_api=$2&_idx=$3&%{QUERY_STRING} [L]
 RewriteRule ^api/([^\/]+)/([^\/]+)/?$ api/index.php?_module=$1&_api=$2&%{QUERY_STRING} [L]
-RewriteRule ^oauth/([^\/]+)$ process/index.php?_module=member&_action=$1&%{QUERY_STRING} [L]
+RewriteRule ^oauth/([^\/]+)/?$ process/index.php?_module=member&_action=$1&%{QUERY_STRING} [L]
 RewriteRule ^attachment/(original|view|thumbnail|download)/([0-9]+)/([^\/]+)$ process/index.php?_module=attachment&_action=$1&idx=$2&name=$3 [L]
 
 RewriteRule ^([a-z]{2})/process/([^\/]+)/([^\/]+)/(.*?)$ process/index.php?_language=$1&_module=$2&_action=$3&_idx=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/process/([^\/]+)/([^\/]+)/?$ process/index.php?_language=$1&_module=$2&_action=$3&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^\/]+)/?$ modules/index.php?_language=$1&_module=$2%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/module/([^\/]+)/([^\/]+)/?$ modules/index.php?_language=$1&_module=$2&&_container=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/module/([^\/]+)/([^\/]+)/?$ modules/index.php?_language=$1&_module=$2&_container=$3&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^\/]+)/([^\/]+)/([^\/]+)/?$ modules/index.php?_language=$1&_module=$2&_container=$3&_view=$4&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/module/([^\/]+)/([^\/]+)/([^\/]+)/(.*?)$ modules/index.php?_language=$1&_module=$2&_container=$3&_view=$4&_idx=$5&%{QUERY_STRING} [L]
 
-RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/([^\/]+)/(.*?)$ index.php?_language=$1&_menu=$2&_page=$3&_view=$4&_idx=$5&%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/([^\/]+)/?$ index.php?_language=$1&_menu=$2&_page=$3&_view=$4&%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/?$ index.php?_language=$1&_menu=$2&_page=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/?$ index.php?_language=$1&%{QUERY_STRING} [L]
 RewriteRule ^([a-z]{2})/([^\/]+)/?$ index.php?_language=$1&_menu=$2&%{QUERY_STRING} [L]
-RewriteRule ^([a-z]{2})/?$ index.php?_language=$1&%{QUERY_STRING}
+RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/?$ index.php?_language=$1&_menu=$2&_page=$3&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/([^\/]+)/?$ index.php?_language=$1&_menu=$2&_page=$3&_view=$4&%{QUERY_STRING} [L]
+RewriteRule ^([a-z]{2})/([^\/]+)/([^\/]+)/([^\/]+)/(.*?)$ index.php?_language=$1&_menu=$2&_page=$3&_view=$4&_idx=$5&%{QUERY_STRING} [L]
