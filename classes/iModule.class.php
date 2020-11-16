@@ -1552,7 +1552,8 @@ class iModule {
 	 * @return string $canonical 고유 URL
 	 */
 	function getCanonical() {
-		return $this->canonical !== null ? $this->canonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
+		$canonical = $this->canonical !== null ? $this->canonical : $this->getHost(false).$_SERVER['REQUEST_URI'];
+		return htmlentities(preg_replace('/("|<|>)/','',$canonical));
 	}
 	
 	/**
