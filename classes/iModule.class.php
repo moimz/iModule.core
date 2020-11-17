@@ -222,26 +222,44 @@ class iModule {
 	 */
 	function initSites($is_sitemap=true) {
 		/**
-		 * 모든 사이트의 RAW 데이터를 저장한다.
+		 * 모든 사이트의 RAW 데이터를 가져온다.
 		 */
-		$this->sites = $this->db()->select($this->table->site)->orderBy('sort','asc')->get();
-		
-		/**
-		 * @todo is_ssl 컬럼이 is_https 컬럼으로 변경됨에 따른 수정사항 (차후 제거필요)
-		 */
-		if (count($this->sites) > 0 && isset($this->sites[0]->is_https) == false) {
-			$this->db()->rawQuery("ALTER TABLE `im_site_table` CHANGE `is_ssl` `is_https` ENUM('TRUE','FALSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'FALSE' COMMENT 'HTTPS접속여부'");
-			return $this->initSites($is_sitemap);
-		}
-		$check = $this->db()->select($this->table->sitemap)->getOne();
-		if ($check != null && isset($check->permission) == false) {
-			$this->db()->rawQuery("ALTER TABLE `im_sitemap_table` ADD `permission` VARCHAR(255) NOT NULL DEFAULT 'true' COMMENT '권한' AFTER `context`;");
+		if ($this->cache()->check('core','site','all') > time() - 3600) {
+			$raws = json_decode($this->cache()->get('core','site','all'));
+			$this->sites = $raws->sites;
+			$this->siteDefaultLanguages = (array)$raws->siteDefaultLanguages;
+			$domains = (array)$raws->domains;
+			$languages = (array)$raws->languages;
+		} else {
+			$raws = new stdClass();
+			$raws->sites = $this->db()->select($this->table->site)->orderBy('sort','asc')->get();
+			$raws->siteDefaultLanguages = array();
+			$raws->domains = array();
+			$raws->languages = array();
+			for ($i=0, $loop=count($raws->sites);$i<$loop;$i++) {
+				if ($raws->sites[$i]->is_default == 'TRUE') $raws->siteDefaultLanguages[$raws->sites[$i]->domain] = $raws->sites[$i]->language;
+				if (isset($raws->domains[$raws->sites[$i]->domain]) == false) {
+					$raws->domains[$raws->sites[$i]->domain] = array();
+				}
+				$raws->domains[$raws->sites[$i]->domain][] = $raws->sites[$i]->language;
+				$raws->languages[$raws->sites[$i]->domain.'@'.$raws->sites[$i]->language] = $raws->sites[$i];
+			}
+			
+			/**
+			 * 사이트 캐시를 저장한다.
+			 */
+			$this->cache()->store('core','site','all',json_encode($raws));
+			
+			$this->sites = $raws->sites;
+			$this->siteDefaultLanguages = $raws->siteDefaultLanguages;
+			$domains = $raws->domains;
+			$languages = $raws->languages;
 		}
 		
 		/**
 		 * 현재 접속한 도메인에 해당하는 사이트가 없을 경우, 유사한 사이트를 찾는다.
 		 */
-		if ($this->db()->select($this->table->site)->where('domain',$this->domain)->has() == false) {
+		if (isset($domains[$this->domain]) == false) {
 			$isAlias = false;
 			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 				if ($this->sites[$i]->alias == '') continue;
@@ -292,24 +310,26 @@ class iModule {
 			/**
 			 * 언어셋이 지정되지 않았을 경우 기본언어셋을 검색한다. 만약 찾을 수 없다면 에러메세지를 출력한다.
 			 */
-			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
-			if ($site == null) $this->printError('NOT_FOUND_LANGUAGE');
-			$this->siteDefaultLanguages[$this->domain] = $site->language;
-			$this->language = $site->language;
+			if (isset($this->siteDefaultLanguages[$this->domain]) == true) {
+				$this->language = $this->siteDefaultLanguages[$this->domain];
+			} else {
+				$this->printError('NOT_FOUND_LANGUAGE');
+			}
 		} else {
 			/**
 			 * 언어셋이 지정되었고, 해당 언어셋이 현재 사이트에서 사용중인지 확인한다. 만약 사용중인 언어셋이 아니라면 기본언어셋을 사용한다.
 			 */
-			$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('language',$this->language)->getOne();
-			if ($site == null) {
-				$site = $this->db()->select($this->table->site)->where('domain',$this->domain)->where('is_default','TRUE')->getOne();
-				
-				/**
-				 * 기본 언어셋이 없을 경우 에러메세지를 출력한다.
-				 */
-				if ($site == null) $this->printError('NOT_FOUND_LANGUAGE');
+			if (isset($languages[$this->domain.'@'.$this->language]) == false) {
+				if (isset($this->siteDefaultLanguages[$this->domain]) == true) {
+					$this->language = $this->siteDefaultLanguages[$this->domain];
+				} else {
+					$this->printError('NOT_FOUND_LANGUAGE');
+				}
 			}
 		}
+		
+		$site = isset($languages[$this->domain.'@'.$this->language]) == true ? $languages[$this->domain.'@'.$this->language] : null;
+		if ($site == null) $this->printError('NOT_FOUND_SITE');
 		
 		/**
 		 * 특수한 경우가 아닌 경우 사이트유효성 검사에 따라 확인된 URL로 이동한다.
@@ -338,80 +358,104 @@ class iModule {
 			}
 		}
 		
+		/**
+		 * 전체사이트 사이트맵을 가져온다.
+		 */
 		if ($is_sitemap == true) {
-			/**
-			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
-			 */
-			$groups = array();
-			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
-				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-				$this->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-				$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-				
-				$sitemap = null;
+			if ($this->cache()->check('core','sitemap','all') > time() - 3600) {
+				$raws = json_decode($this->cache()->get('core','sitemap','all'));
+				$this->menus = (array)$raws->menus;
+				$this->pages = (array)$raws->pages;
+				foreach ($this->pages as $key=>$pages) {
+					$this->pages[$key] = (array)$pages;
+				}
+			} else {
+				$raws = new stdClass();
+				$raws->menus = array();
+				$raws->pages = array();
 				
 				/**
-				 * 사이트맵을 구성하는 모듈을 사용하는 사이트일 경우, 해당 모듈을 통해 사이트맵을 가져온다.
+				 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 가져온다.
 				 */
-				if (strpos($this->sites[$i]->templet,'#') === 0) {
-					$temp = explode('.',substr($this->sites[$i]->templet,1));
-					if ($this->getModule()->isSitemap($temp[0]) == true) {
-						$mModule = $this->getModule($temp[0]);
-						$sitemap = method_exists($mModule,'getSitemap') == true ? $mModule->getSitemap($this->sites[$i]->domain,$this->sites[$i]->language) : null;
+				$groups = array();
+				for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
+					$raws->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+					$raws->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+					$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
+					
+					$sitemap = null;
+					
+					/**
+					 * 사이트맵을 구성하는 모듈을 사용하는 사이트일 경우, 해당 모듈을 통해 사이트맵을 가져온다.
+					 */
+					if (strpos($this->sites[$i]->templet,'#') === 0) {
+						$temp = explode('.',substr($this->sites[$i]->templet,1));
+						if ($this->getModule()->isSitemap($temp[0]) == true) {
+							$mModule = $this->getModule($temp[0]);
+							$sitemap = method_exists($mModule,'getSitemap') == true ? $mModule->getSitemap($this->sites[$i]->domain,$this->sites[$i]->language) : null;
+						}
+					}
+					
+					$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
+					for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
+						$sitemap[$j]->permission = isset($sitemap[$j]->permission) == true ? $this->parsePermissionString($sitemap[$j]->permission) : true;
+						$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
+						$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
+						
+						$sitemap[$j]->header = json_decode($sitemap[$j]->header);
+						$sitemap[$j]->header = $sitemap[$j]->header == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->header;
+						
+						$sitemap[$j]->footer = json_decode($sitemap[$j]->footer);
+						$sitemap[$j]->footer = $sitemap[$j]->footer == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->footer;
+						
+						$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
+						$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
+						if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
+						
+						if (isset($raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) {
+							$raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
+							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+						}
+						
+						if ($sitemap[$j]->page == '') {
+							$raws->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
+						} else {
+							if ($sitemap[$j]->type == 'GROUPSTART') {
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = new stdClass();
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->title = $sitemap[$j]->title;
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages = array();
+								continue;
+							}
+							
+							if ($sitemap[$j]->type == 'GROUPEND') {
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+								continue;
+							}
+							
+							if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) {
+								$temp = json_decode(json_encode($sitemap[$j]));
+								unset($temp->group);
+								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $temp;
+							}
+							$sitemap[$j]->group = $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu];
+							$raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
+						}
 					}
 				}
 				
-				$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
-				for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
-					$sitemap[$j]->permission = isset($sitemap[$j]->permission) == true ? $this->parsePermissionString($sitemap[$j]->permission) : true;
-					$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
-					$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
-					
-					$sitemap[$j]->header = json_decode($sitemap[$j]->header);
-					$sitemap[$j]->header = $sitemap[$j]->header == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->header;
-					
-					$sitemap[$j]->footer = json_decode($sitemap[$j]->footer);
-					$sitemap[$j]->footer = $sitemap[$j]->footer == null ? json_decode('{"type":"NONE"}') : $sitemap[$j]->footer;
-					
-					$sitemap[$j]->context = isset($sitemap[$j]->context) == true && $sitemap[$j]->context ? json_decode($sitemap[$j]->context) : null;
-					$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
-					if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
-					
-					if (isset($this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) {
-						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
-						$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
-					}
-					
-					if ($sitemap[$j]->page == '') {
-						$this->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
-					} else {
-						if ($sitemap[$j]->type == 'GROUPSTART') {
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = new stdClass();
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->title = $sitemap[$j]->title;
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages = array();
-							continue;
-						}
-						
-						if ($sitemap[$j]->type == 'GROUPEND') {
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
-							continue;
-						}
-						
-						if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) {
-							$temp = json_decode(json_encode($sitemap[$j]));
-							unset($temp->group);
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $temp;
-						}
-						$sitemap[$j]->group = $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu];
-						$this->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
-					}
-				}
+				/**
+				 * 사이트맵 캐시를 저장한다.
+				 */
+				$this->cache()->store('core','sitemap','all',json_encode($raws));
+				
+				$this->menus = $raws->menus;
+				$this->pages = $raws->pages;
 			}
 		} else {
 			/**
-			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 저장한다.
+			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 초기화 한다.
 			 */
 			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
@@ -968,13 +1012,27 @@ class iModule {
 		$values = (object)get_defined_vars();
 		$matches = array();
 		
-		$pages = $this->db()->select($this->table->sitemap,'domain,language,menu,page,permission,context')->where('type','MODULE')->where('context','{"module":"'.$module.'"%','LIKE')->get();
-		foreach ($pages as $page) {
-			$page->context = json_decode($page->context);
-			if ($context != $page->context->context) continue;
-			
-			$page->url = $page->menu.'/'.$page->page;
-			$matches[] = $page;
+		if (isset($this->pages) == true) {
+			$matches = array();
+			foreach ($this->pages as $site) {
+				foreach ($site as $menu) {
+					foreach ($menu as $page) {
+						if ($page->type == 'MODULE' && $page->context->module == $module && $page->context->context == $context) {
+							$page->url = $page->menu.'/'.$page->page;
+							$matches[] = $page;
+						}
+					}
+				}
+			}
+		} else {
+			$pages = $this->db()->select($this->table->sitemap,'domain,language,menu,page,permission,context')->where('type','MODULE')->where('context','{"module":"'.$module.'"%','LIKE')->get();
+			foreach ($this->pages as $page) {
+				$page->context = json_decode($page->context);
+				if ($context != $page->context->context) continue;
+				
+				$page->url = $page->menu.'/'.$page->page;
+				$matches[] = $page;
+			}
 		}
 		
 		/**
@@ -1025,7 +1083,7 @@ class iModule {
 		$idx = $idx === null ? $this->idx : $idx;
 		
 		if ($isFullUrl == true || $domain !== $_SERVER['HTTP_HOST']) {
-			$check = $this->db()->select($this->table->site)->where('domain',$domain)->getOne();
+			$check = $this->getSites($domain,'default',false);
 			if ($check == null) {
 				$url = IsHttps() == true ? 'https://' : 'http://';
 				$url.= ($domain === null ? $_SERVER['HTTP_HOST'] : $domain).__IM_DIR__;
