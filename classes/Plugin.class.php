@@ -436,8 +436,16 @@ class Plugin {
 	 * @return boolean $installed 플러그인설치여부
 	 */
 	function isInstalled($plugin=null) {
-		if ($plugin !== null) return $this->IM->db()->select($this->table->plugin)->where('plugin',$plugin)->has();
-		else return $this->pluginInstalled !== null;
+		if ($plugin == null) {
+			$plugins = $this->getPlugins();
+			foreach ($plugins as $installed) {
+				if ($installed->plugin == $plugin) return true;
+			}
+			
+			return false;
+		} else {
+			return $this->pluginInstalled !== null;
+		}
 	}
 	
 	/**
