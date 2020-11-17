@@ -152,9 +152,9 @@ class iModule {
 			 * 이 클래스는 인스톨러에서도 사용되기 인스톨러에서 호출되면 에러가 발생하는 기능 class 를 비활성화 한다.
 			 */
 			if ($_CONFIGS->installed === true) {
-				$this->Event = new Event($this);
 				$this->Plugin = new Plugin($this);
 				$this->Module = new Module($this);
+				$this->Event = new Event($this);
 			}
 		}
 		
