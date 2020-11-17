@@ -446,7 +446,13 @@ class Plugin {
 	 * @return object[] $plugins
 	 */
 	function getPlugins() {
-		$plugins = $this->IM->db()->select($this->table->plugin)->orderBy('sort','asc')->get();
+		if ($this->IM->cache()->check('core','plugin','all') > time() - 3600) {
+			$plugins = json_decode($this->IM->cache()->get('core','plugin','all'));
+		} else {
+			$plugins = $this->IM->db()->select($this->table->plugin)->orderBy('sort','asc')->get();
+			$this->IM->cache()->store('core','plugin','all',json_encode($plugins));
+		}
+		
 		return $plugins;
 	}
 	
@@ -477,8 +483,13 @@ class Plugin {
 	 * @return object[] $plugins
 	 */
 	function getAdminPlugins() {
-		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_admin','TRUE')->orderBy('sort','asc')->get();
-		return $plugins;
+		$plugins = $this->getPlugins();
+		$admins = array();
+		foreach ($plugins as $plugin) {
+			if ($plugin->is_admin == 'TRUE') $admins[] = $plugin;
+		}
+		
+		return $admins;
 	}
 	
 	/**
@@ -487,9 +498,13 @@ class Plugin {
 	 * @return object[] $plugins
 	 */
 	function getCronPlugins() {
-		$plugins = $this->IM->db()->select($this->table->plugin)->where('is_cron','TRUE')->orderBy('sort','asc')->get();
+		$plugins = $this->getPlugins();
+		$crons = array();
+		foreach ($plugins as $plugin) {
+			if ($plugin->is_cron == 'TRUE') $crons[] = $plugin;
+		}
 		
-		return $plugins;
+		return $crons;
 	}
 	
 	/**
