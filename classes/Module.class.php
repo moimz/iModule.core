@@ -68,42 +68,6 @@ class Module {
 		 */
 		$this->table = new stdClass();
 		$this->table->module = 'module_table';
-		
-		/**
-		 * 설치된 모듈에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
-		 */
-		$this->addEventListener();
-	}
-	
-	/**
-	 * 설치된 모듈에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
-	 * DB접근을 줄이기 위하여 60초동안 모든 모듈에 대한 이벤트 리스너를 캐싱한다.
-	 *
-	 * @param boolean $is_force_update 캐싱된 사항을 무시하고 강제로 업데이트할지 여부(기본값 : false)
-	 */
-	function addEventListener($is_force_update=false) {
-		if ($is_force_update == false && $this->IM->cache()->check('core','modules','all') > time() - 60) {
-			$modules = json_decode($this->IM->cache()->get('core','modules','all'));
-		} else {
-			$modules = $this->IM->db()->select($this->table->module)->get();
-			$this->IM->cache()->store('core','modules','all',json_encode($modules));
-		}
-		
-		for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-			$targets = $modules[$i]->targets ? json_decode($modules[$i]->targets) : new stdClass();
-			
-			foreach ($targets as $target=>$events) {
-				foreach ($events as $event=>$callers) {
-					if ($callers == '*') {
-						$this->IM->Event->addEventListener($target,$event,'*','module/'.$modules[$i]->module);
-					} else {
-						foreach ($callers as $caller) {
-							$this->IM->Event->addEventListener($target,$event,$caller,'module/'.$modules[$i]->module);
-						}
-					}
-				}
-			}
-		}
 	}
 	
 	/**
@@ -766,9 +730,18 @@ class Module {
 		if ($isUpdateSize === true) $this->updateSize($module);
 		
 		/**
-		 * 이벤트리스너를 업데이트하고 이벤트를 발생시킨다.
+		 * 설치된 모듈 캐시를 제거한다.
 		 */
-		$this->addEventListener(true);
+		$this->IM->cache()->reset('core','module','all');
+		
+		/**
+		 * 이벤트리스너 캐시를 제거한다.
+		 */
+		$this->IM->cache()->reset('core','event','all');
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
 		$this->IM->fireEvent('afterInstall','core',$mode);
 		
 		return true;
