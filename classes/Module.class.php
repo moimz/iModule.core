@@ -529,8 +529,16 @@ class Module {
 	 * @return boolean $installed 모듈설치여부
 	 */
 	function isInstalled($module=null) {
-		if ($module !== null) return $this->IM->db()->select($this->table->module)->where('module',$module)->has();
-		else return $this->moduleInstalled !== null;
+		if ($module == null) {
+			$modules = $this->getModules();
+			foreach ($modules as $installed) {
+				if ($installed->module == $module) return true;
+			}
+			
+			return false;
+		} else {
+			return $this->moduleInstalled !== null;
+		}
 	}
 	
 	/**
