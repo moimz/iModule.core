@@ -66,11 +66,6 @@ class Plugin {
 		 */
 		$this->table = new stdClass();
 		$this->table->plugin = 'plugin_table';
-		
-		/**
-		 * 설치된 플러그인에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
-		 */
-		$this->addEventListener();
 	}
 	
 	/**
@@ -82,37 +77,6 @@ class Plugin {
 		if ($this->loaded === false) return $this->IM->db();
 		if ($this->DB == null || $this->DB->ping() === false) $this->DB = $this->IM->db($this->getInstalled()->database);
 		return $this->DB;
-	}
-	
-	/**
-	 * 설치된 플러그인에서 사용하는 이벤트리스너를 모두 Event 클래스에 등록한다.
-	 * DB접근을 줄이기 위하여 60초동안 모든 플러그인에 대한 이벤트 리스너를 캐싱한다.
-	 *
-	 * @param boolean $is_force_update 캐싱된 사항을 무시하고 강제로 업데이트할지 여부(기본값 : false)
-	 */
-	function addEventListener($is_force_update=false) {
-		if ($is_force_update == false && $this->IM->cache()->check('core','plugins','all') > time() - 60) {
-			$plugins = json_decode($this->IM->cache()->get('core','plugins','all'));
-		} else {
-			$plugins = $this->IM->db()->select($this->table->plugin)->get();
-			$this->IM->cache()->store('core','plugins','all',json_encode($plugins));
-		}
-		
-		for ($i=0, $loop=count($plugins);$i<$loop;$i++) {
-			$targets = $plugins[$i]->targets ? json_decode($plugins[$i]->targets) : new stdClass();
-			
-			foreach ($targets as $target=>$events) {
-				foreach ($events as $event=>$callers) {
-					if ($callers == '*') {
-						$this->IM->Event->addEventListener($target,$event,'*','plugin/'.$plugins[$i]->plugin);
-					} else {
-						foreach ($callers as $caller) {
-							$this->IM->Event->addEventListener($target,$event,$caller,'plugin/'.$plugins[$i]->plugin);
-						}
-					}
-				}
-			}
-		}
 	}
 	
 	/**
@@ -617,9 +581,18 @@ class Plugin {
 		if ($isUpdateSize === true) $this->updateSize($plugin);
 		
 		/**
-		 * 이벤트리스너를 업데이트하고 이벤트를 발생시킨다.
+		 * 설치된 플러그인 캐시를 제거한다.
 		 */
-		$this->addEventListener(true);
+		$this->IM->cache()->reset('core','plugin','all');
+		
+		/**
+		 * 이벤트리스너 캐시를 제거한다.
+		 */
+		$this->IM->cache()->reset('core','event','all');
+		
+		/**
+		 * 이벤트를 발생시킨다.
+		 */
 		$this->IM->fireEvent('afterInstall','plugin',$mode);
 		
 		return true;
