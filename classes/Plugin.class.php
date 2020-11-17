@@ -436,7 +436,7 @@ class Plugin {
 	 * @return boolean $installed 플러그인설치여부
 	 */
 	function isInstalled($plugin=null) {
-		if ($plugin == null) {
+		if ($plugin != null) {
 			$plugins = $this->getPlugins();
 			foreach ($plugins as $installed) {
 				if ($installed->plugin == $plugin) return true;
