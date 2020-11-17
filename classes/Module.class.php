@@ -571,7 +571,13 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getModules() {
-		$modules = $this->IM->db()->select($this->table->module)->orderBy('sort','asc')->get();
+		if ($this->IM->cache()->check('core','module','all') > time() - 3600) {
+			$modules = json_decode($this->IM->cache()->get('core','module','all'));
+		} else {
+			$modules = $this->IM->db()->select($this->table->module)->orderBy('sort','asc')->get();
+			$this->IM->cache()->store('core','module','all',json_encode($modules));
+		}
+		
 		return $modules;
 	}
 	
@@ -581,8 +587,13 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getAdminModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_admin','TRUE')->orderBy('sort','asc')->get();
-		return $modules;
+		$modules = $this->getModules();
+		$admins = array();
+		foreach ($modules as $module) {
+			if ($module->is_admin == 'TRUE') $admins[] = $module;
+		}
+		
+		return $admins;
 	}
 	
 	/**
@@ -591,12 +602,14 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getContextModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_context','TRUE')->orderBy('sort','asc')->get();
-		for ($i=0, $loop=count($modules);$i<$loop;$i++) {
-			$modules[$i]->title = $this->getTitle($modules[$i]->module);
+		$modules = $this->getModules();
+		$contexts = array();$this->IM->db()->select($this->table->module)->where('is_context','TRUE')->orderBy('sort','asc')->get();
+		foreach ($modules as $module) {
+			$module->title = $this->getTitle($module->module);
+			if ($module->is_context == 'TRUE') $contexts[] = $module;
 		}
 		
-		return $modules;
+		return $contexts;
 	}
 	
 	/**
@@ -605,9 +618,13 @@ class Module {
 	 * @return object[] $modules
 	 */
 	function getCronModules() {
-		$modules = $this->IM->db()->select($this->table->module)->where('is_cron','TRUE')->orderBy('sort','asc')->get();
+		$modules = $this->getModules();
+		$crons = array();
+		foreach ($modules as $module) {
+			if ($module->is_cron == 'TRUE') $crons[] = $module;
+		}
 		
-		return $modules;
+		return $crons;
 	}
 	
 	/**
