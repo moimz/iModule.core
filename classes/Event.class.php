@@ -29,6 +29,77 @@ class Event {
 	 */
 	function __construct($IM) {
 		$this->IM = $IM;
+		
+		/**
+		 * 이벤트리스너를 초기화한다.
+		 */
+		$this->initEventListener();
+	}
+	
+	/**
+	 * 이벤트리스너를 초기화한다.
+	 */
+	function initEventListener() {
+		if ($this->IM->cache()->check('core','event','all') > time() - 3600) {
+			$listeners = json_decode($this->IM->cache()->get('core','event','all'),true);
+		} else {
+			$listeners = array();
+			
+			/**
+			 * 설치된 모듈에서 이벤트리스너를 가져온다.
+			 */
+			$modules = $this->IM->getModule()->getModules();
+			foreach ($modules as $module) {
+				$targets = $module->targets ? json_decode($module->targets) : new stdClass();
+				foreach ($targets as $target=>$events) {
+					foreach ($events as $event=>$callers) {
+						if (isset($listeners[$target]) == false) $listeners[$target] = array();
+						if (isset($listeners[$target][$event]) == false) $listeners[$target][$event] = array();
+						
+						$listener = 'module/'.$module->module;
+						
+						if ($callers == '*') {
+							$callers = array('*');
+						}
+						
+						foreach ($callers as $caller) {
+							if (isset($listeners[$target][$event][$caller]) == false) $listeners[$target][$event][$caller] = array();
+							if (in_array($listener,$listeners[$target][$event][$caller]) == false) $listeners[$target][$event][$caller][] = $listener;
+						}
+					}
+				}
+			}
+			
+			/**
+			 * 설치된 플러그인에서 이벤트리스너를 가져온다.
+			 */
+			$plugins = $this->IM->getPlugin()->getPlugins();
+			foreach ($plugins as $plugin) {
+				$targets = $plugin->targets ? json_decode($plugin->targets) : new stdClass();
+				
+				foreach ($targets as $target=>$events) {
+					foreach ($events as $event=>$callers) {
+						if (isset($listeners[$target]) == false) $listeners[$target] = array();
+						if (isset($listeners[$target][$event]) == false) $listeners[$target][$event] = array();
+						
+						$listener = 'plugin/'.$plugin->plugin;
+						
+						if ($callers == '*') {
+							$callers = array('*');
+						}
+						
+						foreach ($callers as $caller) {
+							if (isset($listeners[$target][$event][$caller]) == false) $listeners[$target][$event][$caller] = array();
+							if (in_array($listener,$listeners[$target][$event][$caller]) == false) $listeners[$target][$event][$caller][] = $listener;
+						}
+					}
+				}
+			}
+			
+			$this->IM->cache()->store('core','event','all',json_encode($listeners));
+		}
+		
+		$this->listeners = $listeners;
 	}
 	
 	/**
