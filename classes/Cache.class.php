@@ -52,6 +52,30 @@ class Cache {
 	}
 	
 	/**
+	 * 캐시파일의 경로를 구한다.
+	 *
+	 * @param string $controller 캐시파일을 생성한 컨트롤러 (module, widget, plugin, core)
+	 * @param string $component 캐시파일을 생성한 컴포넌트
+	 * @param string $code 캐시파일 고유코드
+	 * @return string $path 캐시파일경로
+	 */
+	function path($controller,$component,$code) {
+		$path = $this->cachePath.'/'.$controller.'.'.$component.'.'.$code;
+		
+		/**
+		 * 전체사이트에 적용되는 캐시의 경우에는 도메인과 언어코드를 추가하지 않는다.
+		 */
+		if ($controller == 'core' && in_array($component,array('event','module','site','sitemap')) == true && $code == 'all') {
+			$path.= '.union';
+		} else {
+			$path.= '.'.$this->IM->domain.'.'.$this->IM->language;
+		}
+		$path.= '.cache';
+		
+		return $path;
+	}
+	
+	/**
 	 * 캐시파일 생성시각을 확인한다.
 	 *
 	 * @param string $controller 캐시파일을 생성한 컨트롤러 (module, widget, plugin, core)
@@ -62,8 +86,8 @@ class Cache {
 	function check($controller,$component,$code) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return 0;
 		
-		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
-			return filemtime($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
+		if (is_file($this->path($controller,$component,$code)) == true) {
+			return filemtime($this->path($controller,$component,$code));
 		} else {
 			return 0;
 		}
@@ -80,8 +104,8 @@ class Cache {
 	function get($controller,$component,$code) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return null;
 		
-		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) {
-			return file_get_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
+		if (is_file($this->path($controller,$component,$code)) == true) {
+			return file_get_contents($this->path($controller,$component,$code));
 		} else {
 			return null;
 		}
@@ -99,7 +123,7 @@ class Cache {
 	function store($controller,$component,$code,$data) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return false;
 		
-		return file_put_contents($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache',$data);
+		return file_put_contents($this->path($controller,$component,$code),$data);
 	}
 	
 	/**
@@ -113,7 +137,7 @@ class Cache {
 	function reset($controller,$component,$code) {
 		if ($this->enabled === false || !$this->IM->domain || !$this->IM->language) return false;
 		
-		if (is_file($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache') == true) unlink($this->cachePath.'/'.$controller.'.'.$component.'.'.$code.'.'.$this->IM->domain.'.'.$this->IM->language.'.cache');
+		if (is_file($this->path($controller,$component,$code)) == true) unlink($this->path($controller,$component,$code));
 	}
 }
 ?>
