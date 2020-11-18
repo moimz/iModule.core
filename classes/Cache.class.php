@@ -65,7 +65,7 @@ class Cache {
 		/**
 		 * 전체사이트에 적용되는 캐시의 경우에는 도메인과 언어코드를 추가하지 않는다.
 		 */
-		if ($controller == 'core' && in_array($component,array('event','module','site','sitemap')) == true && $code == 'all') {
+		if ($controller == 'core' && in_array($component,array('event','module','plugin','site','sitemap')) == true && $code == 'all') {
 			$path.= '.union';
 		} else {
 			$path.= '.'.$this->IM->domain.'.'.$this->IM->language;
