@@ -257,7 +257,7 @@ class TCPDF_COLORS {
 				$i = (1 + count($spotc));
 				$spotc[$name] = array('C' => self::$spotcolor[$color][0], 'M' => self::$spotcolor[$color][1], 'Y' => self::$spotcolor[$color][2], 'K' => self::$spotcolor[$color][3], 'name' => self::$spotcolor[$color][4], 'i' => $i);
 			}
-			return $spotc[self::$spotcolor[$color][4]];
+			return isset($spotc[self::$spotcolor[$color][4]])?$spotc[self::$spotcolor[$color][4]]:false;
 		}
 		return false;
 	}
