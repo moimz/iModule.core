@@ -364,25 +364,14 @@ class iModule {
 		if ($is_sitemap == true) {
 			if ($this->cache()->check('core','sitemap','all') > time() - 3600) {
 				$raws = json_decode($this->cache()->get('core','sitemap','all'));
-				$this->menus = (array)$raws->menus;
-				$this->pages = (array)$raws->pages;
-				foreach ($this->pages as $key=>$pages) {
-					$this->pages[$key] = (array)$pages;
-				}
 			} else {
-				$raws = new stdClass();
-				$raws->menus = array();
-				$raws->pages = array();
+				$raws = array();
 				
 				/**
 				 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 가져온다.
 				 */
 				$groups = array();
 				for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
-					$raws->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-					$raws->pages[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-					$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
-					
 					$sitemap = null;
 					
 					/**
@@ -398,7 +387,10 @@ class iModule {
 					
 					$sitemap = $sitemap != null ? $sitemap : $this->db()->select($this->table->sitemap)->where('domain',$this->sites[$i]->domain)->where('language',$this->sites[$i]->language)->orderBy('sort','asc')->get();
 					for ($j=0, $loopj=count($sitemap);$j<$loopj;$j++) {
-						$sitemap[$j]->permission = isset($sitemap[$j]->permission) == true ? $this->parsePermissionString($sitemap[$j]->permission) : true;
+						$sitemap[$j]->domain = isset($sitemap[$j]->domain) == true ? $sitemap[$j]->domain : $this->sites[$i]->domain;
+						$sitemap[$j]->language = isset($sitemap[$j]->language) == true ? $sitemap[$j]->language : $this->sites[$i]->language;
+						
+						$sitemap[$j]->permission = isset($sitemap[$j]->permission) == true ? $sitemap[$j]->permission : 'true';
 						$sitemap[$j]->is_hide = isset($sitemap[$j]->is_hide) == true && $sitemap[$j]->is_hide == 'TRUE';
 						$sitemap[$j]->is_footer = isset($sitemap[$j]->is_footer) == true && $sitemap[$j]->is_footer == 'TRUE';
 						
@@ -412,50 +404,69 @@ class iModule {
 						$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
 						if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
 						
-						if (isset($raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]) == false) {
-							$raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = array();
-							$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+						/**
+						 * 페이지 그룹처리
+						 */
+						if (isset($groups[$sitemap[$j]->menu]) == false) {
+							$groups[$sitemap[$j]->menu] = null;
 						}
 						
-						if ($sitemap[$j]->page == '') {
-							$raws->menus[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][] = $sitemap[$j];
-						} else {
+						if ($sitemap[$j]->page != '') {
 							if ($sitemap[$j]->type == 'GROUPSTART') {
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = new stdClass();
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->title = $sitemap[$j]->title;
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages = array();
+								$groups[$sitemap[$j]->menu] = new stdClass();
+								$groups[$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
+								$groups[$sitemap[$j]->menu]->title = $sitemap[$j]->title;
+								$groups[$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
+								$groups[$sitemap[$j]->menu]->pages = array();
 								continue;
 							}
 							
 							if ($sitemap[$j]->type == 'GROUPEND') {
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] = null;
+								$groups[$sitemap[$j]->menu] = null;
 								continue;
 							}
 							
-							if ($groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu] != null) {
+							if ($groups[$sitemap[$j]->menu] != null) {
 								$temp = json_decode(json_encode($sitemap[$j]));
 								unset($temp->group);
-								$groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu]->pages[] = $temp;
+								$groups[$sitemap[$j]->menu]->pages[] = $temp;
 							}
-							$sitemap[$j]->group = $groups[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu];
-							$raws->pages[$sitemap[$j]->domain.'@'.$sitemap[$j]->language][$sitemap[$j]->menu][] = $sitemap[$j];
+							$sitemap[$j]->group = $groups[$sitemap[$j]->menu];
 						}
 					}
+					
+					if ($sitemap != null) $raws = array_merge($raws,$sitemap);
 				}
 				
 				/**
 				 * 사이트맵 캐시를 저장한다.
 				 */
 				$this->cache()->store('core','sitemap','all',json_encode($raws));
+			}
+			
+			/**
+			 * 메뉴 및 페이지 권한에 따라 사이트맵의 메뉴와 페이지를 구성한다.
+			 */
+			for ($i=0, $loop=count($raws);$i<$loop;$i++) {
+				if ($this->parsePermissionString($raws[$i]->permission) == false) continue;
 				
-				$this->menus = $raws->menus;
-				$this->pages = $raws->pages;
+				if (isset($this->menus[$raws[$i]->domain.'@'.$raws[$i]->language]) == false) {
+					$this->menus[$raws[$i]->domain.'@'.$raws[$i]->language] = array();
+					$this->pages[$raws[$i]->domain.'@'.$raws[$i]->language] = array();
+				}
+				
+				if ($raws[$i]->page == '') {
+					$this->menus[$raws[$i]->domain.'@'.$raws[$i]->language][] = $raws[$i];
+				} else {
+					if (isset($this->pages[$raws[$i]->domain.'@'.$raws[$i]->language][$raws[$i]->menu]) == false) {
+						$this->pages[$raws[$i]->domain.'@'.$raws[$i]->language][$raws[$i]->menu] = array();
+					}
+					$this->pages[$raws[$i]->domain.'@'.$raws[$i]->language][$raws[$i]->menu][] = $raws[$i];
+				}
 			}
 		} else {
 			/**
-			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 초기화 한다.
+			 * 사이트에서 사용중인 1차메뉴 및 2차메뉴를 초기화한다.
 			 */
 			for ($i=0, $loop=count($this->sites);$i<$loop;$i++) {
 				$this->menus[$this->sites[$i]->domain.'@'.$this->sites[$i]->language] = array();
@@ -1311,7 +1322,6 @@ class iModule {
 		$menus = $this->getMenus(null,$domain,$language);
 		
 		foreach ($menus as $menu) {
-			if (isset($menu->permission) == true && $menu->permission == false) continue;
 			if (isset($menu->is_hide) == true && $menu->is_hide == true) continue;
 			
 			/**
@@ -1320,7 +1330,6 @@ class iModule {
 			$menu->pages = array();
 			$pages = $this->getPages($menu->menu,null,$domain,$language);
 			foreach ($pages as $page) {
-				if (isset($page->permission) == true && $page->permission == false) continue;
 				if (isset($page->is_hide) == true && $page->is_hide == true) continue;
 				$menu->pages[] = $page;
 			}
