@@ -2662,7 +2662,13 @@ class iModule {
 	 */
 	function parsePermissionString($permissionString) {
 		$member = $this->getModule('member')->getMember();
-		if ($permissionString != 'false' && $member->type == 'ADMINISTRATOR') return true;
+		
+		/**
+		 * 최고관리자의 경우 모든 권한을 우회할 수 있으나, 권한문자열 시작이 @ 로 시작할 경우에 최고관리자권한을 무시하도록 설정한다.
+		 */
+		if (strpos($permissionString,'@') === 0) {
+			$permissionString = substr($permissionString,1);
+		} elseif ($permissionString != 'false' && $member->type == 'ADMINISTRATOR') return true;
 		
 		if ($member->idx == 0) {
 			$permissionString = str_replace('{$member.idx}','0',$permissionString);
@@ -2706,6 +2712,12 @@ class iModule {
 	 * @return boolean/string $success or $errorString
 	 */
 	function checkPermissionString($permissionString) {
+		/**
+		 * 최고관리자권한을 무시하도록 설정된 경우
+		 */
+		if (strpos($permissionString,'@') === 0) {
+			$permissionString = substr($permissionString,1);
+		}
 		$permissionString = str_replace('{$member.level}',"0",$permissionString);
 		$permissionString = str_replace('{$member.type}',"'MEMBER'",$permissionString);
 		$permissionString = str_replace('{$member.label}',"0",$permissionString);
