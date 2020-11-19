@@ -2700,6 +2700,11 @@ class iModule {
 		 */
 		$this->fireEvent('afterParseString','core','permission',$permissionString);
 		
+		/**
+		 * 치환되지 않은 변수를 false 로 변경한다.
+		 */
+		$permissionString = preg_replace('/\{\$(.*?)\}/',$permissionString,'false');
+		
 		if (@eval('return '.$permissionString.';') == true) return true;
 		else return false;
 	}
