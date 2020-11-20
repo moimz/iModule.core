@@ -404,34 +404,34 @@ class iModule {
 						$sitemap[$j]->description = isset($sitemap[$j]->description) == true && $sitemap[$j]->description ? $sitemap[$j]->description : null;
 						if ($sitemap[$j]->type == 'MODULE') $sitemap[$j]->context->config = isset($sitemap[$j]->context->config) == true ? $sitemap[$j]->context->config : null;
 						
-						/**
-						 * 페이지 그룹처리
-						 */
-						if (isset($groups[$sitemap[$j]->menu]) == false) {
-							$groups[$sitemap[$j]->menu] = null;
-						}
-						
 						if ($sitemap[$j]->page != '') {
+							/**
+							 * 페이지 그룹처리
+							 */
+							if (isset($groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]) == false) {
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu] = null;
+							}
+							
 							if ($sitemap[$j]->type == 'GROUPSTART') {
-								$groups[$sitemap[$j]->menu] = new stdClass();
-								$groups[$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
-								$groups[$sitemap[$j]->menu]->title = $sitemap[$j]->title;
-								$groups[$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
-								$groups[$sitemap[$j]->menu]->pages = array();
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu] = new stdClass();
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]->code = substr($sitemap[$j]->page,1);
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]->title = $sitemap[$j]->title;
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]->icon = $sitemap[$j]->icon;
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]->pages = array();
 								continue;
 							}
 							
 							if ($sitemap[$j]->type == 'GROUPEND') {
-								$groups[$sitemap[$j]->menu] = null;
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu] = null;
 								continue;
 							}
 							
-							if ($groups[$sitemap[$j]->menu] != null) {
+							if ($groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu] != null) {
 								$temp = json_decode(json_encode($sitemap[$j]));
 								unset($temp->group);
-								$groups[$sitemap[$j]->menu]->pages[] = $temp;
+								$groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu]->pages[] = $temp;
 							}
-							$sitemap[$j]->group = $groups[$sitemap[$j]->menu];
+							$sitemap[$j]->group = $groups[$this->sites[$i]->domain.'@'.$this->sites[$i]->language.'@'.$sitemap[$j]->menu];
 						}
 					}
 					
@@ -449,6 +449,7 @@ class iModule {
 			 */
 			for ($i=0, $loop=count($raws);$i<$loop;$i++) {
 				if ($this->parsePermissionString($raws[$i]->permission) == false) continue;
+				if ($raws[$i]->type == 'GROUPSTART' || $raws[$i]->type == 'GROUPEND') continue;
 				
 				if (isset($this->menus[$raws[$i]->domain.'@'.$raws[$i]->language]) == false) {
 					$this->menus[$raws[$i]->domain.'@'.$raws[$i]->language] = array();
