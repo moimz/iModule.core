@@ -788,6 +788,17 @@ class iModule {
 	}
 	
 	/**
+	 * 캐시가 저장되는 절대경로를 반환한다.
+	 *
+	 * @return string $cache_path
+	 */
+	function getCachePath() {
+		global $_CONFIGS;
+		if (isset($_CONFIGS->cache) == true && isset($_CONFIGS->cache->path) == true) return $_CONFIGS->cache->path;
+		return $this->getAttachmentPath().'/cache';
+	}
+	
+	/**
 	 * 모든 첨부파일이 저장되는 절대경로를 반환한다.
 	 *
 	 * @return string $attachment_path

@@ -39,7 +39,7 @@ class Cache {
 		/**
 		 * 캐시파일 경로 및 캐시활성화 여부 정의
 		 */
-		$this->cachePath = $IM->getAttachmentPath().'/cache';
+		$this->cachePath = $IM->getCachePath();
 		$this->enabled = isset($_CONFIGS->enableCache) == false || $_CONFIGS->enableCache === true;
 		
 		/**

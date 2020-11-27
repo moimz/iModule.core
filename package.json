@@ -23,6 +23,7 @@
 	},
 	"directories":{
 		"attachments":"0707",
+		"cache":"0707",
 		"configs":"0707"
 	},
 	"configs":["key","db"],
