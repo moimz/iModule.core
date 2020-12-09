@@ -1857,7 +1857,12 @@
 							}
 						}
 						
-						$("div[data-role=input].error, div[data-role=inputset].error, div[data-module=wysiwyg].error").first().scroll();
+						/**
+						 * 모달창 내의 폼인 경우 스크롤 하지 않는다.
+						 */
+						if ($(this).parents("div[data-role=modal]").length == 0) {
+							$("div[data-role=input].error, div[data-role=inputset].error, div[data-module=wysiwyg].error").first().scroll();
+						}
 					}
 				} else {
 					/**

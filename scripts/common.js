@@ -419,6 +419,15 @@ var iModule = {
 			}
 			$("body").removeClass("disabled").removeClass("mobile");
 			$disabled.remove();
+			
+			/**
+			 * 원래 스크롤 위치가 존재할 경우, 원래 스크롤 위치로 돌아간다.
+			 */
+			if ($("body").attr("data-origin-position") !== undefined) {
+				var scroll = $("body").attr("data-origin-position");
+				$("html, body").attr("data-origin-position",null);
+				$("html, body").scrollTop(scroll);
+			}
 		}
 	},
 	/**
@@ -427,6 +436,11 @@ var iModule = {
 	 * @param boolean is_loading 로딩 인디케이터를 보일지 여부 (기본값 false)
 	 */
 	disable:function(is_loading) {
+		/**
+		 * 다시 활성화될 때 원래 스크롤 위치로 이동하기 위한 값을 저장한다.
+		 */
+		$("body").attr("data-origin-position",$("html, body").scrollTop());
+		
 		var $disabled = $("body > div[data-role=disabled]");
 		var $box = $("body > div[data-role=disabled] > div[data-role=box]");
 		$box.removeClass("loading modal");
@@ -435,7 +449,7 @@ var iModule = {
 			var $disabled = $("<div>").attr("data-role","disabled");
 			$("body").append($disabled);
 			
-			var position = $("body").scrollTop();
+			var position = $("html, body").scrollTop();
 			$("body").addClass("disabled");
 			
 			var $box = $("<div>").attr("data-role","box");
@@ -841,12 +855,6 @@ var iModule = {
 			if (check_closable === true && $modal.attr("data-closable") == "FALSE") return;
 			
 			if ($disabled.length == 0 || $box.length == 0 || $modal.length == 0) return;
-			
-			if ($("body").attr("data-scroll") !== undefined) {
-				var scroll = $("body").attr("data-scroll");
-				$("body").attr("data-scroll",null);
-				$("body").scrollTop(scroll);
-			}
 			
 			$(document).triggerHandler("modal.close",[$modal]);
 			
