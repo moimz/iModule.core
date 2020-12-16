@@ -72,12 +72,12 @@ if ($action == 'directory') {
 		if (isset($_CONFIGS->cache) == true && is_object($_CONFIGS->cache) == true && isset($_CONFIGS->cache->path) == true) {
 			$path = $_CONFIGS->cache->path;
 		} elseif (isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true) {
-			$path = $_CONFIGS->attachment->path.'/cache';
+			$path = $_CONFIGS->attachment->path;
 		} else {
-			$path = 'attachments/cache';
+			$path = 'attachments';
 		}
 	}
-	$path = strpos($path,'/') === 0 ? $path : __IM_PATH__.DIRECTORY_SEPARATOR.$directory;
+	$path = strpos($path,'/') === 0 ? $path : __IM_PATH__.DIRECTORY_SEPARATOR.$path;
 	
 	$results->success = true;
 	$results->path = $path;
@@ -162,14 +162,14 @@ if ($action == 'install') {
 		else $dbFile = true;
 		
 		
-		$cache = isset($_CONFIGS->cache) == true && is_object($_CONFIGS->cache) == true && isset($_CONFIGS->cache->path) == true ? $_CONFIGS->cache->path : __IM_PATH__.'/attachments/cache';
-		if (is_dir($cache) == false) {
-			mkdir($cache,0707);
-		}
-		
 		$attachments = isset($_CONFIGS->attachment) == true && is_object($_CONFIGS->attachment) == true && isset($_CONFIGS->attachment->path) == true ? $_CONFIGS->attachment->path : __IM_PATH__.'/attachments';
 		if (is_dir($attachments.'/temp') == false) {
 			mkdir($attachments.'/temp',0707);
+		}
+		
+		$cache = isset($_CONFIGS->cache) == true && is_object($_CONFIGS->cache) == true && isset($_CONFIGS->cache->path) == true ? $_CONFIGS->cache->path : $attachments.'/cache';
+		if (is_dir($cache) == false) {
+			mkdir($cache,0707);
 		}
 		
 		if ($keyFile !== false && $dbFile !== false) {
