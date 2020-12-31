@@ -17,6 +17,7 @@ set_time_limit(0);
 @ini_set('zlib.output_compression','Off');
 @ini_set('output_buffering','Off');
 @ini_set('output_handler','');
+@ini_set('max_execution_time',0); 
 if (function_exists('apache_setenv') == true) {
 	@apache_setenv('no-gzip',1);
 }
