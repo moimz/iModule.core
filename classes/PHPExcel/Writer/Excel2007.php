@@ -199,7 +199,7 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 					$pFilename = $originalFilename;
 				}
 			}
-
+			
 			$saveDebugLog = PHPExcel_Calculation::getInstance($this->_spreadSheet)->getDebugLog()->getWriteDebugLog();
 			PHPExcel_Calculation::getInstance($this->_spreadSheet)->getDebugLog()->setWriteDebugLog(FALSE);
 			$saveDateReturnType = PHPExcel_Calculation_Functions::getReturnDateType();
@@ -231,7 +231,10 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 			$ro = new ReflectionObject($objZip);
 			$zipOverWrite = $ro->getConstant('OVERWRITE');
 			$zipCreate = $ro->getConstant('CREATE');
-
+			
+			echo '*';
+			ForceFlush();
+			
 			if (file_exists($pFilename)) {
 				unlink($pFilename);
 			}
@@ -297,7 +300,10 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 
 			// Add workbook to ZIP file
 			$objZip->addFromString('xl/workbook.xml', 				$this->getWriterPart('Workbook')->writeWorkbook($this->_spreadSheet, $this->_preCalculateFormulas));
-
+			
+			echo '*';
+			ForceFlush();
+			
 			$chartCount = 0;
 			// Add worksheets
 			for ($i = 0; $i < $this->_spreadSheet->getSheetCount(); ++$i) {
@@ -312,7 +318,10 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 					}
 				}
 			}
-
+			
+			echo '*';
+			ForceFlush();
+			
 			$chartRef1 = $chartRef2 = 0;
 			// Add worksheet relationships (drawings, ...)
 			for ($i = 0; $i < $this->_spreadSheet->getSheetCount(); ++$i) {
@@ -358,7 +367,10 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 					}
 				}
 			}
-
+			
+			echo '*';
+			ForceFlush();
+			
 			// Add media
 			for ($i = 0; $i < $this->getDrawingHashTable()->count(); ++$i) {
 				if ($this->getDrawingHashTable()->getByIndex($i) instanceof PHPExcel_Worksheet_Drawing) {
@@ -390,10 +402,10 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 					$objZip->addFromString('xl/media/' . str_replace(' ', '_', $this->getDrawingHashTable()->getByIndex($i)->getIndexedFilename()), $imageContents);
 				}
 			}
-
+			
 			PHPExcel_Calculation_Functions::setReturnDateType($saveDateReturnType);
 			PHPExcel_Calculation::getInstance($this->_spreadSheet)->getDebugLog()->setWriteDebugLog($saveDebugLog);
-
+			
 			// Close file
 			if ($objZip->close() === false) {
 				throw new PHPExcel_Writer_Exception("Could not close zip file $pFilename.");
@@ -406,6 +418,9 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 				}
 				@unlink($pFilename);
 			}
+			
+			echo '*';
+			ForceFlush();
 		} else {
 			throw new PHPExcel_Writer_Exception("PHPExcel object unassigned.");
 		}
