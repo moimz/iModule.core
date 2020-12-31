@@ -1207,8 +1207,12 @@ class PHPExcelWriter {
 		global $IM;
 		
 		$filepath = $IM->getModule('attachment')->getTempPath(true).'/'.$name;
-		$writer = PHPExcel_IOFactory::createWriter($this->excel,'Excel2007');
-		$writer->save($filepath);
+		try {
+			$writer = PHPExcel_IOFactory::createWriter($this->excel,'Excel2007');
+			$writer->save($filepath);
+		} catch(Exception $e) {
+			file_put_contents($this->IM->getModule('attachment')->getTempPath().'/PHPExcel.error2.log',$e->getMessage());
+		}
 
 		return $filepath;
 	}
