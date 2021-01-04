@@ -132,6 +132,9 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
     {
     	// Assign PHPExcel
 		$this->setPHPExcel($pPHPExcel);
+		
+		echo '*';
+		ForceFlush();
 
     	$writerPartsArray = array(	'stringtable'	=> 'PHPExcel_Writer_Excel2007_StringTable',
 									'contenttypes'	=> 'PHPExcel_Writer_Excel2007_ContentTypes',
@@ -163,6 +166,9 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 		foreach ($hashTablesArray as $tableName) {
 			$this->$tableName 	= new PHPExcel_HashTable();
 		}
+		
+		echo '*';
+		ForceFlush();
     }
 
 	/**
@@ -190,6 +196,9 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 		if ($this->_spreadSheet !== NULL) {
 			// garbage collect
 			$this->_spreadSheet->garbageCollect();
+			
+			echo '*';
+			ForceFlush();
 
 			// If $pFilename is php://output or php://stdout, make it a temporary file...
 			$originalFilename = $pFilename;
@@ -210,6 +219,9 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 			for ($i = 0; $i < $this->_spreadSheet->getSheetCount(); ++$i) {
 				$this->_stringTable = $this->getWriterPart('StringTable')->createStringTable($this->_spreadSheet->getSheet($i), $this->_stringTable);
 			}
+			
+			echo '*';
+			ForceFlush();
 
 			// Create styles dictionaries
 			$this->_styleHashTable->addFromSource( 	            $this->getWriterPart('Style')->allStyles($this->_spreadSheet) 			);
@@ -317,6 +329,8 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 						}
 					}
 				}
+				
+				ForceFlush();
 			}
 			
 			echo '*';
@@ -366,6 +380,8 @@ class PHPExcel_Writer_Excel2007 extends PHPExcel_Writer_Abstract implements PHPE
 						$objZip->addFromString('xl/media/' . $image->getIndexedFilename(), file_get_contents($image->getPath()));
 					}
 				}
+				
+				ForceFlush();
 			}
 			
 			echo '*';
