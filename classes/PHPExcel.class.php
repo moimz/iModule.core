@@ -1211,7 +1211,21 @@ class PHPExcelWriter {
 			$writer = PHPExcel_IOFactory::createWriter($this->excel,'Excel2007');
 			$writer->save($filepath);
 		} catch(Exception $e) {
-			file_put_contents($this->IM->getModule('attachment')->getTempPath().'/PHPExcel.error2.log',$e->getMessage());
+			file_put_contents($this->IM->getModule('attachment')->getTempPath().'/PHPExcel.error.log',$e->getMessage());
+		}
+
+		return $filepath;
+	}
+	
+	function writeExcelFlush($name) {
+		global $IM;
+		
+		$filepath = $IM->getModule('attachment')->getTempPath(true).'/'.$name;
+		try {
+			$writer = PHPExcel_IOFactory::createWriter($this->excel,'Excel2007');
+			$writer->saveFlush($filepath);
+		} catch(Exception $e) {
+			file_put_contents($this->IM->getModule('attachment')->getTempPath().'/PHPExcel.error.log',$e->getMessage());
 		}
 
 		return $filepath;
