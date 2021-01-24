@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 1.2.0
- * @modified 2019. 9. 22.
+ * @modified 2021. 1. 24.
  */
 REQUIRE_ONCE str_replace(DIRECTORY_SEPARATOR.'install'.DIRECTORY_SEPARATOR.'process','',__DIR__).'/configs/init.config.php';
 header("Content-type: text/json; charset=utf-8",true);
@@ -173,7 +173,7 @@ if ($action == 'install') {
 		}
 		
 		if ($keyFile !== false && $dbFile !== false) {
-			if (CreateDatabase($dbConnect,$package->databases) == true) {
+			if (CreateDatabase($dbConnect,$package->databases) === true) {
 				if ($dbConnect->select('site_table')->count() == 0) {
 					$dbConnect->insert('site_table',array('domain'=>$_SERVER['HTTP_HOST'],'language'=>$language,'title'=>'iModule','description'=>'Site Description','templet'=>'default','templet_configs'=>'{}','logo'=>'{"default":-1,"footer":-1}','is_https'=>(IsHttps() == true ? 'TRUE' : 'FALSE'),'is_default'=>'TRUE','sort'=>0))->execute();
 				} else {
