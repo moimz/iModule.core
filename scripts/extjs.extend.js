@@ -6,8 +6,8 @@
  * @file /scripts/extjs.extend.js
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 3.0.0
- * @modified 2019. 11. 19.
+ * @version 1.0.0
+ * @modified 2021. 1. 25.
  */
 Ext.Ajax.setTimeout(600000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
