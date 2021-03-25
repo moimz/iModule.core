@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.7.2
- * @modified 2020. 7. 8.
+ * @version 1.8.0
+ * @modified 2021. 3. 25.
  */
 
 /**
@@ -588,24 +588,69 @@ function AutoLink($text) {
 }
 
 /**
+ * 디렉토리 구성요소를 가져온다.
+ *
+ * @param string $path 경로
+ * @param string $type 가져올 종류 (all : 전체, directory : 디렉토리, file : 파일)
+ * @param boolean $recursive 내부폴더 탐색여부
+ * @return string[] $items
+ */
+function GetDirectoryItems($path,$type='all',$recursive=false) {
+	$path = realpath($path);
+	if (is_dir($path) == false) return array();
+	
+	$items = array();
+	foreach (scandir($path) as $item) {
+		if (in_array($item,array('.','..')) == true) continue;
+		
+		$item = $path.'/'.$item;
+		if (is_dir($item) == true) {
+			if (in_array($type,array('all','directory')) == true) {
+				$items[] = $item;
+			}
+			
+			if ($recursive == true) {
+				$items = array_merge($items,GetDirectoryItems($item,$type,$recursive));
+			}
+		} else {
+			if (in_array($type,array('all','file')) == true) {
+				$items[] = $item;
+			}
+		}
+	}
+	
+	return $items;
+}
+
+/**
+ * 디렉토리내 구성요소의 마지막 수정시간을 가져온다.
+ *
+ * @param string $path 경로
+ * @return int $unixtime 수정시간
+ */
+function GetDirectoryLastModified($path) {
+	$files = GetDirectoryItems($path,'file',true);
+	$lastModified = 0;
+	foreach ($files as $file) {
+		$modified = filemtime($file);
+		$lastModified = $lastModified < $modified ? $modified : $lastModified;
+	}
+	
+	return $lastModified;
+}
+
+/**
  * 폴더의 용량을 구한다.
  *
  * @param string $path 폴더
- * @param boolean $isKIB KiB 단위 사용여부
  * @return int $size 폴더용량
  */
-function GetFolderSize($path) {
+function GetDirectorySize($path) {
+	$files = GetDirectoryItems($path,'file',true);
 	$size = 0;
-	$openDir = @opendir($path);
-	while ($file = @readdir($openDir)) {
-		if ($file != '.' && $file != '..' && is_dir($path.'/'.$file) == true) {
-			$size+= GetFolderSize($path.'/'.$file);
-		} elseif (is_file($path.'/'.$file) == true) {
-			$size+= filesize($path.'/'.$file);
-		}
+	foreach ($files as $file) {
+		$size+= filesize($file);
 	}
-	@closedir($openDir);
-	
 	return $size;
 }
 

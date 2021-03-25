@@ -798,7 +798,7 @@ class Module {
 			
 			if (isset($package->attachments) == true) {
 				foreach ($package->attachments as $path) {
-					$attachment_size+= GetFolderSize($this->IM->getAttachmentPath().'/'.$path);
+					$attachment_size+= GetDirectorySize($this->IM->getAttachmentPath().'/'.$path);
 				}
 			}
 		}
