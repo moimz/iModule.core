@@ -1,17 +1,4 @@
 @font-face {
 	font-family:"NanumSquare";
-	font-weight:300;
-	src:url(../../fonts/NanumSquare-Light.woff) format("woff"), url(../../fonts/NanumSquare-Light.ttf) format("truetype");
-}
-
-@font-face {
-	font-family:"NanumSquare";
-	font-weight:400;
-	src:url(../../fonts/NanumSquare-Regular.woff) format("woff"), url(../../fonts/NanumSquare-Regular.ttf) format("truetype");
-}
-
-@font-face {
-	font-family:"NanumSquare";
-	font-weight:700;
-	src:url(../../fonts/NanumSquare-Bold.woff) format("woff"), url(../../fonts/NanumSquare-Bold.ttf) format("truetype");
+	src:url(../../fonts/NanumSquare.woff) format("woff"), url(../../fonts/NanumSquare.ttf) format("truetype");
 }
