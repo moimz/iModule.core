@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.8.0
- * @modified 2021. 3. 25.
+ * @version 1.8.1
+ * @modified 2021. 4. 26.
  */
 
 /**
@@ -703,6 +703,28 @@ function CheckDependency($dependency,$version) {
 	} elseif ($dependency == 'encrypt') {
 		$check->installed = function_exists('openssl_encrypt');
 		$check->installedVersion = null;
+	} elseif ($dependency == 'rewrite') {
+		$check->installed = false;
+		
+		$request = IsHttps() == true ? 'https://' : 'http://';
+		$request.= $_SERVER['HTTP_HOST'];
+		$request.= array_shift(explode('/install',$_SERVER['REQUEST_URI']));
+		$request.= $version;
+		
+		$ch = curl_init();
+		curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
+		curl_setopt($ch,CURLOPT_URL,$request);
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+		$data = curl_exec($ch);
+		$http_code = curl_getinfo($ch,CURLINFO_HTTP_CODE);
+		curl_close($ch);
+		
+		if ($http_code == 200) {
+			$result = json_decode($data);
+			if ($result != null && isset($result->success) == true && $result->success == true) {
+				$check->installed = true;
+			}
+		}
 	} else {
 		$check->installed = false;
 		$check->installedVersion = null;
