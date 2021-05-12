@@ -7,7 +7,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 1.0.0
- * @modified 2021. 1. 25.
+ * @modified 2021. 5. 12.
  */
 Ext.Ajax.setTimeout(600000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
@@ -32,8 +32,13 @@ Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sor
 		}
 		
 		if (me.usermenu == true) me.menuDisabled = false;
+		if (me.filter !== undefined) me.menuDisabled = false;
 		if (me.cellWrap) {
 			me.variableRowHeight = true;
+		}
+		
+		if (me.menuDisabled === false && !isSortable) {
+			// @todo sort 메뉴 제거
 		}
 		
 		ariaAttr = me.ariaRenderAttributes || (me.ariaRenderAttributes = {});
