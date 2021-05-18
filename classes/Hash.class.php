@@ -7,8 +7,8 @@
  * @file /classes/Hash.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.0.0
- * @modified 2018. 3. 18.
+ * @version 1.0.1
+ * @modified 2021. 5. 18.
  */
 define('PBKDF2_COMPAT_HASH_ALGORITHM','SHA256');
 define('PBKDF2_COMPAT_ITERATIONS',12000);
@@ -17,7 +17,7 @@ define('PBKDF2_COMPAT_HASH_BYTES',24);
 
 class Hash {
 	function password_hash($password,$force_compat=false) {
-		if (function_exists('mcrypt_create_iv')) {
+		if (function_exists('mcrypt_create_iv') && version_compare(PHP_VERSION,'7.2','<')) {
 			$salt = base64_encode(mcrypt_create_iv(PBKDF2_COMPAT_SALT_BYTES,MCRYPT_DEV_URANDOM));
 		} elseif (file_exists('/dev/urandom') && $fp = @fopen('/dev/urandom','r')) {
 			$salt = base64_encode(fread($fp,PBKDF2_COMPAT_SALT_BYTES));
