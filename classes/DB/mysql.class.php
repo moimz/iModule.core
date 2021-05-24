@@ -7,8 +7,8 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.3.2
- * @modified 2020. 5. 26.
+ * @version 1.4.0
+ * @modified 2021. 5. 24.
  */
 class mysql {
 	private $db;
@@ -24,6 +24,7 @@ class mysql {
 	private $_lastQuery;
 	private $_join = array();
 	private $_where = array();
+	private $_having = array();
 	private $_orderBy = array();
 	private $_groupBy = array();
 	private $_limit = null;
@@ -524,6 +525,18 @@ class mysql {
 		return $this;
 	}
 	
+	public function having($havingProp,$havingValue=null,$operator=null) {
+		if ($operator) $havingValue = array($operator=>$havingValue);
+		$this->_having[] = array('AND',$havingValue,$havingProp);
+		return $this;
+	}
+	
+	public function orHaving($havingProp,$havingValue=null,$operator=null) {
+		if ($operator) $havingValue = array($operator=>$havingValue);
+		$this->_having[] = array('OR',$havingValue,$havingProp);
+		return $this;
+	}
+	
 	public function join($joinTable,$joinCondition,$joinType = '') {
 		$allowedTypes = array('LEFT','RIGHT','OUTER','INNER','LEFT OUTER','RIGHT OUTER');
 		$joinType = strtoupper(trim($joinType));
@@ -620,6 +633,7 @@ class mysql {
 		if (empty($this->_tableDatas) == false) $this->_buildTableData($this->_tableDatas);
 		$this->_buildWhere();
 		$this->_buildGroupBy();
+		$this->_buildHaving();
 		$this->_buildOrderBy();
 		$this->_buildLimit();
 		$this->_lastQuery = $this->replacePlaceHolders($this->_query,$this->_bindParams);
@@ -808,6 +822,90 @@ class mysql {
 			$this->_query.= $value.',';
 		}
 		$this->_query = rtrim($this->_query,',').' ';
+	}
+	
+	private function _buildHaving() {
+		if (empty($this->_having) == true) return;
+		$this->_query.= ' HAVING ';
+		$this->_having[0][0] = '';
+		
+		foreach ($this->_having as $index=>&$cond) {
+			list ($concat,$wValue,$wKey) = $cond;
+			
+			if ($wKey == '(') {
+				$this->_query.= ' '.$concat.' ';
+				if (isset($this->_having[$index+1]) == true) $this->_having[$index+1][0] = '';
+			} elseif ($wKey != ')') {
+				$this->_query.= ' '.$concat.' ';
+			}
+			if (is_array($wValue) == false || (strtolower(key($wValue)) != 'inset' && strtolower(key($wValue)) != 'fulltext')) $this->_query.= $wKey;
+			
+			if ($wValue === null) continue;
+			
+			if (is_array($wValue) == false) $wValue = array('='=>$wValue);
+			
+			$key = key($wValue);
+			$val = $wValue[$key];
+			switch (strtolower($key)) {
+				case '0':
+					$this->_bindParams($wValue);
+					break;
+				case 'not in':
+				case 'in':
+					$comparison = ' '.$key.' (';
+					if (is_object($val) == true) {
+						$comparison.= $this->_buildPair('',$val);
+					} else {
+						foreach ($val as $v) {
+							$comparison.= ' ?,';
+							$this->_bindParam($v);
+						}
+					}
+					$this->_query.= rtrim($comparison,',').' ) ';
+					break;
+				case 'inset' :
+					$comparison = ' FIND_IN_SET (?,'.$wKey.')';
+					$this->_bindParam($val);
+					
+					$this->_query.= $comparison;
+					break;
+				case 'is not':
+					$this->_query.= ' IS NOT NULL';
+					break;
+				case 'is':
+					$this->_query.= ' IS NULL';
+					break;
+				case 'not between':
+				case 'between':
+					$this->_query.= " $key ? AND ? ";
+					$this->_bindParams($val);
+					break;
+				case 'not exists':
+				case 'exists':
+					$this->_query.= $key.$this->_buildPair('',$val);
+					break;
+				case 'not like':
+				case 'like':
+					$this->_query .= " $key ? ";
+					$this->_bindParam($val);
+					break;
+				case 'fulltext':
+					$comparison = ' MATCH ('.$wKey.') AGAINST (? IN BOOLEAN MODE)';
+					
+					$keylist = explode(' ',$val);
+					for ($i=0, $loop=count($keylist);$i<$loop;$i++) {
+						$keylist[$i] = '\'+'.$keylist[$i].'*\'';
+					}
+					$keylist = implode(' ',$keylist);
+					
+					$this->_bindParam($keylist);
+					$this->_query.= $comparison;
+					
+					break;
+				default:
+					$this->_query.= $this->_buildPair($key,$val);
+			}
+		}
 	}
 	
 	private function _buildOrderBy() {
