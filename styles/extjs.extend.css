@@ -13,7 +13,7 @@
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
-.x-grid-cell-inner > i {vertical-align:middle; height:18px; line-height:18px;}
+.x-grid-cell-inner > i {vertical-align:middle; height:18px; line-height:18px; margin:-1px 0px 0px 0px;}
 .x-grid-cell-inner > i.icon {width:18px; height:18px; display:inline-block; line-height:18px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:-1px 0px 0px 0px; vertical-align:middle; text-overflow:clip;}
 .x-grid-cell-inner > i.tree {width:20px; margin-right:5px; display:inline-block; vertical-align:middle;}
 .x-grid-cell-inner > i.tree:before {position:absolute; left:15px; width:10px; height:100%; content:" "; border-left:1px dotted #ccc; background:transparent;}
