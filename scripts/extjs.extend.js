@@ -15,8 +15,8 @@ Ext.define("Ext.moimz.data.JsonStore",{override:"Ext.data.JsonStore",pageSize:0}
 Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x"});
 Ext.define("Ext.moimz.data.proxy.Ajax",{override:"Ext.data.proxy.Ajax",timeout:60000});
 Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidth:60});
-Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false,usermenu:false,
-	beforeRender: function() {
+Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false,lockable:false,usermenu:false,
+	beforeRender:function() {
 		var me = this,
 			rootHeaderCt = me.getRootHeaderCt(),
 			isSortable = me.isSortable(),
@@ -25,14 +25,13 @@ Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sor
  
 		me.callParent();
 		
-		if (!me.usermenu && !isSortable && !me.groupable &&
+		if (!me.usermenu && !me.requiresMenu && !isSortable && !me.groupable &&
 				!me.lockable && (rootHeaderCt.grid.enableColumnHide === false ||
 				!rootHeaderCt.getHideableColumns().length)) {
 			me.menuDisabled = true;
 		}
 		
 		if (me.usermenu == true) me.menuDisabled = false;
-		if (me.filter !== undefined) me.menuDisabled = false;
 		if (me.cellWrap) {
 			me.variableRowHeight = true;
 		}
@@ -119,6 +118,14 @@ Ext.define("Ext.moimz.form.Basic",{override:"Ext.form.Basic",scrollToFirstErrorF
 		}
 	}
 }});
+Ext.define("Ext.moimz.form.field.Display",{override:"Ext.form.field.Display",fieldSubTpl:[
+	'<div id="{id}" data-ref="inputEl" role="textbox" aria-readonly="true"',
+	' aria-labelledby="{cmpId}-labelEl" {inputAttrTpl}',
+	' tabindex="<tpl if="tabIdx != null">{tabIdx}<tpl else>-1</tpl>"',
+	'<tpl if="fieldStyle"> style="{fieldStyle}"</tpl>',
+	' class="{fieldCls} {fieldCls}-{ui} x-selectable">{value}</div>',
+	{compiled:true,disableFormats: true}
+]});
 Ext.define("Ext.moimz.form.Panel",{override:"Ext.form.Panel",trackResetOnLoad:true});
 Ext.define("Ext.moimz.form.action.Action",{override:"Ext.form.action.Action",submitEmptyText:false});
 Ext.define("Ext.moimz.form.action.Submit",{
@@ -275,8 +282,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		if (ariaDom) {
 			if (Ext.isNumber(newValue) && isFinite(newValue)) {
 				ariaDom.setAttribute('aria-valuenow', newValue);
-			}
-			else {
+			} else {
 				ariaDom.removeAttribute('aria-valuenow');
 			}
 		}
@@ -286,8 +292,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		}
 	},
 	getErrors:function(value) {
-		if (!this.allowThousandSeparator)
-			return this.callParent(arguments);
+		if (!this.allowThousandSeparator) return this.callParent(arguments);
 		value = arguments.length > 0 ? value : this.processRawValue(this.getRawValue());
 	
 		var me = this,
@@ -301,7 +306,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 	
 		value = me.toBaseNumber(value);
 	
-		if(isNaN(value)){
+		if (isNaN(value)){
 			errors.push(format(me.nanText, value));
 		}
 	
@@ -309,8 +314,7 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 	
 		if (me.minValue === 0 && num < 0) {
 			errors.push(this.negativeText);
-		}
-		else if (num < me.minValue) {
+		} else if (num < me.minValue) {
 			errors.push(format(me.minText, me.minValue));
 		}
 	
@@ -404,6 +408,54 @@ Ext.define("Ext.moimz.form.field.Number",{override:"Ext.form.field.Number",field
 		}
 	}
 });
+Ext.define("Ext.moimz,window.MessageBox",{override:"Ext.window.MessageBox",show:function(cfg) {
+	var me = this, visibleFocusables;
+
+	cfg = cfg || {};
+
+	if (Ext.Component.layoutSuspendCount) {
+		Ext.on({
+			resumelayouts:function() {
+				me.show(cfg);
+			},
+			single:true
+		});
+		return me;
+	}
+
+	me.reconfigure(cfg);
+	if (cfg.cls) {
+		me.addCls(cfg.cls);
+	}
+
+	visibleFocusables = me.query('textfield:not([hidden]),textarea:not([hidden]),button:not([hidden])');
+	me.preventFocusOnActivate = !visibleFocusables.length;
+
+	Ext.window.Window.prototype.show.call(this);
+	me.center();
+	
+	return me;
+}});
+Ext.define("Ext.moimz.grid.filters.filter.List",{override:"Ext.grid.filters.filter.List",onCheckChange:function() {
+	var me = this, updateBuffer = me.updateBuffer;
+	var value = [], i, len, checkItem;
+	var items = me.menu.items;
+	for (i=0, len=items.length;i<len;i++) {
+		checkItem = items.getAt(i);
+	
+		if (checkItem.checked) {
+			value.push(checkItem.value);
+		}
+	}
+	
+	me.grid.fireEvent("updateColumnFilter",me.grid,me,me.filter,value,me.filter.getValue());
+	
+	if (updateBuffer) {
+		me.task.delay(updateBuffer);
+	} else {
+		me.setValue();
+	}
+}});
 Ext.define("Ext.moimz.Component",{override:"Ext.Component",onBoxReady:function(width,height) {
 	var me = this, label;
 	
@@ -447,14 +499,14 @@ Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:func
 	if (me.maximizable) me.header.on({scope:me,dblclick:me.toggleMaximize});
 	if (me.autoScroll) me.body.on("scroll",function() { setTimeout(function() { me.storedScrollY = me.getScrollY(); },100); });
 },afterRender:function() {
-	var me = this, header = me.header, keyMap;
+	var me = this, header = me.header;
 
 	me.minWidth = me.getWidth();
 	me.maxHeight = $(window).height() - 50;
 
 	if (me.maximized) {
 		me.maximized = false;
-		me.maximize();
+		me.maximize(null, true);
 		if (header) {
 			header.removeCls(header.indicateDragCls);
 		}
@@ -462,25 +514,12 @@ Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:func
 
 	me.callParent();
 	
-	if (me.closable) {
-		keyMap = me.getKeyMap();
-		keyMap.on(27, me.onEsc, me);
-	} else {
-		keyMap = me.keyMap;
-	}
-	
-	if (keyMap && me.hidden) {
-		keyMap.disable();
-	}
+	me.initTabGuards();
 },onResize:function(width,height,oldWidth,oldHeight) {
 	var me = this;
 	
 	if (me.floating && me.constrain) {
 		me.doConstrain();
-	}
-	
-	if (oldWidth) {
-		me.refreshScroll();
 	}
 	
 	if (me.hasListeners.resize) {
@@ -498,16 +537,13 @@ Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:func
 		me.setY(Math.max(25,$(window).height() - me.getHeight() - 25));
 	}
 }});
-
 Ext.define("Ext.moimz.container.Container",{override:"Ext.container.Container",afterLayout:function(layout) {
-	var me = this, scroller = me.getScrollable();
+	var me = this;
 	++me.layoutCounter;
-	
-	if (scroller && me.layoutCounter > 1) scroller.refresh();
-	if (me.hasListeners.afterlayout) me.fireEvent("afterlayout",me,layout);
+ 
+	if (me.hasListeners.afterlayout) me.fireEvent('afterlayout', me, layout);
 	if (me.storedScrollY) me.setScrollY(me.storedScrollY);
 }});
-
 Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField",accept:null,clearOnSubmit:false,reset:function() {
 	var me = this, clear = me.clearOnSubmit;
 	if (me.rendered) {
@@ -535,11 +571,9 @@ Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField"
 	me.invokeTriggers("afterFieldRender");
 }});
 
-
-
 /**
  * ExtJS 라이브러리 언어셋 적용
- * iModule 언어셋에서 처리
+ * @todo iModule 언어셋에서 처리
  */
 Ext.onReady(function() {
 	if (Ext.Date) {

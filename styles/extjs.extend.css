@@ -7,14 +7,14 @@
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
  * @version 1.0.1
- * @modified 2021. 1. 25.
+ * @modified 2021. 5. 20.
  */
 .x-btn-danger {background-color:#F44336; border-color:#E53935;}
 .x-btn-danger.x-btn-over {background-color:#E53935; border-color:#E53935;}
 .x-btn-danger.x-btn-focus {background-color:#F44336;}
 
 .x-grid-cell-inner > i {vertical-align:middle; height:18px; line-height:18px;}
-.x-grid-cell-inner > i.icon {width:18px; height:18px; display:inline-block; line-height:18px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:0px 0px 0px 0px; vertical-align:middle; text-overflow:clip;}
+.x-grid-cell-inner > i.icon {width:18px; height:18px; display:inline-block; line-height:18px; background-repeat:no-repeat; background-size:contain; background-position:50% 50%; margin:-1px 0px 0px 0px; vertical-align:middle; text-overflow:clip;}
 .x-grid-cell-inner > i.tree {width:20px; margin-right:5px; display:inline-block; vertical-align:middle;}
 .x-grid-cell-inner > i.tree:before {position:absolute; left:15px; width:10px; height:100%; content:" "; border-left:1px dotted #ccc; background:transparent;}
 .x-grid-cell-inner > i.tree:after {position:absolute; top:0; left:15px; width:10px; height:50%; content:" "; border-bottom:1px dotted #ccc;}
@@ -40,7 +40,6 @@
 .x-field.x-form-wysiwyg .x-form-text-wrap {overflow:visible !important;}
 
 .x-form-no-padding .x-form-text-default {padding-right:0px;}
-
 .x-fieldset-body .x-field:last-child {margin-bottom:4px;}
 
 .x-form-item-label-inner i.required {display:inline-block; line-height:1; font-size:14px; color:red; font-style:normal; vertical-align:middle; margin-top:-8px; margin-right:3px;}
@@ -48,6 +47,12 @@
 .x-form-checkboxgroup-body {padding:0px !important;}
 .x-form-radio-default:before {content:"\f1db";}
 .x-form-item-label-default.required > span:before {content:"*"; color:red; display:inline-block; height:14px; padding-top:3px; padding-right:3px; line-height:0; vertical-align:top;}
+.x-panel-tags {overflow:visible;}
+.x-panel-tags .x-panel {overflow:visible;}
+.x-panel-tags .x-panel-body {overflow:visible;}
+.x-panel-tags .x-fieldset-body {overflow:visible;}
+.x-panel-tags .x-panel-bodyWrap {overflow:visible;}
+.x-panel-tags .x-form-tags {z-index:2000000;}
 
 .x-legend-panel .x-panel-body-default {border-color:#fff !important;}
 .x-small-header .x-panel-header {padding:6px 8px !important;}
@@ -61,7 +66,8 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-grid-row-summary + .x-grid-row-summary .x-grid-cell {background-color:#ddd !important; color:#222; font-weight:700; border-color:#ccc !important;}
 .x-toolbar-default {background:#fcfcfc;}
 .x-column-header {background:#f4f4f4;}
-.x-column-header-checkbox {border-color:#d1d1d0;}
+.x-column-header-checkbox {border-color:#d1d1d0; padding-left:2px;}
+.x-grid-checkcolumn-cell-inner {text-align:center; padding-left:7px;}
 .x-grid-cell-inner a {color:#5070be; text-decoration:none;}
 .x-grid-cell-inner.x-grid-cell-inner-checkcolumn {text-overflow:clip !important;}
 .x-grid-cell-row-checker {vertical-align:top !important;}
@@ -122,9 +128,3 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-stepbar > div:first-child > span {margin-left:0;}
 .x-stepbar > div:first-child:before {content:"";}
 .x-stepbar > div.selected > span {opacity:1; background:#5fa2dd; color:#fff; font-weight:bold;}
-
-/**
- * For Chrome 56
- */
-.x-webkit .x-form-text {height:100% !important;}
-.x-webkit :not(.x-form-textarea-body) > .x-form-trigger-wrap {height:initial;}
