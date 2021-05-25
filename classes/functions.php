@@ -7,8 +7,8 @@
  * @file /classes/functions.php
  * @author Arzz
  * @license MIT License
- * @version 1.8.1
- * @modified 2021. 4. 26.
+ * @version 1.8.2
+ * @modified 2021. 5. 25.
  */
 
 /**
@@ -375,13 +375,15 @@ function GetString($str,$code) {
 		 * 데이터베이스 인덱스에 사용할 수 있게 HTML태그 및 HTML엔티티, 그리고 불필요한 공백문자를 제거한다.
 		 */
 		case 'index' :
-			$str = preg_replace('/<(P|p)>/',' <p>',$str);
+			$str = preg_replace('/<(P|p)>/','',$str);
+			$str = preg_replace('/<\/(P|p)>/',"\n",$str);
+			$str = preg_replace('/<br(.*?)>/',"\n",$str);
+			$str = preg_replace('/\r\n/',"\n",$str);
+			$str = preg_replace('/[\n]+/',"\n",$str);
 			$str = strip_tags($str);
 			$str = preg_replace('/&[a-z]+;/',' ',$str);
-			$str = preg_replace('/\r\n/',' ',$str);
-			$str = str_replace("\n",' ',$str);
 			$str = str_replace("\t",' ',$str);
-			$str = preg_replace('/[[:space:]]+/',' ',$str);
+			$str = preg_replace('/[ ]+/',' ',$str);
 	}
 	
 	return trim($str);
