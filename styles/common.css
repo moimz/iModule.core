@@ -11,15 +11,15 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2020. 1. 22.
+ * @modified 2021. 5. 27.
  */
 * {padding:0px; margin:0px; -webkit-font-smoothing:antialiased;}
 *:focus {outline:none;}
-html, body {width:100%; height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#222;}
-body {overflow:auto;}
+html, body {width:100%; min-height:100%; -webkit-text-size-adjust:100%; -ms-text-size-adjust:100%; font-size:14px; color:#222;}
+body {overflow:auto; position:relative;}
 header, main, footer, section, aside, article {display:block;}
 body[data-scroll] {position:fixed; height:100%;}
-body > div[data-role=wrapper] {width:100%; height:100%;}
+body > div[data-role=wrapper] {width:100%; min-height:100%;}
 input, textarea, button, select {font-family:inherit; outline:none; font-size:inherit; border-radius:0;}
 input[type=search] {-webkit-appearance:none;}
 input[type=search]::-webkit-search-decoration {-webkit-appearance:none;}
