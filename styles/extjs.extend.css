@@ -113,6 +113,7 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-form-display-field-body .x-form-help {padding-top:0; margin-top:0;}
 .x-box-default {padding:8px; font-size:12px; line-height:1.6; background:#ffffef; color:#666;}
 
+.x-tool-tool-el {display:block !important; line-height:16px;}
 .x-tool-maximize {font-size:14px; line-height:16px;}
 .x-tool-maximize:before {content:"\f2d0";}
 .x-tool-restore {font-size:14px; line-height:16px;}
