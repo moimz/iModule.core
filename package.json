@@ -51,6 +51,12 @@
 					"type":"date",
 					"comment":"최근 자동화작업 실행일자"
 				},
+				"hour":{
+					"type":"int",
+					"length":2,
+					"default":0,
+					"comment":"최근 자동화작업 실행시각(반복주기가 HOURLY 인 경우)"
+				},
 				"result":{
 					"type":"longtext",
 					"comment":"자동화작업 결과"
@@ -71,7 +77,7 @@
 				}
 			},
 			"indexes":{
-				"host,module,type,date":"primary_key"
+				"host,module,type,date,hour":"primary_key"
 			},
 			"comment":"아이모듈 자동화작업 테이블"
 		},
