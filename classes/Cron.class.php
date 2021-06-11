@@ -8,7 +8,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2019. 8. 22.
+ * @modified 2021. 6. 11.
  */
 class Cron {
 	/**
@@ -111,7 +111,7 @@ class Cron {
 			$end_date = time();
 			$runtime = $IM->getMicroTime() - $start_time;
 			
-			if ($result) $IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'HOURLY','date'=>date('Y-m-d'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
+			if ($result) $IM->db()->replace($this->table->cron,array('host'=>$_SERVER['HTTP_HOST'],'module'=>$module,'type'=>'HOURLY','date'=>date('Y-m-d'),'hour'=>date('G'),'result'=>$result,'start_date'=>$start_date,'end_date'=>$end_date,'runtime'=>$runtime))->execute();
 		}
 	}
 	
