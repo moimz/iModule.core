@@ -518,6 +518,21 @@ class mysql {
 	}
 	
 	/**
+	 * 백업테이블을 생성한다.
+	 *
+	 * @param string $table 백업할 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $success
+	 */
+	function backup($table,$included_prefix=false) {
+		$table = filter_var($table,FILTER_SANITIZE_STRING);
+		$backupname = $table.'_BK'.date('YmdHis');
+		$this->rawQuery('CREATE TABLE IF NOT EXISTS `'.($included_prefix == true ? '' : $this->_prefix).$backupname.'` SELECT * FROM `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
+		
+		return $this->getLastError() == '';
+	}
+	
+	/**
 	 * 테이블 구조를 변경한다.
 	 *
 	 * @param string $table 테이블명
