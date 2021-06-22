@@ -33,8 +33,14 @@ class mysql {
 	private $_stmtError;
 	private $_tableLockMethod = 'READ';
 	public $count = 0;
-
-	public function __construct($db=null,$class=null) {
+	
+	/**
+	 * 클래스를 초기화한다.
+	 *
+	 * @param object $db 데이터베이스 접속정보
+	 * @param object $class 데이터베이스 루트클래스
+	 */
+	function __construct($db=null,$class=null) {
 		if ($db !== null) {
 			$this->db = $db;
 			if (isset($this->db->port) == false) $this->db->port = 3306;
@@ -44,14 +50,20 @@ class mysql {
 		$this->_class = $class;
 	}
 	
-	public function connect($mysqli=null) {
+	/**
+	 * 데이터베이스에 접속한다.
+	 *
+	 * @param mysqli $mysqli mysqli 클래스객체
+	 * @return mysqli $mysqli mysqli 클래스객체
+	 */
+	function connect($mysqli=null) {
 		if ($mysqli != null) {
 			$this->_mysqli = $mysqli;
 		} else {
 			ob_start();
 			$this->_mysqli = new mysqli($this->db->host,$this->db->username,$this->db->password,$this->db->database,$this->db->port);
 			ob_end_clean();
-			if ($this->_mysqli->connect_error) $this->error($this->_mysqli->connect_error);
+			if ($this->_mysqli->connect_error) $this->_error($this->_mysqli->connect_error);
 			$this->_mysqli->set_charset($this->db->charset);
 		}
 		
@@ -69,42 +81,81 @@ class mysql {
 		return $this->_mysqli;
 	}
 	
-	public function db() {
+	/**
+	 * 데이터베이스 접속정보를 가져온다.
+	 *
+	 * @param object $db
+	 */
+	function db() {
 		return $this->db;
 	}
 	
-	public function mysqli() {
+	/**
+	 * mysqli 클래스객체를 가져온다.
+	 *
+	 * @param mysqli $mysqli
+	 */
+	function mysqli() {
 		return $this->_mysqli;
 	}
 	
-	public function check($db) {
+	/**
+	 * 데이터베이스에 접속이 가능한지 확인한다.
+	 *
+	 * @param object $db 데이터베이스 접속정보
+	 * @return boolean $success 접속성공여부
+	 */
+	function check($db) {
 		if (isset($db->port) == false) $db->port = 3306;
 		$mysqli = @new mysqli($db->host,$db->username,$db->password,$db->database,$db->port);
 		if ($mysqli->connect_errno) return false;
 		return true;
 	}
 	
-	function getPrefix($prefix) {
+	/**
+	 * 데이터베이스 서버에 ping 을 보낸다.
+	 *
+	 * @return boolean $pong
+	 */
+	function ping() {
+		return $this->_mysqli->ping();
+	}
+	
+	/**
+	 * 테이블명 앞에 고정적으로 사용될 prefix 값을 가져온다.
+	 *
+	 * @return string $prefix
+	 */
+	function getPrefix() {
 		return $this->_prefix;
 	}
 	
+	/**
+	 * 테이블명 앞에 고정적으로 사용될 prefix 값을 설정한다.
+	 *
+	 * @param string $prefix
+	 */
 	function setPrefix($prefix) {
 		$this->_prefix = $prefix;
 		return $this;
 	}
 	
+	/**
+	 * 테이블명 앞에 고정적으로 사용되는 prefix 값을 포함한 전체 테이블명을 가져온다.
+	 *
+	 * @param string $table prefix 가 없는 테이블명
+	 * @return string $table prefix 가 포함된 테이블명
+	 */
 	function getTable($table) {
 		return $this->_prefix.$table;
 	}
 	
-	function error($msg,$query='') {
-		$this->reset();
-		if ($this->_class == null) die('DATABASE_ERROR : '.$msg.'<br>'.$query);
-		else $this->_class->printError($msg,$query);
-	}
-	
-	private function reset() {
+	/**
+	 * 진행중인 쿼리빌더를 초기화한다.
+	 */
+	function reset() {
 		$this->_where = array();
+		$this->_having = array();
 		$this->_join = array();
 		$this->_orderBy = array();
 		$this->_groupBy = array(); 
@@ -115,7 +166,15 @@ class mysql {
 		$this->count = 0;
 	}
 	
-	public function rawQuery($query,$bindParams=null,$sanitize=true) {
+	/**
+	 * 쿼리빌더 없이 RAW 쿼리를 실행한다.
+	 *
+	 * @param string $query 쿼리문
+	 * @param any[] $bindParams 바인딩할 변수
+	 * @param boolean $sanitize SQL 인젝션 방어를 위한 필터사용여부 (기본값 : true)
+	 * @return object 쿼리실행결과
+	 */
+	function rawQuery($query,$bindParams=null,$sanitize=true) {
 		$this->_query = $query;
 		if ($sanitize) $this->_query = filter_var($query,FILTER_SANITIZE_STRING,FILTER_FLAG_NO_ENCODE_QUOTES);
 		$stmt = $this->_prepareQuery();
@@ -125,7 +184,7 @@ class mysql {
 				$params[0].= $this->_determineType($val);
 				array_push($params,$bindParams[$prop]);
 			}
-			call_user_func_array(array($stmt,'bind_param'),$this->refValues($params));
+			call_user_func_array(array($stmt,'bind_param'),$this->_refValues($params));
 		}
 		$stmt->execute();
 		$this->_stmtError = $stmt->error;
@@ -133,25 +192,13 @@ class mysql {
 		return $this->_dynamicBindResults($stmt);
 	}
 	
-	public function unpreparedQuery($query) {
-		$stmt = $this->_mysqli->query($query);
-		if(!$stmt){
-			throw new Exception("Unprepared Query Failed, ERRNO: ".$this->_mysqli->errno." (".$this->_mysqli->error.")", $this->_mysqli->errno);
-		};
-		
-		return $stmt;
-	}
-	
-	public function query($query) {
-		$this->_query = filter_var($query,FILTER_SANITIZE_STRING);
-		$stmt = $this->_buildQuery();
-		$stmt->execute();
-		$this->_stmtError = $stmt->error;
-		$this->reset();
-		return $this->_dynamicBindResults($stmt);
-	}
-	
-	public function tables($include_desc=false) {
+	/**
+	 * 데이터베이스의 전체 테이블목록을 가져온다.
+	 *
+	 * @param boolean $include_desc 테이블구조 포함여부
+	 * @return object[] $tables
+	 */
+	function tables($include_desc=false) {
 		if ($include_desc == true) {
 			$tables = $this->rawQuery('SHOW TABLE STATUS');
 			for ($i=0, $loop=count($tables);$i<$loop;$i++) {
@@ -179,13 +226,27 @@ class mysql {
 		return $tables;
 	}
 	
-	public function exists($table,$included_prefix=false) {
+	/**
+	 * 테이블명이 존재하는지 확인한다.
+	 *
+	 * @param string $table 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @param boolean $exists
+	 */
+	function exists($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$count = $this->rawQuery("SHOW TABLES LIKE '".($included_prefix == true ? '' : $this->_prefix).$table."'");
 		return count($count) == 1;
 	}
 	
-	public function size($table,$included_prefix=false) {
+	/**
+	 * 테이블의 용량을 가져온다.
+	 *
+	 * @param string $table 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return int $size
+	 */
+	function size($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$data = $this->rawQuery("SELECT `DATA_LENGTH`, `INDEX_LENGTH` FROM `information_schema`.`TABLES` WHERE `table_schema`='".$this->db->database."' and `table_name`='".($included_prefix == true ? '' : $this->_prefix).$table."'");
 		
@@ -196,7 +257,14 @@ class mysql {
 		}
 	}
 	
-	public function desc($table,$included_prefix=false) {
+	/**
+	 * 테이블의 구조를 가져온다.
+	 *
+	 * @param string $table 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return object[] $desc
+	 */
+	function desc($table,$included_prefix=false) {
 		$columns = $this->rawQuery('SHOW FULL COLUMNS FROM `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
 		for ($i=0, $loop=count($columns);$i<$loop;$i++) {
 			$column = new stdClass();
@@ -222,9 +290,17 @@ class mysql {
 		return $columns;
 	}
 	
-	public function compare($table,$schema) {
+	/**
+	 * 테이블의 구조를 비교한다.
+	 *
+	 * @param string $table 테이블명
+	 * @param object $schema 테이블구조
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $is_coincidence
+	 */
+	function compare($table,$schema,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$desc = $this->rawQuery('SHOW FULL COLUMNS FROM `'.$this->_prefix.$table.'`');
+		$desc = $this->rawQuery('SHOW FULL COLUMNS FROM `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
 		if (count($desc) != count(array_keys((array)$schema->columns))) return false;
 		
 		$auto_increment = '';
@@ -252,7 +328,7 @@ class mysql {
 			}
 			
 			if (isset($compare->comment) == true && $compare->comment != $desc[$i]->Comment) {
-				$query = 'ALTER TABLE `'.$this->_prefix.$table.'` CHANGE `'.$desc[$i]->Field.'` `'.$desc[$i]->Field.'` '.$desc[$i]->Type;
+				$query = 'ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` CHANGE `'.$desc[$i]->Field.'` `'.$desc[$i]->Field.'` '.$desc[$i]->Type;
 				if ($desc[$i]->Null == 'NO') $query.= ' NOT NULL';
 				else $query.= ' NULL';
 				if (isset($compare->default) == true) $query.= " DEFAULT '".$compare->default."'";
@@ -262,7 +338,7 @@ class mysql {
 			}
 		}
 		
-		$index = $this->rawQuery('SHOW INDEX FROM `'.$this->_prefix.$table.'`');
+		$index = $this->rawQuery('SHOW INDEX FROM `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
 		
 		$indexByType = array();
 		for ($i=0, $loop=count($index);$i<$loop;$i++) {
@@ -290,16 +366,16 @@ class mysql {
 				$column = filter_var($column,FILTER_SANITIZE_STRING);
 				$column = '`'.str_replace(',','`,`',$column).'`';
 				if ($type == 'primary_key') {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD PRIMARY KEY('.$column.')');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD PRIMARY KEY('.$column.')');
 					if ($this->getLastError()) return false;
 				} elseif ($type == 'index') {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD INDEX('.$column.')');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD INDEX('.$column.')');
 					if ($this->getLastError()) return false;
 				} elseif ($type == 'fulltext') {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.')');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD FULLTEXT('.$column.')');
 					if ($this->getLastError()) return false;
 				} elseif ($type == 'unique') {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD UNIQUE('.$column.')');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD UNIQUE('.$column.')');
 					if ($this->getLastError()) return false;
 				}
 			}
@@ -308,18 +384,26 @@ class mysql {
 		if (isset($schema->auto_increment) == true && $auto_increment != $schema->auto_increment) return false;
 		
 		if (isset($schema->comment) == true) {
-			$comment = $this->rawQuery("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '".$this->_prefix.$table."'");
+			$comment = $this->rawQuery("SELECT TABLE_COMMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '".($included_prefix == true ? '' : $this->_prefix).$table."'");
 			if ($comment[0]->TABLE_COMMENT != $schema->comment) {
-				$this->rawQuery("ALTER TABLE `".$this->_prefix.$table."` COMMENT = '".$schema->comment."'");
+				$this->rawQuery("ALTER TABLE `".($included_prefix == true ? '' : $this->_prefix).$table."` COMMENT = '".$schema->comment."'");
 			}
 		}
 		
 		return true;
 	}
 	
-	public function create($table,$schema) {
+	/**
+	 * 테이블을 생성한다.
+	 *
+	 * @param string $table 테이블명
+	 * @paran object $schema 테이블구조
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $success
+	 */
+	function create($table,$schema,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$query = 'CREATE TABLE IF NOT EXISTS `'.$this->_prefix.$table.'` (';
+		$query = 'CREATE TABLE IF NOT EXISTS `'.($included_prefix == true ? '' : $this->_prefix).$table.'` (';
 		
 		$isFirst = true;
 		foreach ($schema->columns as $column=>$options) {
@@ -340,11 +424,11 @@ class mysql {
 			}
 			
 			if (isset($options->default) == true) {
-				$query.= " DEFAULT '".$options->default."'";
+				$query.= " DEFAULT '".$this->escape($options->default)."'";
 			}
 			
 			if (isset($options->comment) == true) {
-				$query.= " COMMENT '".$options->comment."'";
+				$query.= " COMMENT '".$this->escape($options->comment)."'";
 			}
 			
 			$isFirst = false;
@@ -359,17 +443,17 @@ class mysql {
 			$column = '`'.str_replace(',','`,`',$column).'`';
 			
 			if ($index == 'primary_key') {
-				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD PRIMARY KEY('.$column.')');
+				$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD PRIMARY KEY('.$column.')');
 			} elseif ($index == 'index') {
-				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD INDEX('.$column.')');
+				$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD INDEX('.$column.')');
 			} elseif ($index == 'fulltext') {
 				if (version_compare($this->version,'5.7.6','>=') == true) {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.') WITH PARSER ngram');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD FULLTEXT('.$column.') WITH PARSER ngram');
 				} else {
-					$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD FULLTEXT('.$column.')');
+					$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD FULLTEXT('.$column.')');
 				}
 			} elseif ($index == 'unique') {
-				$this->rawQuery('ALTER TABLE `'.$this->_prefix.$table.'` ADD UNIQUE('.$column.')');
+				$this->rawQuery('ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` ADD UNIQUE('.$column.')');
 			}
 			
 			if ($this->getLastError()) {
@@ -380,7 +464,7 @@ class mysql {
 		
 		if (isset($schema->auto_increment) == true && $schema->auto_increment) {
 			$auto_increment = filter_var($schema->auto_increment,FILTER_SANITIZE_STRING);
-			$query = 'ALTER TABLE `'.$this->_prefix.$table.'` CHANGE `'.$auto_increment.'` `'.$auto_increment.'` int('.$schema->columns->{$schema->auto_increment}->length.') NOT NULL AUTO_INCREMENT';
+			$query = 'ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` CHANGE `'.$auto_increment.'` `'.$auto_increment.'` int('.$schema->columns->{$schema->auto_increment}->length.') NOT NULL AUTO_INCREMENT';
 			if (isset($schema->columns->{$schema->auto_increment}->comment) == true) $query.= " COMMENT '".$schema->columns->{$schema->auto_increment}->comment."'";
 			$this->rawQuery($query);
 			if ($this->getLastError()) return false;
@@ -389,51 +473,50 @@ class mysql {
 		return true;
 	}
 	
-	public function drop($table,$included_prefix=false) {
+	/**
+	 * 테이블을 삭제한다.
+	 *
+	 * @param string $table 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $success
+	 */
+	function drop($table,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
-		$this->rawQuery('DROP TABLE IF EXISTS `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
+		$this->rawQuery('DROP TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
 		
 		return $this->getLastError() == '';
 	}
 	
-	public function rename($table,$newname) {
+	/**
+	 * 테이블을 비운다.
+	 *
+	 * @param string $table 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $success
+	 */
+	function truncate($table,$included_prefix=false) {
+		$table = filter_var($table,FILTER_SANITIZE_STRING);
+		$this->rawQuery('TRUNCATE TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'`');
+		
+		return $this->getLastError() == '';
+	}
+	
+	/**
+	 * 테이블의 이름을 변경한다.
+	 *
+	 * @param string $table 변경전 테이블명
+	 * @param string $newname 변경할 테이블명
+	 * @param boolean $included_prefix 테이블명에 prefix 포함여부
+	 * @return boolean $success
+	 */
+	function rename($table,$newname,$included_prefix=false) {
 		$table = filter_var($table,FILTER_SANITIZE_STRING);
 		$newname = filter_var($newname,FILTER_SANITIZE_STRING);
-		$this->rawQuery('RENAME TABLE `'.$this->_prefix.$table.'` TO `'.$this->_prefix.$newname.'`');
+		$this->rawQuery('RENAME TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` TO `'.($included_prefix == true ? '' : $this->_prefix).$newname.'`');
 		
 		return $this->getLastError() == '';
 	}
 	
-	public function execute() {
-		if (preg_match('/^SELECT /',$this->_query) == true) {
-			return $this->get();
-		} elseif (preg_match('/^INSERT /',$this->_query) == true) {
-			$stmt = $this->_buildQuery();
-			$stmt->execute();
-			$this->_stmtError = $stmt->error;
-			$this->reset();
-			$this->count = $stmt->affected_rows;
-			if ($stmt->affected_rows < 1) return false;
-			if ($stmt->insert_id > 0) return $stmt->insert_id;
-			return true;
-		} elseif (preg_match('/^DELETE /',$this->_query) == true) {
-			$stmt = $this->_buildQuery();
-			$stmt->execute();
-			$this->_stmtError = $stmt->error;
-			$this->reset();
-			return ($stmt->affected_rows > 0);
-		} else {
-			$stmt = $this->_buildQuery();
-			$status = $stmt->execute();
-			$this->reset();
-			$this->_stmtError = $stmt->error;
-			$this->count = $stmt->affected_rows;
-			return $status;
-		}
-	}
-	
-	public function has() {
-		return $this->count() > 0;
 	/**
 	 * 테이블 구조를 변경한다.
 	 *
@@ -513,7 +596,315 @@ class mysql {
 		return $this->getLastError() == '';
 	}
 	
-	public function count() {
+	/**
+	 * LOCK 방법을 설정한다.
+	 *
+	 * @param string $method 방법 (READ, WRITE)
+	 * @return class $this
+	 */
+	function setLockMethod($method) {
+		switch(strtoupper($method)) {
+			case 'READ' || 'WRITE' :
+				$this->_tableLockMethod = $method;
+				break;
+			default:
+				$this->_error('Bad lock type: Can be either READ or WRITE');
+				break;
+		}
+		return $this;
+	}
+	
+	/**
+	 * 테이블을 설정된 LOCK 방법에 따라 LOCK 한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @return boolean $success
+	 */
+	function lock($table) {
+		$this->_query = 'LOCK TABLES';
+		
+		if(gettype($table) == 'array') {
+			foreach($table as $key => $value) {
+				if(gettype($value) == 'string') {
+					if($key > 0) {
+						$this->_query .= ',';
+					}
+					$this->_query .= ' '.$this->_prefix.$value.' '.$this->_tableLockMethod;
+				}
+			}
+		} else{
+			$table = $this->_prefix.$table;
+			$this->_query = 'LOCK TABLES '.$table.' '.$this->_tableLockMethod;
+		}
+		
+		$result = $this->_unpreparedQuery($this->_query);
+		$errno  = $this->_mysqli->errno;
+		
+		$this->reset();
+		
+		if ($result) {
+			return true;
+		} else {
+			$this->_error('Locking of table '.$table.' failed',$errno);
+		}
+	}
+	
+	/**
+	 * 현재 LOCK 중인 테이블을 UNLOCK 한다.
+	 *
+	 * @return boolean $success
+	 */
+	function unlock() {
+		$this->_query = 'UNLOCK TABLES';
+		$result = $this->_unpreparedQuery($this->_query);
+		$errno  = $this->_mysqli->errno;
+		$this->reset();
+		if ($result) {
+			return true;
+		} else {
+			$this->_error('Unlocking of tables failed',$errno);
+			return false;
+		}
+	}
+	
+	/**
+	 * SELECT 쿼리빌더를 시작한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @param any[] $columns 가져올 컬럼명 (배열 또는 콤마(,)로 구분된 컬럼명)
+	 * @return class $this
+	 */
+	function select($table,$columns='*') {
+		if (empty($columns)) $columns = '*';
+		$column = is_array($columns) ? implode(',',$columns) : $columns; 
+		$this->_query = 'SELECT '.$column.' FROM '.$this->_prefix.$table;
+		
+		return $this;
+	}
+	
+	/**
+	 * INSERT 쿼리빌더를 시작한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @param any[] $data 저장할 데이터 (array(컬럼명=>값))
+	 * @return class $this
+	 */
+	function insert($table,$data) {
+		$this->_query = 'INSERT into '.$this->_prefix.$table;
+		$this->_tableDatas = $data;
+		
+		return $this;
+	}
+	
+	/**
+	 * REPLACE 쿼리빌더를 시작한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @param any[] $data 저장할 데이터 (array(컬럼명=>값))
+	 * @return class $this
+	 */
+	function replace($table,$data) {
+		$this->_query = 'REPLACE into '.$this->_prefix.$table;
+		$this->_tableDatas = $data;
+		
+		return $this;
+	}
+	
+	/**
+	 * UPDATE 쿼리빌더를 시작한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @param any[] $data 저장할 데이터 (array(컬럼명=>값))
+	 * @return class $this
+	 */
+	function update($table,$data) {
+		$this->_query = 'UPDATE '.$this->_prefix.$table.' SET ';
+		$this->_tableDatas = $data;
+		
+		return $this;
+	}
+	
+	/**
+	 * DELETE 쿼리빌더를 시작한다.
+	 *
+	 * @param string $table prefix 를 포함하지 않은 테이블명
+	 * @param any[] $data 저장할 데이터 (array(컬럼명=>값))
+	 * @return class $this
+	 */
+	function delete($table) {
+		$this->_query = 'DELETE FROM '.$this->_prefix.$table;
+		
+		return $this;
+	}
+	
+	/**
+	 * WHERE 절을 정의한다. (AND조건)
+	 *
+	 * @param string $whereProp WHERE 조건절 (컬럼명 또는 WHERE 조건문)
+	 * @param any[] $whereValue 검색할 조건값 (컬럼데이터 또는 WHERE 조건문에 바인딩할 값의 배열)
+	 * @param string $operator 조건 (=, IN, NOT IN, LIKE 등)
+	 * @return class $this
+	 */
+	function where($whereProp,$whereValue=null,$operator=null) {
+		if ($operator) $whereValue = array($operator=>$whereValue);
+		$this->_where[] = array('AND',$whereValue,$whereProp);
+		return $this;
+	}
+	
+	/**
+	 * WHERE 절을 정의한다. (OR조건)
+	 *
+	 * @param string $whereProp WHERE 조건절 (컬럼명 또는 WHERE 조건문)
+	 * @param any[] $whereValue 검색할 조건값 (컬럼데이터 또는 WHERE 조건문에 바인딩할 값의 배열)
+	 * @param string $operator 조건 (=, IN, NOT IN, LIKE 등)
+	 * @return class $this
+	 */
+	function orWhere($whereProp,$whereValue=null,$operator=null) {
+		if ($operator) $whereValue = array($operator=>$whereValue);
+		$this->_where[] = array('OR',$whereValue,$whereProp);
+		return $this;
+	}
+	
+	/**
+	 * HAVING 절을 정의한다. (AND조건)
+	 *
+	 * @param string $havingProp HAVING 조건절 (컬럼명 또는 WHERE 조건문)
+	 * @param any[] $havingValue 검색할 조건값 (컬럼데이터 또는 WHERE 조건문에 바인딩할 값의 배열)
+	 * @param string $operator 조건 (=, IN, NOT IN, LIKE 등)
+	 * @return class $this
+	 */
+	function having($havingProp,$havingValue=null,$operator=null) {
+		if ($operator) $havingValue = array($operator=>$havingValue);
+		$this->_having[] = array('AND',$havingValue,$havingProp);
+		return $this;
+	}
+	
+	/**
+	 * HAVING 절을 정의한다. (OR조건)
+	 *
+	 * @param string $havingProp HAVING 조건절 (컬럼명 또는 WHERE 조건문)
+	 * @param any[] $havingValue 검색할 조건값 (컬럼데이터 또는 WHERE 조건문에 바인딩할 값의 배열)
+	 * @param string $operator 조건 (=, IN, NOT IN, LIKE 등)
+	 * @return class $this
+	 */
+	function orHaving($havingProp,$havingValue=null,$operator=null) {
+		if ($operator) $havingValue = array($operator=>$havingValue);
+		$this->_having[] = array('OR',$havingValue,$havingProp);
+		return $this;
+	}
+	
+	/**
+	 * JOIN 절을 정의한다. (AND조건)
+	 *
+	 * @param string $joinTable JOIN 할 prefix 가 포함되지 않은 테이블명
+	 * @param string $joinCondition JOIN 조건
+	 * @param string $joinType 조인형태 (LEFT, RIGHT, OUTER, INNER, LEFT OUTER, RIGHT OUTER)
+	 * @return class $this
+	 */
+	function join($joinTable,$joinCondition,$joinType = '') {
+		$allowedTypes = array('LEFT','RIGHT','OUTER','INNER','LEFT OUTER','RIGHT OUTER');
+		$joinType = strtoupper(trim($joinType));
+		if ($joinType && in_array($joinType,$allowedTypes) == false)
+			die('Wrong JOIN type: '.$joinType);
+		if (is_object($joinTable) == false) {
+			$joinTable = $this->_prefix.filter_var($joinTable,FILTER_SANITIZE_STRING);
+		}
+		$this->_join[] = array($joinType,$joinTable,$joinCondition);
+		return $this;
+	}
+	
+	/**
+	 * ORDER 절을 정의한다.
+	 *
+	 * @param string $orderByField 정렬할 필드명
+	 * @param string $orderbyDirection 정렬순서 (ASC, DESC)
+	 * @param string $customFields 커스덤필드배열 (테이블에 정의된 컬럼이 아닌 경우)
+	 * @return class $this
+	 */
+	function orderBy($orderByField,$orderbyDirection='DESC',$customFields=null) {
+		$allowedDirection = array('ASC','DESC');
+		$orderbyDirection = strtoupper(trim($orderbyDirection));
+		$orderByField = preg_replace('/[^-a-z0-9\.\(\),_]+/i','',$orderByField);
+		if (empty($orderbyDirection) == true || in_array($orderbyDirection,$allowedDirection) == false) $this->_error('Wrong order direction: '.$orderbyDirection);
+		
+		if (is_array($customFields) == true) {
+			foreach ($customFields as $key=>$value) {
+				$customFields[$key] = preg_replace('/[^-a-z0-9\.\(\),_]+/i','',$value);
+			}
+			$orderByField = 'FIELD ('.$orderByField.',"'.implode('","',$customFields).'")';
+		}
+		$this->_orderBy[$orderByField] = $orderbyDirection;
+		return $this;
+	}
+	
+	/**
+	 * GROUP 절을 정의한다.
+	 *
+	 * @param string $groupByField GROUP 할 컬럼명
+	 * @return class $this
+	 */
+	function groupBy($groupByField) {
+		$groupByField = preg_replace ('/[^-a-z0-9\.\(\),_]+/i','',$groupByField);
+		$this->_groupBy[] = $groupByField;
+		return $this;
+	}
+	
+	/**
+	 * LIMIT 절을 정의한다.
+	 *
+	 * @param int $start 시작점
+	 * @param int $limit 가져올 갯수 ($limit 이 정의되지 않은 경우, 0번째 부터 $start 갯수만큼 가져온다.)
+	 * @return class $this
+	 */
+	function limit($start,$limit=null) {
+		$start = is_numeric($start) == false || $start < 0 ? 0 : $start;
+		if ($limit != null) {
+			$this->_limit = array($start,$limit);
+		} else {
+			$this->_limit = array(0,$start);
+		}
+		return $this;
+	}
+	
+	/**
+	 * 쿼리를 실행한다.
+	 *
+	 * @return object 실행결과
+	 */
+	function execute() {
+		if (preg_match('/^SELECT /',$this->_query) == true) {
+			return $this->get();
+		} elseif (preg_match('/^INSERT /',$this->_query) == true) {
+			$stmt = $this->_buildQuery();
+			$stmt->execute();
+			$this->_stmtError = $stmt->error;
+			$this->reset();
+			$this->count = $stmt->affected_rows;
+			if ($stmt->affected_rows < 1) return false;
+			if ($stmt->insert_id > 0) return $stmt->insert_id;
+			return true;
+		} elseif (preg_match('/^DELETE /',$this->_query) == true) {
+			$stmt = $this->_buildQuery();
+			$stmt->execute();
+			$this->_stmtError = $stmt->error;
+			$this->reset();
+			return ($stmt->affected_rows > 0);
+		} else {
+			$stmt = $this->_buildQuery();
+			$status = $stmt->execute();
+			$this->reset();
+			$this->_stmtError = $stmt->error;
+			$this->count = $stmt->affected_rows;
+			return $status;
+		}
+	}
+	
+	/**
+	 * SELECT 쿼리문에 의해 선택된 데이터의 갯수를 가져온다.
+	 *
+	 * @return boolean $has
+	 */
+	function count() {
 		if (count($this->_groupBy) == 0) {
 			$this->_query = preg_replace('/SELECT (.*?) FROM /','SELECT COUNT(*) AS ROW_COUNT FROM ',$this->_query);
 			$stmt = $this->_buildQuery();
@@ -533,7 +924,22 @@ class mysql {
 		}
 	}
 	
-	public function get($field=null) {
+	/**
+	 * SELECT 쿼리문에 의해 선택된 데이터가 존재하는지 확인한다.
+	 *
+	 * @return boolean $has
+	 */
+	function has() {
+		return $this->count() > 0;
+	}
+	
+	/**
+	 * SELECT 쿼리문에 의해 선택된 데이터를 가져온다.
+	 *
+	 * @param string $field 필드명 (필드명을 지정할 경우, 컬럼명->컬럼값이 아닌 해당 필드명의 값만 배열로 반환한다.)
+	 * @return any[] $items
+	 */
+	function get($field=null) {
 		$stmt = $this->_buildQuery();
 		
 		$stmt->execute();
@@ -542,134 +948,70 @@ class mysql {
 		return $this->_dynamicBindResults($stmt,$field);
 	}
 	
-	public function getOne() {
-		$res = $this->get();
-		if (is_object($res) == true) return $res;
-		if (isset($res[0]) == true) return $res[0];
-		return null;
-	}
-	
-	public function select($table,$columns='*') {
-		if (empty($columns)) $columns = '*';
-		$column = is_array($columns) ? implode(',',$columns) : $columns; 
-		$this->_query = 'SELECT '.$column.' FROM '.$this->_prefix.$table;
+	/**
+	 * SELECT 쿼리문에 의해 선택된 데이터중 한개만 가져온다.
+	 *
+	 * @param string $field 필드명 (필드명을 지정할 경우, 컬럼명->컬럼값이 아닌 해당 필드명의 값만 반환한다.)
+	 * @return object $item
+	 */
+	function getOne($field=null) {
+		$result = $this->get();
 		
-		return $this;
-	}
-	
-	public function insert($table,$data) {
-		$this->_query = 'INSERT into '.$this->_prefix.$table;
-		$this->_tableDatas = $data;
+		$item = null;
+		if (is_object($result) == true) $item = $result;
+		if (isset($result[0]) == true) $item = $result[0];
 		
-		return $this;
-	}
-	
-	public function replace($table,$data) {
-		$this->_query = 'REPLACE into '.$this->_prefix.$table;
-		$this->_tableDatas = $data;
-		
-		return $this;
-	}
-	
-	public function update($table,$data) {
-		$this->_query = 'UPDATE '.$this->_prefix.$table.' SET ';
-		$this->_tableDatas = $data;
-		
-		return $this;
-	}
-	
-	public function delete($table) {
-		$this->_query = 'DELETE FROM '.$this->_prefix.$table;
-		
-		return $this;
-	}
-	
-	public function truncate($table) {
-		$this->_query = 'TRUNCATE TABLE '.$this->_prefix.$table;
-		
-		return $this;
-	}
-	
-	public function where($whereProp,$whereValue=null,$operator=null) {
-		if ($operator) $whereValue = array($operator=>$whereValue);
-		$this->_where[] = array('AND',$whereValue,$whereProp);
-		return $this;
-	}
-	
-	public function orWhere($whereProp,$whereValue=null,$operator=null) {
-		if ($operator) $whereValue = array($operator=>$whereValue);
-		$this->_where[] = array('OR',$whereValue,$whereProp);
-		return $this;
-	}
-	
-	public function having($havingProp,$havingValue=null,$operator=null) {
-		if ($operator) $havingValue = array($operator=>$havingValue);
-		$this->_having[] = array('AND',$havingValue,$havingProp);
-		return $this;
-	}
-	
-	public function orHaving($havingProp,$havingValue=null,$operator=null) {
-		if ($operator) $havingValue = array($operator=>$havingValue);
-		$this->_having[] = array('OR',$havingValue,$havingProp);
-		return $this;
-	}
-	
-	public function join($joinTable,$joinCondition,$joinType = '') {
-		$allowedTypes = array('LEFT','RIGHT','OUTER','INNER','LEFT OUTER','RIGHT OUTER');
-		$joinType = strtoupper(trim($joinType));
-		if ($joinType && in_array($joinType,$allowedTypes) == false)
-			die('Wrong JOIN type: '.$joinType);
-		if (is_object($joinTable) == false) {
-			$joinTable = $this->_prefix.filter_var($joinTable,FILTER_SANITIZE_STRING);
-		}
-		$this->_join[] = array($joinType,$joinTable,$joinCondition);
-		return $this;
-	}
-	
-	public function orderBy($orderByField,$orderbyDirection='DESC',$customFields=null) {
-		$allowedDirection = array('ASC','DESC');
-		$orderbyDirection = strtoupper(trim($orderbyDirection));
-		$orderByField = preg_replace('/[^-a-z0-9\.\(\),_]+/i','',$orderByField);
-		if (empty($orderbyDirection) == true || in_array($orderbyDirection,$allowedDirection) == false) $this->error('Wrong order direction: '.$orderbyDirection);
-		
-		if (is_array($customFields) == true) {
-			foreach ($customFields as $key=>$value) {
-				$customFields[$key] = preg_replace('/[^-a-z0-9\.\(\),_]+/i','',$value);
-			}
-			$orderByField = 'FIELD ('.$orderByField.',"'.implode('","',$customFields).'")';
-		}
-		$this->_orderBy[$orderByField] = $orderbyDirection;
-		return $this;
-	}
-	
-	public function groupBy($groupByField) {
-		$groupByField = preg_replace ('/[^-a-z0-9\.\(\),_]+/i','',$groupByField);
-		$this->_groupBy[] = $groupByField;
-		return $this;
-	}
-	
-	public function limit($start,$limit=null) {
-		$start = is_numeric($start) == false || $start < 0 ? 0 : $start;
-		if ($limit != null) {
-			$this->_limit = array($start,$limit);
+		if ($field != null) {
+			return $item != null && isset($item->{$field}) == true ? $item->{$field} : null;
 		} else {
-			$this->_limit = array(0,$start);
+			return $item;
 		}
-		return $this;
 	}
 	
-	public function getInsertId() {
+	/**
+	 * 마지막으로 실행한 INSERT 쿼리문의 결과값(insert_id, AUTO_INCREMENT)을 가져온다.
+	 *
+	 * @return int $insert_id
+	 */
+	function getInsertId() {
 		return $this->_mysqli->insert_id;
 	}
 	
-	public function escape($str) {
+	/**
+	 * 마지막으로 실행한 쿼리문을 가져온다.
+	 *
+	 * @param string $query
+	 */
+	function getLastQuery() {
+		return $this->_lastQuery;
+	}
+	
+	/**
+	 * 마지막으로 실행한 에러메시지를 가져온다.
+	 *
+	 * @param string $error
+	 */
+	function getLastError() {
+		return trim($this->_stmtError.' '.$this->_mysqli->error);
+	}
+	
+	/**
+	 * escape 한 문자열을 가져온다.
+	 * 예 : iModule's class -> iModule\'s class
+	 *
+	 * @param string $str
+	 * @return string $escaped_str
+	 */
+	function escape($str) {
 		return $this->_mysqli->real_escape_string($str);
 	}
 	
-	public function ping() {
-		return $this->_mysqli->ping();
-	}
-	
+	/**
+	 * 변수형태을 반환한다.
+	 *
+	 * @param any $item 변수형태를 파악하기 위한 변수
+	 * @return string $type
+	 */
 	private function _determineType($item) {
 		switch (gettype($item)) {
 			case 'NULL':
@@ -690,21 +1032,33 @@ class mysql {
 		return '';
 	}
 	
+	/**
+	 * 바인딩 데이터를 처리한다.
+	 */
 	private function _bindParam($value) {
 		$this->_bindParams[0].= $this->_determineType($value);
 		array_push ($this->_bindParams,$value);
 	}
 	
+	/**
+	 * 바인딩 데이터를 처리한다.
+	 */
 	private function _bindParams($values) {
 		foreach ($values as $value) $this->_bindParam($value);
 	}
 	
+	/**
+	 * 바인딩 데이터를 처리한다.
+	 */
 	private function _buildPair($operator,$value) {
-		if (is_object($value) == true) return $this->error('OBJECT_PAIR');
+		if (is_object($value) == true) return $this->_error('OBJECT_PAIR');
 		$this->_bindParam($value);
 		return ' '.$operator.' ? ';
 	}
 	
+	/**
+	 * 쿼리빌더로 정의된 설정값을 이용하여 실제 쿼리문을 생성한다.
+	 */
 	private function _buildQuery() {
 		$this->_buildJoin();
 		if (empty($this->_tableDatas) == false) $this->_buildTableData($this->_tableDatas);
@@ -713,13 +1067,20 @@ class mysql {
 		$this->_buildHaving();
 		$this->_buildOrderBy();
 		$this->_buildLimit();
-		$this->_lastQuery = $this->replacePlaceHolders($this->_query,$this->_bindParams);
+		$this->_lastQuery = $this->_replacePlaceHolders($this->_query,$this->_bindParams);
 
 		$stmt = $this->_prepareQuery();
-		if (count($this->_bindParams) > 1) call_user_func_array(array($stmt,'bind_param'),$this->refValues($this->_bindParams));
+		if (count($this->_bindParams) > 1) call_user_func_array(array($stmt,'bind_param'),$this->_refValues($this->_bindParams));
 		return $stmt;
 	}
 	
+	/**
+	 * 쿼리 실행결과 반환된 결과값을 정리한다.
+	 *
+	 * @param mysqli_stmt $stmt
+	 * @param string[] $selector 가져올 값
+	 * @return any[] $result
+	 */
 	private function _dynamicBindResults(mysqli_stmt $stmt,$selector=null) {
 		$parameters = array();
 		$results = array();
@@ -748,6 +1109,9 @@ class mysql {
 		return $results;
 	}
 	
+	/**
+	 * JOIN 절을 생성한다.
+	 */
 	private function _buildJoin() {
 		if (empty($this->_join) == true) return;
 		foreach ($this->_join as $data) {
@@ -760,6 +1124,11 @@ class mysql {
 		}
 	}
 	
+	/**
+	 * 테이블 데이터절 생성한다.
+	 *
+	 * @param any[] $tableData 테이블데이터 (array(컬럼명=>값))
+	 */
 	private function _buildTableData($tableData) {
 		if (is_array($tableData) == false) return;
 		
@@ -800,13 +1169,16 @@ class mysql {
 					else $this->_query.= '!'.$val.',';
 					break;
 				default:
-					$this->error('Wrong operation');
+					$this->_error('Wrong operation');
 			}
 		}
 		$this->_query = rtrim($this->_query,',');
 		if ($isInsert !== false) $this->_query.= ')';
 	}
 	
+	/**
+	 * WHERE 절을 생성한다.
+	 */
 	private function _buildWhere() {
 		if (empty($this->_where) == true) return;
 		$this->_query.= ' WHERE ';
@@ -891,16 +1263,9 @@ class mysql {
 		}
 	}
 	
-	private function _buildGroupBy() {
-		if (empty($this->_groupBy) == true) return;
-		
-		$this->_query.= ' GROUP BY ';
-		foreach ($this->_groupBy as $key=>$value) {
-			$this->_query.= $value.',';
-		}
-		$this->_query = rtrim($this->_query,',').' ';
-	}
-	
+	/**
+	 * HAVING 절을 생성한다.
+	 */
 	private function _buildHaving() {
 		if (empty($this->_having) == true) return;
 		$this->_query.= ' HAVING ';
@@ -985,6 +1350,22 @@ class mysql {
 		}
 	}
 	
+	/**
+	 * GROUP 절을 생성한다.
+	 */
+	private function _buildGroupBy() {
+		if (empty($this->_groupBy) == true) return;
+		
+		$this->_query.= ' GROUP BY ';
+		foreach ($this->_groupBy as $key=>$value) {
+			$this->_query.= $value.',';
+		}
+		$this->_query = rtrim($this->_query,',').' ';
+	}
+	
+	/**
+	 * ORDER 절을 생성한다.
+	 */
 	private function _buildOrderBy() {
 		if (empty($this->_orderBy) == true) return;
 		
@@ -996,6 +1377,9 @@ class mysql {
 		$this->_query = rtrim($this->_query,',').' ';
 	}
 	
+	/**
+	 * LIMIT 절을 생성한다.
+	 */
 	private function _buildLimit() {
 		if ($this->_limit == null) return;
 		
@@ -1006,14 +1390,51 @@ class mysql {
 		}
 	}
 	
+	/**
+	 * 쿼리문을 준비시킨다.
+	 *
+	 * @return mysqli_stmt $stmt
+	 */
 	private function _prepareQuery() {
 		if (!$stmt = $this->_mysqli->prepare($this->_query)) {
-			$this->error('Problem preparing query '.$this->_mysqli->error,$this->_query);
+			$this->_error('Problem preparing query '.$this->_mysqli->error,$this->_query);
 		}
 		return $stmt;
 	}
 	
-	private function refValues($arr) {
+	/**
+	 * prepared 되지 않은 쿼리를 실행한다.
+	 *
+	 * @param string $query
+	 */
+	private function _unpreparedQuery($query) {
+		$stmt = $this->_mysqli->query($query);
+		if (!$stmt) {
+			$this->_error('Problem unpreparing query '.$this->_mysqli->error,$query);
+		}
+		return $stmt;
+	}
+	
+	/**
+	 * 데이터베이스 에러메시지를 출력한다.
+	 * 루트디비클래스가 있는 경우, 해당 루트디비클래스의 printError() 함수를 이용하여 출력한다.
+	 *
+	 * @param string $msg 에러메시지
+	 * @param string $query 쿼리문
+	 */
+	private function _error($msg,$query='') {
+		$this->reset();
+		if ($this->_class == null) die('DATABASE_ERROR : '.$msg.'<br>'.$query);
+		else $this->_class->printError($msg,$query);
+	}
+	
+	/**
+	 * 데이터값을 call by reference 로 전달하기 위해 변환한다.
+	 *
+	 * @param any[] $arr
+	 * @return any[] $arr
+	 */
+	private function _refValues($arr) {
 		if (strnatcmp(phpversion(),'5.3') >= 0) {
 			$refs = array();
 			foreach ($arr as $key=>$value) {
@@ -1024,7 +1445,13 @@ class mysql {
 		return $arr;
 	}
 	
-	private function replacePlaceHolders($str,$vals) {
+	/**
+	 * 바인딩해야하는 변수를 치환한다.
+	 *
+	 * @param string $str 바인딩되기전의 문자열
+	 * @return string $newStr 바인딩해야하는 변수를 치환한 문자열
+	 */
+	private function _replacePlaceHolders($str,$vals) {
 		$i = 1;
 		$newStr = '';
 		while ($pos = strpos ($str,'?')) {
@@ -1038,22 +1465,7 @@ class mysql {
 		return $newStr;
 	}
 	
-	public function getLastQuery() {
-		return $this->_lastQuery;
-	}
-	
-	public function getLastError() {
-		return trim($this->_stmtError.' '.$this->_mysqli->error);
-	}
-	
-	public function getSubQuery() {
-		array_shift($this->_bindParams);
-		$val = array('query'=>$this->_query,'params'=>$this->_bindParams,'alias'=>$this->host);
-		$this->reset();
-		return $val;
-	}
-	
-	public function interval($diff,$func='NOW()') {
+	function interval($diff,$func='NOW()') {
 		$types = array('s'=>'second','m'=>'minute','h'=>'hour','d'=>'day','M'=>'month','Y'=>'year');
 		$incr = '+';
 		$items = '';
@@ -1062,115 +1474,75 @@ class mysql {
 			if (empty($matches[1]) == false) $incr = $matches[1];
 			if (empty($matches[2]) == false) $items = $matches[2];
 			if (empty($matches[3]) == false) $type = $matches[3];
-			if (in_array($type,array_keys($types)) == false) $this->error('invalid interval type in '.$diff);
+			if (in_array($type,array_keys($types)) == false) $this->_error('invalid interval type in '.$diff);
 			
 			$func.= ' '.$incr.' interval '.$items.' '.$types[$type].' ';
 		}
 		return $func;
 	}
 	
-	public function now($diff=null,$func='NOW()') {
+	function now($diff=null,$func='NOW()') {
 		return array('[F]'=>array($this->interval($diff,$func)));
 	}
 	
-	public function inc($num=1) {
+	function inc($num=1) {
 		return array('[I]'=>'+'.(int)$num);
 	}
 	
-	public function dec($num = 1) {
+	function dec($num = 1) {
 		return array('[I]'=>"-".(int)$num);
 	}
 	
-	public function not($col=null) {
+	function not($col=null) {
 		return array('[N]'=>(string)$col);
 	}
 	
-	public function func($expr,$bindParams=null) {
+	function func($expr,$bindParams=null) {
 		return array('[F]'=>array($expr,$bindParams));
 	}
 	
-	public function copy() {
+	/**
+	 * 현재까지 쿼리빌더에 의해 생성된 쿼리를 복제한다.
+	 *
+	 * @param class $copy 복제된 쿼리빌더 클래스
+	 */
+	function copy() {
 		$copy = unserialize(serialize($this));
 		$copy->_mysqli = $this->_mysqli;
 		return $copy;
 	}
 	
-	public function startTransaction() {
+	/**
+	 * 트랜잭션을 시작한다.
+	 */
+	function startTransaction() {
 		$this->_mysqli->autocommit(false);
 		$this->_transaction_in_progress = true;
 		register_shutdown_function(array($this,'_transaction_status_check'));
 	}
 	
-	public function commit() {
+	/**
+	 * 입력된 모든 쿼리를 커밋한다.
+	 */
+	function commit() {
 		$this->_mysqli->commit();
 		$this->_transaction_in_progress = false;
 		$this->_mysqli->autocommit(true);
 	}
 	
-	public function rollback() {
+	/**
+	 * 입력된 쿼리를 롤백한다.
+	 */
+	function rollback() {
 		$this->_mysqli->rollback();
 		$this->_transaction_in_progress = false;
 		$this->_mysqli->autocommit(true);
 	}
 	
-	public function setLockMethod($method) {
-		switch(strtoupper($method)) {
-			case 'READ' || 'WRITE':
-				$this->_tableLockMethod = $method;
-				break;
-			default:
-				throw new Exception('Bad lock type: Can be either READ or WRITE');
-				break;
-		}
-		return $this;
-	}
-	
-	public function lock($table) {
-		$this->_query = 'LOCK TABLES';
-		
-		if(gettype($table) == 'array') {
-			foreach($table as $key => $value) {
-				if(gettype($value) == 'string') {
-					if($key > 0) {
-						$this->_query .= ',';
-					}
-					$this->_query .= ' '.$this->_prefix.$value.' '.$this->_tableLockMethod;
-				}
-			}
-		} else{
-			$table = $this->_prefix.$table;
-			$this->_query = 'LOCK TABLES '.$table.' '.$this->_tableLockMethod;
-		}
-		
-		$result = $this->unpreparedQuery($this->_query);
-		$errno  = $this->_mysqli->errno;
-		
-		$this->reset();
-		
-		if ($result) {
-			return true;
-		} else {
-			throw new Exception('Locking of table '.$table.' failed', $errno);
-		}
-		
-		return false;
-	}
-	
-	public function unlock() {
-		$this->_query = 'UNLOCK TABLES';
-		$result = $this->unpreparedQuery($this->_query);
-		$errno  = $this->_mysqli->errno;
-		$this->reset();
-		if ($result) {
-			return $this;
-		} else {
-			throw new Exception('Unlocking of tables failed', $errno);
-		}
-		
-		return $this;
-	}
-	
-	public function _transaction_status_check() {
+	/**
+	 * 트랜잭션 시작이후 입력된 쿼리의 오류를 확인한다.
+	 */
+	function _transaction_status_check() {
 		if (!$this->_transaction_in_progress) return;
 		$this->rollback();
 	}
