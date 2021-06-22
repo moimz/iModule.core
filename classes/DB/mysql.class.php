@@ -7,8 +7,8 @@
  * @file /classes/DB/mysql.class.php
  * @author Arzz
  * @license MIT License
- * @version 1.4.0
- * @modified 2021. 5. 24.
+ * @version 2.0.0
+ * @modified 2021. 6. 22.
  */
 class mysql {
 	private $db;
@@ -434,6 +434,83 @@ class mysql {
 	
 	public function has() {
 		return $this->count() > 0;
+	/**
+	 * 테이블 구조를 변경한다.
+	 *
+	 * @param string $table 테이블명
+	 * @param string $type 구조변경종류 (ADD, CHANGE, DROP)
+	 * @param string $column 컬럼명 (ADD, CHANGE 인 경우 컬럼구조객체)
+	 * @param object $target 대상컬럼 (ADD 인 경우 추가할 컬럼위치의 컬럼명)
+	 */
+	function alter($table,$type,$column,$target=null,$included_prefix=false) {
+		$type = strtoupper($type);
+		if (in_array($type,array('ADD','CHANGE','DROP')) == false) {
+			$this->_error('Bad alter type: Can be either ADD or CHANGE or DROP');
+			return false;
+		}
+		$table = filter_var($table,FILTER_SANITIZE_STRING);
+		$query = 'ALTER TABLE `'.($included_prefix == true ? '' : $this->_prefix).$table.'` '.$type.' ';
+		
+		if ($type == 'ADD' || $type == 'CHANGE') {
+			if (is_array($column) == true) $column = (object)$column;
+			if (is_object($column) == false || isset($column->type) == false) {
+				$this->_error('Bad column type');
+				return false;
+			}
+			
+			if ($type == 'ADD') {
+				if (isset($column->name) == false) {
+					$this->_error('Bad column name');
+					return false;
+				}
+				$query.= '`'.filter_var($column->name,FILTER_SANITIZE_STRING).'`';
+			}
+			
+			if ($type == 'CHANGE') {
+				if ($target == null) {
+					$this->_error('Bad target column');
+					return false;
+				}
+				$query.= ' `'.$target.'` ';
+				if (isset($column->name) == true) $query.= '`'.filter_var($column->name,FILTER_SANITIZE_STRING).'`';
+				else $query.= $target;
+			}
+			
+			$query.= ' ';
+			if (isset($column->length) == true) {
+				$query.= $column->type.'('.$column->length.')';
+			} else {
+				$query.= $column->type;
+			}
+			
+			if (isset($column->is_null) == true && $column->is_null == true) {
+				$query.= ' NULL';
+			} else {
+				$query.= ' NOT NULL';
+			}
+			
+			if (isset($column->default) == true) {
+				$query.= " DEFAULT '".$this->escape($column->default)."'";
+			}
+			
+			if (isset($column->comment) == true) {
+				$query.= " COMMENT '".$this->escape($column->comment)."'";
+			}
+			
+			if ($type == 'ADD' && $target != null) $query.= ' AFTER `'.$target.'`';
+		}
+		
+		if ($type == 'DROP') {
+			if (is_string($column) == false) {
+				$this->_error('Bad column name');
+				return false;
+			}
+			$query.= '`'.filter_var($column,FILTER_SANITIZE_STRING).'`';
+		}
+		
+		$this->rawQuery($query);
+		
+		return $this->getLastError() == '';
 	}
 	
 	public function count() {
