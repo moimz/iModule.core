@@ -10,7 +10,7 @@
  * @author Arzz (arzz@arzz.com)
  * @license MIT License
  * @version 3.0.0
- * @modified 2020. 2. 19.
+ * @modified 2021. 6. 22.
  */
 class Module {
 	/**
@@ -653,6 +653,25 @@ class Module {
 		if ($this->checkDependencies($module) !== true) return $this->IM->getErrorText('DEPENDENCY_ERROR',$this->checkDependencies($module));
 		
 		/**
+		 * 이전 설치버전이 존재할 경우, 모듈의 update.php 를 실행한다.
+		 */
+		$previous = $this->IM->db()->select($this->table->module)->where('module',$module)->getOne();
+		if ($previous != null) {
+			$previousVersion = $previous->version;
+			$currentVersion = $package->version;
+			
+			$me = $this->IM->getModule($module);
+			if (is_file($me->getModule()->getPath().'/update.php') == true) {
+				define('__IM_INSTALLER__',true);
+				
+				$result = INCLUDE $me->getModule()->getPath().'/update.php';
+				if ($result !== true) {
+					return $result;
+				}
+			}
+		}
+		
+		/**
 		 * 모듈에서 사용하는 attachment 폴더를 생성한다.
 		 */
 		if (isset($package->attachments) == true && is_array($package->attachments) == true) {
@@ -709,7 +728,6 @@ class Module {
 		
 		$targets = isset($package->targets) == true ? json_encode($package->targets,JSON_UNESCAPED_UNICODE | JSON_NUMERIC_CHECK) : '{}';
 		
-		$previous = $this->IM->db()->select($this->table->module)->where('module',$module)->getOne();
 		if ($previous == null) {
 			$sort = $this->IM->db()->select($this->table->module)->count();
 			$this->IM->db()->insert($this->table->module,array(
