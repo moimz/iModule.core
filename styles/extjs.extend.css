@@ -129,3 +129,46 @@ tr.x-grid-row-summary:first-child {display:none;}
 .x-stepbar > div:first-child > span {margin-left:0;}
 .x-stepbar > div:first-child:before {content:"";}
 .x-stepbar > div.selected > span {opacity:1; background:#5fa2dd; color:#fff; font-weight:bold;}
+
+.x-form-froala-files {border:0; margin:0; padding:0;}
+.x-form-froala-files:empty {display:none;}
+.x-form-froala-files {list-style:none; display:block; width:100%; margin-left:-10px;}
+.x-form-froala-files > li[data-role=file] {display:inline-block; vertical-align:top; padding:10px 0px 0px 10px; height:auto; margin:0px;}
+.x-form-froala-files > li[data-role=file] > div {width:100px; max-height:165px; overflow:hidden; position:relative; z-index:0;}
+.x-form-froala-files > li[data-role=file] > div > i.icon {display:block; width:100px; height:100px; box-sizing:border-box; border:1px solid #ddd; margin-bottom:5px; position:relative; z-index:5;}
+.x-form-froala-files > li[data-role=file] > div > i.icon {display:inline-block; background-repeat:no-repeat; background-position:50% 50%; background-image:url(../modules/attachment/images/icon_large_etc.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=folder] {background-image:url(../modules/attachment/images/icon_large_folder.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=document] {background-image:url(../modules/attachment/images/icon_large_document.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=image] {background-image:url(../modules/attachment/images/icon_large_image.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=video] {background-image:url(../modules/attachment/images/icon_large_video.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=audio] {background-image:url(../modules/attachment/images/icon_large_audio.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-type=archive] {background-image:url(../modules/attachment/images/icon_large_archive.png);}
+
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-extension^=ppt] {background-image:url(../modules/attachment/images/icon_large_ppt.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-extension^=doc] {background-image:url(../modules/attachment/images/icon_large_doc.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-extension^=xls] {background-image:url(../modules/attachment/images/icon_large_xls.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-extension^=hwp] {background-image:url(../modules/attachment/images/icon_large_hwp.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon[data-extension^=pdf] {background-image:url(../modules/attachment/images/icon_large_pdf.png);}
+.x-form-froala-files > li[data-role=file] > div > i.icon > div.preview {width:100%; height:100%; position:absolute; top:0; left:0; background-color:#fff; background-repeat:no-repeat; background-position:50% 50%; background-size:cover;}
+.x-form-froala-files > li[data-role=file] > div > div.name {line-height:20px; text-align:center; font-size:12px; word-break:break-all;}
+.x-form-froala-files > li[data-role=file] > div > div.size {height:20px; line-height:20px; text-align:center; font-family:tahoma; font-size:11px; color:#7ba4d5;}
+.x-form-froala-files > li[data-role=file] > div > div.progress {position:absolute; display:none; z-index:10;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=delete] {width:20px; height:20px; background:#F44336; border:1px solid #E53935; box-sizing:border-box; cursor:pointer; position:absolute; top:0; right:0; color:#fff; cursor:pointer; z-index:10; display:none;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=delete] > i {font-family:moimz; font-style:normal; font-size:12px;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=delete] > i:before {content:"\eb03";}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=delete]:hover {background:#E53935;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=insert] {width:100px; height:100px; background:rgba(0,0,0,0.7); border:0px; position:absolute; z-index:5; top:0; left:0; font-size:12px; color:#fff; cursor:pointer; display:none;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=insert] > i {display:block; width:100px; height:20px; padding:10px 0px 5px 0px; font-family:moimz; font-style:normal; font-size:14px;}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=insert] > i:before {content:"\EB00";}
+.x-form-froala-files > li[data-role=file] > div > button[data-action=insert]:after {content:"본문삽입";}
+.x-form-froala-files > li[data-role=file][data-status=WAIT] > div > i.icon {opacity:0.5;}
+.x-form-froala-files > li[data-role=file][data-status=WAIT] > div > div.progress {display:block; top:70px; left:0; width:100%; height:30px; background:url(../modules/attachment/images/loading.gif) no-repeat 50% 50%;}
+.x-form-froala-files > li[data-role=file][data-status=UPLOADING] > div > i.icon {opacity:0.5;}
+.x-form-froala-files > li[data-role=file][data-status=UPLOADING] > div > div.progress {display:block; left:9px; top:82px; z-index:3; width:80px; height:4px; border:1px solid rgba(0,0,0,0.8); border-radius:3px; background:rgba(0,0,0,0.5);}
+.x-form-froala-files > li[data-role=file][data-status=UPLOADING] > div > div.progress > div {height:4px; border-radius:2px; background:#fff; width:50%;}
+.x-form-froala-files > li[data-role=file][data-status=COMPLETE] > div > button[data-action=delete] {display:block;}
+.x-form-froala-files > li[data-role=file][data-status=PUBLISHED] > div > button[data-action=delete] {display:block;}
+.x-form-froala-files > li[data-role=file][data-status=DRAFT] > div > button[data-action=delete] {display:block;}
+.x-form-froala-files[data-uploader-wysiwyg=TRUE] > li[data-role=file][data-status=COMPLETE] > div:hover > button[data-action=insert] {display:block;}
+.x-form-froala-files[data-uploader-wysiwyg=TRUE] > li[data-role=file][data-status=DRAFT] > div:hover > button[data-action=insert] {display:block;}
+.x-form-froala-files[data-uploader-wysiwyg=TRUE] > li[data-role=file][data-status=PUBLISHED] > div:hover > button[data-action=insert] {display:block;}

@@ -6,15 +6,152 @@
  * @file /scripts/extjs.extend.js
  * @author Arzz (arzz@arzz.com)
  * @license GPLv3
- * @version 1.1.0
- * @modified 2021. 5. 28.
+ * @version 1.2.0
+ * @modified 2021. 6. 28.
  */
 Ext.Ajax.setTimeout(600000);
 Ext.define("Ext.moimz.data.reader.Json",{override:"Ext.data.reader.Json",rootProperty:"lists",totalProperty:"total",messageProperty:"message"});
 Ext.define("Ext.moimz.data.JsonStore",{override:"Ext.data.JsonStore",pageSize:0});
 Ext.define("Ext.moimz.toolbar.Toolbar",{override:"Ext.toolbar.Toolbar",scrollable:"x",enableFocusableContainer:false});
 Ext.define("Ext.moimz.data.proxy.Ajax",{override:"Ext.data.proxy.Ajax",timeout:60000});
-Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidth:60});
+Ext.define("Ext.moimz.PagingToolbar",{override:"Ext.PagingToolbar",inputItemWidth:60,type:"default",getPagingItems:function() {
+	var me = this,
+		inputListeners = {
+			scope: me,
+			blur: me.onPagingBlur
+		};
+	
+	inputListeners[Ext.supports.SpecialKeyDownRepeat ? 'keydown' : 'keypress'] = me.onPagingKeyDown;
+	
+	if (me.type == "simple") {
+		return [{
+			itemId: 'first',
+			tooltip: me.firstText,
+			overflowText: me.firstText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-first',
+			disabled: true,
+			handler: me.moveFirst,
+			scope: me
+		},{
+			itemId: 'prev',
+			tooltip: me.prevText,
+			overflowText: me.prevText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-prev',
+			disabled: true,
+			handler: me.movePrevious,
+			scope: me
+		},
+		{
+			xtype: 'numberfield',
+			itemId: 'inputItem',
+			name: 'inputItem',
+			cls: Ext.baseCSSPrefix + 'tbar-page-number',
+			allowDecimals: false,
+			minValue: 1,
+			hideTrigger: true,
+			enableKeyEvents: true,
+			keyNavEnabled: false,
+			selectOnFocus: true,
+			submitValue: false,
+			// mark it as not a field so the form will not catch it when getting fields
+			isFormField: false,
+			width: me.inputItemWidth,
+			margin: '-1 2 3 2',
+			listeners: inputListeners
+		},{
+			xtype: 'tbtext',
+			itemId: 'afterTextItem',
+			html: Ext.String.format(me.afterPageText, 1)
+		},
+		{
+			itemId: 'next',
+			tooltip: me.nextText,
+			overflowText: me.nextText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-next',
+			disabled: true,
+			handler: me.moveNext,
+			scope: me
+		},{
+			itemId: 'last',
+			tooltip: me.lastText,
+			overflowText: me.lastText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-last',
+			disabled: true,
+			handler: me.moveLast,
+			scope: me
+		}];
+	} else {
+		return [{
+			itemId: 'first',
+			tooltip: me.firstText,
+			overflowText: me.firstText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-first',
+			disabled: true,
+			handler: me.moveFirst,
+			scope: me
+		},{
+			itemId: 'prev',
+			tooltip: me.prevText,
+			overflowText: me.prevText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-prev',
+			disabled: true,
+			handler: me.movePrevious,
+			scope: me
+		},
+		'-',
+		me.beforePageText,
+		{
+			xtype: 'numberfield',
+			itemId: 'inputItem',
+			name: 'inputItem',
+			cls: Ext.baseCSSPrefix + 'tbar-page-number',
+			allowDecimals: false,
+			minValue: 1,
+			hideTrigger: true,
+			enableKeyEvents: true,
+			keyNavEnabled: false,
+			selectOnFocus: true,
+			submitValue: false,
+			// mark it as not a field so the form will not catch it when getting fields
+			isFormField: false,
+			width: me.inputItemWidth,
+			margin: '-1 2 3 2',
+			listeners: inputListeners
+		},{
+			xtype: 'tbtext',
+			itemId: 'afterTextItem',
+			html: Ext.String.format(me.afterPageText, 1)
+		},
+		'-',
+		{
+			itemId: 'next',
+			tooltip: me.nextText,
+			overflowText: me.nextText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-next',
+			disabled: true,
+			handler: me.moveNext,
+			scope: me
+		},{
+			itemId: 'last',
+			tooltip: me.lastText,
+			overflowText: me.lastText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-page-last',
+			disabled: true,
+			handler: me.moveLast,
+			scope: me
+		},
+		'-',
+		{
+			itemId: 'refresh',
+			tooltip: me.refreshText,
+			overflowText: me.refreshText,
+			iconCls: Ext.baseCSSPrefix + 'tbar-loading',
+			disabled: me.store.isLoading(),
+			handler: me.doRefresh,
+			scope: me
+		}];
+	}
+}});
 Ext.define("Ext.moimz.grid.column.Column",{override:"Ext.grid.column.Column",sortable:false,hideable:false,lockable:false,usermenu:false,
 	beforeRender:function() {
 		var me = this,
@@ -559,6 +696,496 @@ Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField"
 	Ext.form.field.Base.prototype.afterRender.call(this);
 	me.invokeTriggers("afterFieldRender");
 }});
+Ext.define("Ext.form.field.FroalaEditor",{
+	extend:"Ext.form.field.Base",
+	alternateClassName:"Ext.form.FroalaEditor",
+	fieldSubTpl:[
+		'<textarea id="{id}" data-ref="inputEl" {inputAttrTpl}',
+			'<tpl if="name"> name="{name}"</tpl>',
+			'<tpl if="placeholder"> placeholder="{placeholder}"</tpl>',
+			'<tpl if="maxLength !== undefined"> maxlength="{maxLength}"</tpl>',
+			'<tpl if="readOnly"> readonly="readonly"</tpl>',
+			'<tpl if="disabled"> disabled="disabled"</tpl>',
+			'<tpl if="tabIdx != null"> tabindex="{tabIdx}"</tpl>',
+			' class="{fieldCls} {typeCls} {typeCls}-{ui} {inputCls}" ',
+			'<tpl if="fieldStyle"> style="{fieldStyle}"</tpl>',
+			'<tpl foreach="ariaElAttributes"> {$}="{.}"</tpl>',
+			'<tpl foreach="inputElAriaAttributes"> {$}="{.}"</tpl>',
+			' autocomplete="off">\n',
+			'<tpl if="value">{[Ext.util.Format.htmlEncode(values.value)]}</tpl>',
+		'</textarea>',
+		'<ul id="{id}-lists" class="x-form-froala-files" data-uploader-wysiwyg="TRUE"></ul>',
+		{
+			disableFormats: true
+		}
+	],
+	$textarea:null,
+	key:"1G4C2A10A6E5B4gC3E3G3C2B7D5B3F4D2C1zHMDUGENKACTMXQL==",
+	uploadUrl:null,
+	uploadParams:{},
+	height:500,
+	toolbar:["html","|","bold","italic","underline","align","|","paragraphFormat","fontSize","color","|","insertImage","insertFile","insertLink","insertTable"],
+	files:[],
+	deleteFiles:[],
+	uploadQueue:{
+		files:[],
+		totalSize:0,
+		uploadedSize:0,
+		currentUploadedSize:0,
+		currentFile:null
+	},
+	getFileSize:function(fileSize,isKiB) {
+		var isKiB = isKiB === true;
+		var depthSize = isKiB == true ? 1024 : 1000;
+		
+		fileSize = parseInt(fileSize);
+		return depthSize > fileSize ? fileSize+"B" : depthSize * depthSize > fileSize ? (fileSize/depthSize).toFixed(2)+(isKiB == true ? "KiB" : "KB") : depthSize * depthSize * depthSize > fileSize ? (fileSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "MiB" : "MB") : (fileSize/depthSize/depthSize/depthSize).toFixed(2)+(isKiB == true ? "GiB" : "GB");
+	},
+	getFileName:function(name,length) {
+		if (name.length < 12 || name.length < length) return name;
+		
+		return name.substr(0,length-8).replace(/[ ]+$/,'')+"..."+name.substr(name.length-8,8).replace(/^[ ]+/,'');
+	},
+	uploadProgress:function() {
+		var me = this;
+		
+		if (!Ext.getCmp(me.id + "-progress-window")) {
+			new Ext.Window({
+				id:me.id + "-progress-window",
+				title:"파일 업로드중...",
+				width:500,
+				modal:true,
+				bodyPadding:5,
+				closable:false,
+				items:[
+					new Ext.ProgressBar({
+						id:me.id + "-progress-bar"
+					})
+				],
+				listeners:{
+					show:function() {
+						Ext.getCmp(me.id + "-progress-bar").updateProgress(0,"파일업로드 준비중입니다. 잠시만 기다려주십시오.");
+					}
+				}
+			}).show();
+		}
+		
+		if (me.uploadQueue.currentFile == null) return;
+		
+		var file = me.uploadQueue.files[me.uploadQueue.currentFile];
+		var uploadedSize = file.uploaded + me.uploadQueue.uploadedSize + me.uploadQueue.currentUploadedSize;
+		var totalSize = me.uploadQueue.totalSize;
+		Ext.getCmp(me.id + "-progress-bar").updateProgress(uploadedSize / totalSize,me.uploadQueue.currentFile + "/" + me.uploadQueue.files.length + "개 파일 업로드중(" + me.getFileSize(uploadedSize) + "/" + me.getFileSize(totalSize) + ")");
+	},
+	uploadFiles:function(files) {
+		var me = this;
+		if (files.length == 0 || me.uploadQueue.files.length > 0) return;
+		
+		me.uploadProgress();
+		
+		me.$textarea.froalaEditor("edit.off");
+		me.$textarea.froalaEditor("popups.hideAll");
+		
+		var totalSize = 0;
+		var uploadedSize = 0;
+		var queue = [];
+		for (var i=0, loop=files.length;i<loop;i++) {
+			queue[i] = files[i];
+		}
+		
+		var drafts = [];
+		for (var i=0, loop=files.length;i<loop;i++) {
+			var draft = {};
+			draft.name = files[i].name;
+			draft.size = files[i].size;
+			draft.type = files[i].type;
+			
+			drafts.push(draft);
+		}
+		
+		var params = me.uploadParams;
+		params.drafts = JSON.stringify(drafts);
+		
+		$.ajax({
+			url:me.uploadUrl,
+			method:"POST",
+			data:params,
+			dataType:"json",
+			timeout:30000,
+			success:function(result) {
+				if (result.success == true) {
+					for (var i=0, loop=result.drafts.length;i<loop;i++) {
+						if (result.drafts[i].code != null) {
+							queue[i].idx = result.drafts[i].idx;
+							queue[i].code = result.drafts[i].code;
+							queue[i].mime = result.drafts[i].mime;
+							queue[i].uploaded = result.drafts[i].uploaded;
+							queue[i].extension = result.drafts[i].extension;
+							queue[i].status = result.drafts[i].status;
+							
+							totalSize+= queue[i].size;
+							me.uploadQueue.files.push(queue[i]);
+							me.printFile(queue[i]);
+						}
+					}
+					
+					me.uploadQueue.totalSize = totalSize;
+					me.uploadStart();
+				}
+			},
+			error:function() {
+			}
+		});
+	},
+	uploadStart:function() {
+		var me = this;
+		
+		if (me.uploadQueue.currentFile == null) {
+			me.uploadQueue.currentFile = 0;
+			return me.uploadStart();
+		}
+		
+		if (me.uploadQueue.currentFile >= me.uploadQueue.files.length) {
+			return me.uploadComplete();
+		}
+		
+		var file = me.uploadQueue.files[me.uploadQueue.currentFile];
+		if (file.status != "WAIT") {
+			me.uploadQueue.currentFile++;
+			return me.uploadStart();
+		}
+		
+		me.uploadProgress();
+		me.uploadFile();
+	},
+	uploadComplete:function() {
+		var me = this;
+		
+		me.uploadQueue.files = [];
+		me.uploadQueue.totalSize = 0;
+		me.uploadQueue.uploadedSize = 0;
+		me.uploadQueue.currentUploadedSize = 0;
+		me.uploadQueue.currentFile = null;
+		
+		setTimeout(function(id) {
+			Ext.getCmp(id + "-progress-window").close();
+		},2000,me.id);
+		
+		me.$textarea.froalaEditor("edit.on");
+	},
+	uploadFile:function() {
+		var me = this;
+		
+		if (me.uploadQueue.currentFile == null) return me.uploadStart();
+		
+		var file = me.uploadQueue.files[me.uploadQueue.currentFile];
+		var chunkSize = 2 * 1000 * 1000;
+		file.chunk = file.size > file.uploaded + chunkSize ? file.uploaded + chunkSize : file.size;
+		
+		$.ajax({
+			url:me.uploadUrl + "?code="+encodeURIComponent(file.code),
+			method:"POST",
+			contentType:file.mime,
+			headers:{
+				"Content-Range":"bytes " + file.uploaded + "-" + (file.chunk - 1) + "/" + file.size
+			},
+			xhr:function() {
+				var xhr = $.ajaxSettings.xhr();
+
+				if (xhr.upload) {
+					xhr.upload.addEventListener("progress",function(e) {
+						if (e.lengthComputable) {
+							me.uploadQueue.currentUploadedSize = e.loaded;
+							me.uploadProgress();
+						}
+					},false);
+				}
+
+				return xhr;
+			},
+			processData:false,
+			data:file.slice(file.uploaded,file.chunk)
+		}).done(function(result) {
+			if (result.success == true) {
+				file.failCount = 0;
+				
+				if (file.chunk == file.size) {
+					me.printFile(result.file);
+					me.uploadQueue.uploadedSize+= file.size;
+					me.uploadQueue.currentFile++;
+					me.uploadStart();
+				} else {
+					file.uploaded = result.uploaded;
+					me.uploadFile();
+				}
+			} else {
+				if (file.failCount < 3) {
+					file.failCount++;
+					me.uploadFile();
+				} else {
+					file.status = "FAIL";
+				}
+			}
+		}).fail(function() {
+			if (file.failCount < 3) {
+				file.failCount++;
+				me.uploadFile();
+			}
+		});
+	},
+	insertFile:function(idx) {
+		var me = this;
+		
+		var $files = $("#" + me.id + "-inputEl-lists");
+		var $file = $("li[data-role=file][data-idx="+idx+"]",$files);
+		var file = $file.data("file");
+		
+		if (file === undefined) return;
+		if (file.type == "image") {
+			me.$textarea.froalaEditor("image.insert",file.path,false,{idx:file.idx});
+		} else {
+			me.$textarea.froalaEditor("file.insert",file.download,file.name,{idx:file.idx,size:file.size});
+		}
+	},
+	deleteFile:function(idx) {
+		var me = this;
+		
+		Ext.Msg.show({title:"안내",msg:"선택한 파일을 삭제하시겠습니까?",buttons:Ext.Msg.OKCANCEL,icon:Ext.Msg.QUESTION,fn:function(button) {
+			if (button == "ok") {
+				var $files = $("#" + me.id + "-inputEl-lists");
+				var $file = $("li[data-role=file][data-idx="+idx+"]",$files);
+				var file = $file.data("file");
+				
+				me.$textarea.froalaEditor("image.remove",$("*[data-idx="+idx+"]"));
+				me.deleteFiles.push(idx);
+			}
+		}});
+	},
+	printFile:function(file) {
+		var me = this;
+		
+		var $files = $("#" + me.id + "-inputEl-lists");
+		
+		var $file = $("<li>").attr("data-role","file").attr("data-idx",file.idx).attr("data-status",file.status);
+		if (file.status != "WAIT") $file.data("file",file);
+		
+		var $item = $("<div>");
+		var $icon = $("<i>").addClass("icon").attr("data-type",file.type).attr("data-extension",file.extension);
+		var $preview = $("<div>").addClass("preview");
+		
+		if (file.thumbnail) $preview.css("backgroundImage","url("+file.thumbnail+")");
+		else $preview.hide();
+		
+		$icon.append($preview);
+		$item.append($icon);
+		
+		var $progress = $("<div>").addClass("progress").append($("<div>"));
+		$item.append($progress);
+		
+		var $name = $("<div>").addClass("name").html(file.name);
+		$item.append($name);
+		
+		var $size = $("<div>").addClass("size").html(me.getFileSize(file.size));
+		$item.append($size);
+		
+		var $delete = $("<button>").attr("type","button").attr("data-action","delete");
+		$delete.append($("<i>"));
+		$delete.on("click",function() {
+			me.deleteFile($file.attr("data-idx"));
+		});
+		$item.append($delete);
+		
+		var $insert = $("<button>").attr("type","button").attr("data-action","insert");
+		$insert.append($("<i>"));
+		$insert.on("click",function() {
+			me.insertFile($file.attr("data-idx"));
+		});
+		$item.append($insert);
+		
+		$file.append($item);
+		
+		if ($("li[data-role=file][data-idx="+file.idx+"]",$files).length == 0) {
+			$files.append($file);
+		} else {
+			$("li[data-role=file][data-idx="+file.idx+"]",$files).replaceWith($file);
+		}
+		
+		if (file.status == "COMPLETE") {
+			if (file.type.indexOf("image") === 0) {
+				me.$textarea.froalaEditor("image.insert",file.path,false,{idx:file.idx},$("img[data-idx="+file.idx+"].fr-uploading",me.$textarea.data("froala.editor").$el));
+			} else {
+				me.$textarea.froalaEditor("file.insert",file.path,file.name,{idx:file.idx,size:file.size});
+			}
+		} else if (file.status == "WAIT") {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				var result = e.target.result;
+				if (file.type.indexOf("image") === 0) {
+					$("div.preview",$item).css("backgroundImage","url(" + result + ")");
+					$("div.preview",$item).show();
+					
+					me.$textarea.froalaEditor("html.insert",'<p><img data-idx="'+file.idx+'" class="fr-uploading" src="'+result+'"></p>');
+				}
+			};
+			reader.readAsDataURL(file);
+		}
+		
+		if (file.status != "WAIT" && $.inArray(file.idx,me.files) === -1) {
+			me.files.push(file.idx);
+		}
+		
+		me.updateLayout();
+	},
+	constructor:function(config) {
+		this.callParent([config]);
+		
+		this.addCls("x-form-wysiwyg x-selectable");
+	},
+	getSubmitValue:function() {
+		var me = this;
+		return JSON.stringify({text:me.getValue(),files:me.files,delete_files:me.deleteFiles});
+	},
+	setValue:function(value) {
+		var me = this;
+		
+		if (typeof value == "object") {
+			if (value.text) {
+				me.setRawValue(me.valueToRaw(value.text));
+				me.$textarea.froalaEditor("html.set",value.text);
+			}
+			
+			if (value.files) {
+				for (var i=0, loop=value.files.length;i<loop;i++) {
+					me.printFile(value.files[i]);
+				}
+			}
+			
+			return me.mixins.field.setValue.call(me,value.text);
+		} else {
+			me.setRawValue(me.valueToRaw(value));
+			me.$textarea.froalaEditor("html.set",value);
+			return me.mixins.field.setValue.call(me, value.text);
+		}
+	},
+	onDisable:function() {
+		var me = this, inputEl = me.inputEl;
+		me.callParent();
+		if (inputEl) {
+			inputEl.dom.disabled = true;
+			if (me.hasActiveError()) {
+				me.clearInvalid();
+				me.hadErrorOnDisable = true;
+			}
+		}
+		
+		if (me.wasValid === false) {
+			me.checkValidityChange(true);
+		}
+		
+		me.$textarea.froalaEditor("edit.off");
+	},
+	onEnable:function() {
+		var me = this, inputEl = me.inputEl, mark = me.preventMark, valid;
+		
+		me.callParent();
+		if (inputEl) {
+			inputEl.dom.disabled = false;
+		}
+ 
+		if (me.wasValid !== undefined) {
+			me.forceValidation = true;
+			me.preventMark = !me.hadErrorOnDisable;
+			valid = me.isValid();
+			me.forceValidation = false;
+			me.preventMark = mark;
+			me.checkValidityChange(valid);
+		}
+		delete me.hadErrorOnDisable;
+		
+		me.$textarea.froalaEditor("edit.on");
+	},
+	afterRender:function() {
+		var me = this;
+		me.callParent(arguments);
+		
+		var $textarea = $("textarea",$("#"+me.id));
+		$textarea.on("froalaEditor.image.beforeUpload",function(e,editor,files) {
+			me.uploadFiles(files);
+			return false;
+		});
+		
+		$textarea.on("froalaEditor.file.beforeUpload",function(e,editor,files) {
+			me.uploadFiles(files);
+			return false;
+		});
+		
+		$textarea.on("froalaEditor.image.beforePasteUpload",function(e,editor,img) {
+			if (img.src.indexOf('data:') !== 0) return;
+			var type = img.src.match(/data:(.*?);/).length > 0 ? img.src.match(/data:(.*?);/).pop() : null;
+			if (type == null) return;
+			
+			$current_image = $(img);
+			$current_image.remove();
+			
+			var binary = atob($(img).attr('src').split(',')[1]);
+			var array = [];
+
+			for (var i=0;i<binary.length;i++) {
+				array.push(binary.charCodeAt(i));
+			}
+			var upload_img = new Blob([new Uint8Array(array)],{type:type});
+			upload_img.name = "clipboard."+type.split("/").pop();
+			
+			var files = [upload_img];
+			me.uploadFiles(files);
+			return false;
+		});
+		
+		$textarea.on("froalaEditor.focus",function(e,editor) {
+			if (editor.opts.zIndex == 0) {
+				var zIndex = 0;
+				$("*[style*=z-index]").each(function() { zIndex = Math.max(zIndex,parseInt($(this).css("z-index"),10)); });
+				editor.opts.zIndex = zIndex + 1;
+			}
+		});
+		
+		$textarea.on("froalaEditor.image.inserted",function(e,editor,$image) {
+			$image.removeClass();
+		});
+		
+		$textarea.on("froalaEditor.file.inserted",function(e,editor,$file,response) {
+			if (response) {
+				var result = typeof response == "object" ? response : JSON.parse(response);
+				if (result.idx) {
+					$file.attr("data-idx",result.idx);
+					$file.attr("contenteditable","false");
+					$file.addClass("fr-deletable");
+					
+					if (result.size) {
+						$file.append($("<span>").html(me.getFileSize(result.size)));
+					}
+				}
+				$file.attr("data-code",null);
+			}
+		});
+		
+		$textarea.froalaEditor({
+			key:me.key,
+			toolbarButtons:me.toolbar,
+			fontSize:["8","9","10","11","12","14","18","24"],
+			heightMin:me.height,
+			heightMax:me.height,
+			imageDefaultWidth:0,
+			imageEditButtons:["imageAlign","imageLink","linkOpen","linkEdit","linkRemove","imageDisplay","imageStyle","imageAlt","imageSize"],
+			paragraphFormat:{N:"Normal",H1:"Heading 1",H2:"Heading 2",H3:"Heading 3"},
+			toolbarSticky:false,
+			zIndex:0,
+			pluginsEnabled:["align","codeView","colors","file","fontSize","image","lineBreaker","link","lists","paragraphFormat","insertCode","table","url","video"]
+		});
+		
+		me.$textarea = $textarea;
+	}
+});
 
 /**
  * ExtJS 라이브러리 언어셋 적용
