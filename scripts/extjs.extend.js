@@ -702,8 +702,6 @@ Ext.define("Ext.form.field.FroalaEditor",{
 	fieldSubTpl:[
 		'<textarea id="{id}" data-ref="inputEl" {inputAttrTpl}',
 			'<tpl if="name"> name="{name}"</tpl>',
-			'<tpl if="placeholder"> placeholder="{placeholder}"</tpl>',
-			'<tpl if="maxLength !== undefined"> maxlength="{maxLength}"</tpl>',
 			'<tpl if="readOnly"> readonly="readonly"</tpl>',
 			'<tpl if="disabled"> disabled="disabled"</tpl>',
 			'<tpl if="tabIdx != null"> tabindex="{tabIdx}"</tpl>',
@@ -719,11 +717,12 @@ Ext.define("Ext.form.field.FroalaEditor",{
 			disableFormats: true
 		}
 	],
+	placeholder:"Type Somethig",
 	$textarea:null,
 	key:"1G4C2A10A6E5B4gC3E3G3C2B7D5B3F4D2C1zHMDUGENKACTMXQL==",
 	uploadUrl:null,
 	uploadParams:{},
-	height:500,
+	height:300,
 	toolbar:["html","|","bold","italic","underline","align","|","paragraphFormat","fontSize","color","|","insertImage","insertFile","insertLink","insertTable"],
 	files:[],
 	deleteFiles:[],
@@ -1179,6 +1178,7 @@ Ext.define("Ext.form.field.FroalaEditor",{
 			imageEditButtons:["imageAlign","imageLink","linkOpen","linkEdit","linkRemove","imageDisplay","imageStyle","imageAlt","imageSize"],
 			paragraphFormat:{N:"Normal",H1:"Heading 1",H2:"Heading 2",H3:"Heading 3"},
 			toolbarSticky:false,
+			placeholderText:me.placeholder,
 			zIndex:0,
 			pluginsEnabled:["align","codeView","colors","file","fontSize","image","lineBreaker","link","lists","paragraphFormat","insertCode","table","url","video"]
 		});
