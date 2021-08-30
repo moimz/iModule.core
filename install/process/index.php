@@ -114,7 +114,7 @@ if ($action == 'install') {
 		if (Request('key') != $_CONFIGS->key) $errors['key'] = 'key_preset';
 	} elseif (is_file(__IM_PATH__.'/configs/key.config.php') == true) {
 		$keyFile = explode("\n",file_get_contents(__IM_PATH__.'/configs/key.config.php'));
-		$key = $keyFile[1];
+		$key = trim($keyFile[1]);
 		if (Request('key') != $key) $errors['key'] = 'key_exists';
 	} else {
 		$key = Request('key') ? Request('key') : $errors['key'] = 'key';
