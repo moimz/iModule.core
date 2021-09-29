@@ -87,6 +87,7 @@ class Crawler {
 			curl_setopt($ch,CURLOPT_COOKIEFILE,$this->cookie);
 		}
 		curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,false);
 		$buffer = curl_exec($ch);
 		$cinfo = curl_getinfo($ch);
 		curl_close($ch);
