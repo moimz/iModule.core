@@ -712,7 +712,9 @@ Ext.define("Ext.form.field.FroalaEditor",{
 			' autocomplete="off">\n',
 			'<tpl if="value">{[Ext.util.Format.htmlEncode(values.value)]}</tpl>',
 		'</textarea>',
-		'<ul id="{id}-lists" class="x-form-froala-files" data-uploader-wysiwyg="TRUE"></ul>',
+		'<ul id="{id}-lists" class="x-form-froala-files" data-uploader-wysiwyg="TRUE"',
+		'<tpl if="visibleFiles"> style="height:100px;"</tpl>',
+		'></ul>',
 		{
 			disableFormats: true
 		}
@@ -726,6 +728,8 @@ Ext.define("Ext.form.field.FroalaEditor",{
 	toolbar:["html","|","bold","italic","underline","align","|","paragraphFormat","fontSize","color","|","insertImage","insertFile","insertLink","insertTable"],
 	files:[],
 	deleteFiles:[],
+	anchor:"100%",
+	visibleFiles:true,
 	uploadQueue:{
 		files:[],
 		totalSize:0,
@@ -1042,7 +1046,7 @@ Ext.define("Ext.form.field.FroalaEditor",{
 	},
 	getSubmitValue:function() {
 		var me = this;
-		return JSON.stringify({text:me.getValue(),files:me.files,delete_files:me.deleteFiles});
+		return JSON.stringify({text:me.getValue(),files:me.files,delete_files:me.deleteFiles,visible_files:me.visibleFiles});
 	},
 	setValue:function(value) {
 		var me = this;
@@ -1065,6 +1069,24 @@ Ext.define("Ext.form.field.FroalaEditor",{
 			me.$textarea.froalaEditor("html.set",value);
 			return me.mixins.field.setValue.call(me, value.text);
 		}
+	},
+	focus:function() {
+		var me = this;
+		
+		me.$textarea.froalaEditor("size.refresh");
+		me.$textarea.froalaEditor("events.focus");
+	},
+	reset:function() {
+		var me = this;
+		
+		me.setRawValue("");
+		me.files = [];
+		me.deleteFiles = [];
+		
+		me.$textarea.froalaEditor("html.set","");
+		
+		var $files = $("#" + me.id + "-inputEl-lists");
+		$files.empty();
 	},
 	onDisable:function() {
 		var me = this, inputEl = me.inputEl;
@@ -1165,6 +1187,7 @@ Ext.define("Ext.form.field.FroalaEditor",{
 					}
 				}
 				$file.attr("data-code",null);
+				$file.after("<p></p>");
 			}
 		});
 		
@@ -1184,6 +1207,10 @@ Ext.define("Ext.form.field.FroalaEditor",{
 		});
 		
 		me.$textarea = $textarea;
+		
+		if (me.visibleFiles === false) {
+			$("#" + me.id + "-inputEl-lists").hide();
+		}
 	}
 });
 
