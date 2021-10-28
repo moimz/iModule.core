@@ -686,15 +686,35 @@ Ext.define("Ext.moimz.form.FileUploadField",{override:"Ext.form.FileUploadField"
 	if (me.accept != null) {
 		me.fileInputEl.set({accept:me.accept});
 	}
-},afterRender:function() {
-	var me = this;
+},onRender:function() {
+	var me = this, inputEl, button, buttonEl, trigger;
+	
+	me.callParent(arguments);
+	
+	inputEl = me.inputEl;
+	inputEl.dom.name = ''; 
+	
+	inputEl.on("focus",me.onInputFocus,me);
+	inputEl.on("mousedown",me.onInputMouseDown,me);
+	
+	trigger = me.getTrigger("filebutton");
+	button = me.button = trigger.component;
+	me.fileInputEl = button.fileInputEl;
+	buttonEl = button.el;
+	
+	if (me.buttonOnly) {
+		me.inputWrap.setDisplayed(false);
+		me.shrinkWrap = 3;
+	}
+	
+	trigger.el.setWidth(buttonEl.getWidth() + buttonEl.getMargin('lr'));
+	if (Ext.isIE) {
+		me.button.getEl().repaint();
+	}
+	
 	if (me.accept != null) {
 		me.fileInputEl.set({accept:me.accept});
 	}
-	
-	me.autoSize();
-	Ext.form.field.Base.prototype.afterRender.call(this);
-	me.invokeTriggers("afterFieldRender");
 }});
 Ext.define("Ext.form.field.FroalaEditor",{
 	extend:"Ext.form.field.Base",
