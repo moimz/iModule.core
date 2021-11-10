@@ -1061,8 +1061,10 @@ Ext.define("Ext.form.field.FroalaEditor",{
 	},
 	constructor:function(config) {
 		this.callParent([config]);
-		
 		this.addCls("x-form-wysiwyg x-selectable");
+		this.files = [];
+		this.delete_files = [];
+		this.visible_files = [];
 	},
 	getSubmitValue:function() {
 		var me = this;
