@@ -1114,6 +1114,7 @@ class Templet {
 			$startPage = $p - floor($pagenum/2) > 0 ? $p - floor($pagenum/2) : 1;
 			$endPage = $p + floor($pagenum/2) > $pagenum ? $p + floor($pagenum/2) : $startPage + $pagenum - 1;
 			$endPage = $endPage > $total ? $total : $endPage;
+			if ($startPage > 1 && $endPage - $startPage < $pagenum) $startPage = max(1,$endPage - $pagenum);
 			$prevPageStart = null;
 			$nextPageStart = null;
 		}
