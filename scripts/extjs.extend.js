@@ -1147,11 +1147,19 @@ Ext.define("Ext.form.field.FroalaEditor",{
 		
 		me.$textarea.froalaEditor("edit.on");
 	},
+	onRender:function() {
+		this.callParent(arguments);
+		
+		this.mixins.labelable.self.initTip();
+		this.renderActiveError();
+		
+		this.$textarea = $("textarea",$("#"+this.id));
+	},
 	afterRender:function() {
 		var me = this;
 		me.callParent(arguments);
 		
-		var $textarea = $("textarea",$("#"+me.id));
+		var $textarea = me.$textarea;
 		$textarea.on("froalaEditor.image.beforeUpload",function(e,editor,files) {
 			me.uploadFiles(files);
 			return false;
@@ -1233,6 +1241,10 @@ Ext.define("Ext.form.field.FroalaEditor",{
 		if (me.visibleFiles === false) {
 			$("#" + me.id + "-inputEl-lists").hide();
 		}
+	},
+	getEditor:function() {
+		var me = this;
+		return me.$textarea;
 	}
 });
 
