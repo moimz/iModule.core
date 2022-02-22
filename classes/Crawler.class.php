@@ -22,7 +22,7 @@ class Crawler {
 	private $agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.117 Safari/537.36';
 	private $referer = null;
 	private $cookie = null;
-	private $timeout = 30;
+	private $timeout = 10;
 	
 	/**
 	 * HTTP_REFERER 를 설정한다.
