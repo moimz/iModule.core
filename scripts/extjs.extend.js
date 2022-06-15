@@ -656,11 +656,11 @@ Ext.define("Ext.moimz.window.Window",{override:"Ext.window.Window",onRender:func
 	
 	if (me.isInit !== true) {
 		me.center();
+		if (me.getY() + me.getHeight() > $(window).height()) {
+			me.setY(Math.max(25,$(window).height() - me.getHeight() - 25));
+		}
+		
 		me.isInit = true;
-	}
-	
-	if (me.getY() + me.getHeight() > $(window).height()) {
-		me.setY(Math.max(25,$(window).height() - me.getHeight() - 25));
 	}
 }});
 Ext.define("Ext.moimz.container.Container",{override:"Ext.container.Container",afterLayout:function(layout) {
